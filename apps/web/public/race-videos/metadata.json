@@ -1,0 +1,122 @@
+﻿[
+    {
+        "id":  "race-template-001",
+        "src":  "/race-videos/mobile/race-template-001.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "firstHorseCrossAt":  52.8,
+        "secondHorseCrossAt":  53.2,
+        "thirdHorseCrossAt":  53.7,
+        "resultShowAt":  54.1,
+        "closeUpStart":  54.5,
+        "closeUpEnd":  59,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "maskAreas":  [
+
+                      ],
+        "notes":  "Video limpio sin información externa. Ajustar tiempos reales según cada MP4."
+    },
+    {
+        "id":  "race-template-002",
+        "src":  "/race-videos/mobile/race-template-002.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "firstHorseCrossAt":  52.8,
+        "secondHorseCrossAt":  53.2,
+        "thirdHorseCrossAt":  53.7,
+        "resultShowAt":  54.1,
+        "closeUpStart":  54.5,
+        "closeUpEnd":  59,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "maskAreas":  [
+
+                      ],
+        "notes":  "Video limpio sin información externa. Ajustar tiempos reales según cada MP4."
+    },
+    {
+        "id":  "race-template-003",
+        "src":  "/race-videos/mobile/race-template-003.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "firstHorseCrossAt":  52.8,
+        "secondHorseCrossAt":  53.2,
+        "thirdHorseCrossAt":  53.7,
+        "resultShowAt":  54.1,
+        "closeUpStart":  54.5,
+        "closeUpEnd":  59,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "maskAreas":  [
+
+                      ],
+        "notes":  "Video limpio sin información externa. Ajustar tiempos reales según cada MP4."
+    },
+    {
+        "id":  "race-template-004",
+        "src":  "/race-videos/mobile/race-template-004.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "firstHorseCrossAt":  52.8,
+        "secondHorseCrossAt":  53.2,
+        "thirdHorseCrossAt":  53.7,
+        "resultShowAt":  54.1,
+        "closeUpStart":  54.5,
+        "closeUpEnd":  59,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "maskAreas":  [
+
+                      ],
+        "notes":  "Video limpio sin información externa. Ajustar tiempos reales según cada MP4."
+    },
+    {
+        "id":  "race-template-005",
+        "src":  "/race-videos/mobile/race-template-005.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "firstHorseCrossAt":  52.8,
+        "secondHorseCrossAt":  53.2,
+        "thirdHorseCrossAt":  53.7,
+        "resultShowAt":  54.1,
+        "closeUpStart":  54.5,
+        "closeUpEnd":  59,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "maskAreas":  [
+
+                      ],
+        "notes":  "Video limpio sin información externa. Ajustar tiempos reales según cada MP4."
+    }
+]

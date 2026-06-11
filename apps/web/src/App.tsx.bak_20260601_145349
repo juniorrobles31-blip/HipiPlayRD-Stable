@@ -1,0 +1,619 @@
+﻿import { useEffect, useMemo, useState } from 'react';
+import { Activity, BadgeDollarSign, Blocks, Clock3, Copy, Crown, Database, Dice5, Gift, History, LogOut, Radio, RefreshCcw, ShieldCheck, Sparkles, Trophy, Wifi, WifiOff } from 'lucide-react';
+import { api, logout, setToken, Wallet } from './api';
+import { clearLocalFirstDb, dbGetAll, LocalDerbyBet, LocalLedgerMovement, LocalWalletState, SyncQueueItem, WalletMode } from './localDb';
+import { deriveLocalRaceSeed, LocalRaceSeed, progressOf, racePhase, seconds } from './derbyEngine';
+import { MARKET_CONFIG, DerbyMarketExposure, addBetToExposure, buildResultOrderFromExposure, calculateLeastBetTop3, createEmptyExposure, getMarketStatus, simulatePublicBettingStep } from './marketEngine';
+import { getLocalWallet, initLocalWallet } from './localWallet';
+import { localDerbyHistory, placeLocalDerbyBet, resolvePendingLocalBets } from './localLedger';
+import { pendingSyncItems, syncPendingQueue } from './syncQueue';
+
+type User = { id: string; username: string };
+type Tab = 'games' | 'pool' | 'history' | 'audit';
+
+type RaceVisualStatus = 'running' | 'finished';
+
+type VisualRace = {
+  raceId: string;
+  raceCode: string;
+  startedAt: number;
+  durationMs: number;
+  resultOrder: number[];
+  selectedHorse: number;
+  amount: number;
+  status: RaceVisualStatus;
+};
+
+const RACE_VISUAL_DURATION_MS = 60_000;
+
+const money = (n: number) => new Intl.NumberFormat('es-DO', { style: 'currency', currency: 'DOP' }).format(n || 0);
+
+function Login({ onLogin }: { onLogin: (user: User, wallet: Wallet) => void }) {
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('admin123');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.login(username, password);
+      setToken(res.token);
+      onLogin(res.user, res.wallet);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesion');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return <div className="login-shell">
+    <div className="login-card glass">
+      <div className="brand-badge"><Sparkles size={22} /> Juega123 Local-First</div>
+      <h1>Derby Minute con fichas</h1>
+      <p>La wallet se usa para comprar fichas. Las apuestas se realizan con fichas locales y los movimientos se auditan con hashes blockchain-ready.</p>
+      <form onSubmit={submit} className="form-grid">
+        <label>Usuario<input value={username} onChange={e => setUsername(e.target.value)} /></label>
+        <label>Clave<input type="password" value={password} onChange={e => setPassword(e.target.value)} /></label>
+        {error && <div className="error-box">{error}</div>}
+        <button className="primary" disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
+      </form>
+      <small>Prueba local: admin / admin123</small>
+    </div>
+  </div>;
+}
+
+function WalletCards({ wallet, syncCount, online }: { wallet: LocalWalletState | null; syncCount: number; online: boolean }) {
+  return <section className="wallet-grid wallet-grid-plus local-wallet-grid">
+    <div className="metric-card wallet-identity-card">
+      <ShieldCheck />
+      <span>Wallet State ID local</span>
+      <strong>{wallet?.walletStateId || 'Inicializando...'}</strong>
+      <small>Nonce #{wallet?.nonce ?? 0} - base local</small>
+    </div>
+    <div className="metric-card"><BadgeDollarSign /><span>Wallet RD$</span><strong>{money(wallet?.realBalance || 0)}</strong></div>
+    <div className="metric-card"><Gift /><span>Fichas locales</span><strong>{money(wallet?.demoBalance || 0)}</strong></div>
+    <div className="metric-card"><Crown /><span>Bonos locales</span><strong>{money(wallet?.giftBalance || 0)}</strong></div>
+    <div className="metric-card"><Database /><span>Mov. pendiente sync</span><strong>{syncCount}</strong><small>{online ? 'Conectado' : 'Offline'}</small></div>
+    <div className="metric-card"><Activity /><span>Ultimo movimiento</span><strong>{wallet?.lastMovementId || 'Sin movimiento'}</strong><small>{wallet?.updatedAt ? new Date(wallet.updatedAt).toLocaleString() : 'Pendiente'}</small></div>
+  </section>;
+}
+
+function RaceTrack({
+  seed,
+  selectedHorse,
+  hasTicket,
+  now,
+  marketOrder,
+  visualRace,
+}: {
+  seed: LocalRaceSeed | null;
+  selectedHorse?: number;
+  hasTicket?: boolean;
+  now: number;
+  marketOrder?: number[];
+  visualRace?: VisualRace | null;
+}) {
+  const clockPhase = seed ? racePhase(seed, now) : 'betting';
+  const isVisualRace = Boolean(seed && visualRace && visualRace.raceId === seed.raceId);
+  const visualElapsed = isVisualRace && visualRace ? Math.max(0, now - visualRace.startedAt) : 0;
+  const visualProgress = isVisualRace && visualRace ? Math.min(1, visualElapsed / visualRace.durationMs) : 0;
+  const phase = isVisualRace && visualRace
+    ? visualRace.status === 'running'
+      ? 'locked'
+      : 'revealed'
+    : clockPhase;
+
+  const officialOrder = isVisualRace && visualRace?.resultOrder?.length
+    ? visualRace.resultOrder
+    : marketOrder || [];
+
+  const resultOrder = phase === 'revealed' && officialOrder.length ? officialOrder : [];
+  const top3 = resultOrder.slice(0, 3);
+  const progress = isVisualRace ? visualProgress : seed ? progressOf(seed, now) : 0;
+  const closeIn = seed ? seconds(new Date(seed.betClosesAt).getTime() - now) : 0;
+  const revealIn = isVisualRace && visualRace
+    ? Math.max(0, Math.ceil((visualRace.durationMs - visualElapsed) / 1000))
+    : seed
+      ? seconds(new Date(seed.revealsAt).getTime() - now)
+      : 0;
+
+  const phaseLabel = isVisualRace && phase === 'locked'
+    ? 'Carrera en vivo - simulacion real de 60 segundos'
+    : isVisualRace && phase === 'revealed'
+      ? 'Foto finish - resultado calculado por menor exposicion'
+      : phase === 'betting'
+        ? hasTicket
+          ? 'Boleto generado - esperando cierre del mercado'
+          : 'Apuestas abiertas - selecciona tu caballo'
+        : phase === 'locked'
+          ? 'Puertas cerradas - carrera en vivo'
+          : 'Foto finish - resultado oficial local calculado';
+
+  const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+  const smooth = (t: number) => t * t * (3 - 2 * t);
+
+  return <div className={`derby-stadium phase-${phase} local-first-race ${isVisualRace ? 'visual-race-active' : ''}`}>
+    <div className="stadium-lights">
+      <span className={phase === 'locked' ? 'light amber on' : 'light amber'}></span>
+      <span className={phase === 'betting' ? 'light green on' : 'light green'}></span>
+      <span className={phase === 'revealed' ? 'light gold on' : 'light gold'}></span>
+    </div>
+
+    <div className="race-progress-panel broadcast-panel">
+      <div>
+        <strong>{phaseLabel}</strong>
+        <small>{phase === 'revealed' ? 'Puedes apostar otra vez en la proxima carrera.' : phase === 'locked' ? `Llegada en ${revealIn}s` : `Cierre de apuestas en ${closeIn}s`}</small>
+      </div>
+      <div className="race-progress-ring" style={{ ['--p' as string]: `${progress * 100}%` }}>
+        <span>{phase === 'revealed' ? 'FIN' : phase === 'locked' ? revealIn : closeIn}</span>
+      </div>
+    </div>
+
+    <div className="race-scene realistic-race-scene">
+      <div className="grandstand crowd-line clean-grandstand">
+        <span>GRADAS</span>
+        <span>PUBLICO</span>
+        <span>TRANSMISION</span>
+        <span>META</span>
+      </div>
+      <div className="finish-line"><span>META</span></div>
+      <div className="starting-gate"><span>GATE</span></div>
+      <div className="race-track derby-track cinematic realistic-track">
+        {[1,2,3,4,5,6].map(h => {
+          const rank = officialOrder.indexOf(h) + 1;
+          const safeRank = rank > 0 ? rank : h;
+          const isTop = phase === 'revealed' && top3.includes(h);
+          const pulse = Math.sin((now / 280) + h) * 1.8;
+          const bettingX = 7 + h * 1.2 + pulse;
+          const oldLockedX = 18 + ((now / 1000 + h) % 1) * 35 + h * 2;
+          const finalTargets: Record<number, number> = { 1: 96, 2: 91, 3: 86, 4: 79, 5: 73, 6: 67 };
+          const target = finalTargets[safeRank] || 64;
+          const raceT = smooth(visualProgress);
+          const breathing = visualProgress < 0.97 ? Math.sin(now / 180 + h * 2.1) * 1.05 : 0;
+          const dirtSlip = visualProgress > 0.08 && visualProgress < 0.92 ? Math.cos(now / 360 + h) * 0.75 : 0;
+          const latePush = visualProgress > 0.72 ? (6 - safeRank) * (visualProgress - 0.72) * 2.2 : 0;
+          const visualX = clamp(5 + (target - 5) * raceT + breathing + dirtSlip + latePush, 5, target);
+          const finalX = phase === 'revealed' && officialOrder.length ? target : 12;
+          const x = isVisualRace
+            ? visualRace?.status === 'finished'
+              ? finalX
+              : visualX
+            : phase === 'revealed'
+              ? finalX
+              : phase === 'locked'
+                ? Math.min(82, oldLockedX)
+                : bettingX;
+
+          return <div key={h} className={`lane realistic-lane ${selectedHorse === h ? 'selected' : ''} ${isTop ? 'winner-lane' : ''}`}>
+            <span className="lane-number">#{h}</span>
+            <div className="lane-dirt"></div>
+            <div
+              className={`horse-runner realistic-horse horse-color-${h} ${phase === 'locked' ? 'is-running' : ''}`}
+              style={{
+                ['--x' as string]: `${x}%`,
+                ['--delay' as string]: `${h * 80}ms`
+              }}
+            >
+              <span className="horse-shadow"></span>
+
+              <div className="horse-model">
+                <div className="horse-tail"></div>
+                <div className="horse-body"></div>
+                <div className="horse-neck"></div>
+                <div className="horse-head"></div>
+                <div className="horse-ear"></div>
+                <div className="horse-mane"></div>
+
+                <div className="horse-leg leg-front-a"></div>
+                <div className="horse-leg leg-front-b"></div>
+                <div className="horse-leg leg-back-a"></div>
+                <div className="horse-leg leg-back-b"></div>
+
+                <div className="jockey-rider">
+                  <span>{h}</span>
+                </div>
+              </div>
+
+              {phase === 'locked' && <span className="race-dust dust-one"></span>}
+              {phase === 'locked' && <span className="race-dust dust-two"></span>}
+            </div>
+            {phase === 'revealed' && officialOrder.length > 0 && <em className={isTop ? 'top3' : ''}>{safeRank}o</em>}
+          </div>;
+        })}
+      </div>
+    </div>
+  </div>;
+}
+
+function DerbyLocalFirstPanel({ user, wallet, refreshLocal }: { user: User; wallet: LocalWalletState | null; refreshLocal: () => Promise<void> }) {
+  const [seed, setSeed] = useState<LocalRaceSeed | null>(null);
+  const [now, setNow] = useState(Date.now());
+  const [mode, setMode] = useState<WalletMode>('demo');
+  const [amount, setAmount] = useState(100);
+  const [horse, setHorse] = useState(1);
+  const [bets, setBets] = useState<LocalDerbyBet[]>([]);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [exposure, setExposure] = useState<DerbyMarketExposure>(() => createEmptyExposure('initial'));
+  const [marketMessage, setMarketMessage] = useState('');
+  const [visualRace, setVisualRace] = useState<VisualRace | null>(null);
+  const [resolvedVisualRaceId, setResolvedVisualRaceId] = useState('');
+
+  async function loadSeed() {
+    try {
+      const res = await api.currentSeed();
+      setSeed(res.seed);
+      setExposure(prev => prev.raceId === res.seed.raceId ? prev : createEmptyExposure(res.seed.raceId));
+    } catch {
+      const local = await deriveLocalRaceSeed();
+      setSeed(local);
+      setExposure(prev => prev.raceId === local.raceId ? prev : createEmptyExposure(local.raceId));
+    }
+  }
+
+  async function loadLocalBets() {
+    const all = await localDerbyHistory(user.id);
+    setBets(all);
+  }
+
+  async function applyVisualRaceResult(race: VisualRace) {
+    const resolved = await resolvePendingLocalBets(user.id, race.raceId, race.raceCode, race.resultOrder);
+    if (resolved.length) {
+      setMessage(`Resultado aplicado despues de la carrera visual. ${resolved[0].status === 'won' ? 'Ganaste Top 3.' : 'Fuera del Top 3.'}`);
+      await refreshLocal();
+      await syncNow();
+      await loadLocalBets();
+    }
+  }
+
+  async function resolveIfNeeded(_currentSeed: LocalRaceSeed) {
+    // La resolucion contable ahora se aplica cuando termina la carrera visual de 60 segundos.
+    return;
+  }
+  async function tick() {
+    const t = Date.now();
+    setNow(t);
+    const localSeed = await deriveLocalRaceSeed(t);
+    setSeed(prev => prev?.raceId === localSeed.raceId ? prev : localSeed);
+
+    setExposure(prev => {
+      const base = prev.raceId === localSeed.raceId ? prev : createEmptyExposure(localSeed.raceId);
+      const phaseNow = racePhase(localSeed, t);
+      return phaseNow === 'betting' ? simulatePublicBettingStep(base, t) : base;
+    });
+
+    await resolveIfNeeded(localSeed);
+    await loadLocalBets();
+  }
+
+  useEffect(() => {
+    loadSeed().then(loadLocalBets);
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [user.id]);
+
+  async function syncNow() {
+    setSyncing(true);
+    try {
+      await syncPendingQueue(20);
+    } finally {
+      setSyncing(false);
+      await refreshLocal();
+    }
+  }
+
+  async function bet() {
+    if (!seed) return;
+    setLoading(true);
+    setMessage('');
+    try {
+      const phase = racePhase(seed, Date.now());
+      const status = getMarketStatus(exposure);
+
+      if (phase !== 'betting') throw new Error('Apuestas cerradas para esta carrera. Espera la proxima.');
+      if (!status.canAcceptBet) throw new Error(`La calculadora cerro apuestas: ${status.reason}`);
+
+      const res = await placeLocalDerbyBet({ userId: user.id, raceId: seed.raceId, raceCode: seed.code, mode, horse, amount });
+
+      setExposure(prev => addBetToExposure(prev, horse, amount, user.id, 'local'));
+      setMarketMessage('Tu apuesta entro en la calculadora. El Top 3 se definira por los caballos menos apostados.');
+      setMessage(`Boleto generado localmente: ${res.bet.id}. Movimiento firmado: ${res.movement.movementId}.`);
+      await refreshLocal();
+      await loadLocalBets();
+      await syncNow();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Error generando boleto local');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const clockPhase = seed ? racePhase(seed, now) : 'betting';
+  const marketStatus = getMarketStatus(exposure);
+  const activeBet = seed ? bets.find(b => b.raceId === seed.raceId) : undefined;
+  const lastBet = bets[0];
+  const marketOrder = seed && marketStatus.canResolve
+    ? buildResultOrderFromExposure(exposure, seed.seed)
+    : [];
+
+  const visualOrder = visualRace && seed && visualRace.raceId === seed.raceId
+    ? visualRace.resultOrder
+    : [];
+
+  const phase = visualRace && seed && visualRace.raceId === seed.raceId
+    ? visualRace.status === 'running'
+      ? 'locked'
+      : 'revealed'
+    : clockPhase;
+
+  const resultOrder = visualRace?.status === 'finished' && visualOrder.length
+    ? visualOrder
+    : clockPhase === 'revealed' && marketOrder.length
+      ? marketOrder
+      : [];
+
+  const top3 = resultOrder.slice(0, 3);
+  const bettingOpen = clockPhase === 'betting' && !activeBet && marketStatus.canAcceptBet;
+  const raceButtonLabel = activeBet
+    ? visualRace?.status === 'running'
+      ? 'Carrera en vivo'
+      : 'Boleto generado'
+    : `Apostar local al #${horse}`;
+
+  useEffect(() => {
+    if (!seed || !activeBet) return;
+    if (visualRace?.raceId === seed.raceId) return;
+
+    const status = getMarketStatus(exposure);
+    const phaseNow = racePhase(seed, now);
+
+    if (phaseNow === 'betting') {
+      setMarketMessage(`Boleto generado. Esperando cierre de apuestas y mas participacion antes de iniciar la carrera.`);
+      return;
+    }
+
+    if (!status.canResolve) {
+      setMarketMessage(`Boleto generado. La calculadora espera mas apuestas: ${status.reason}`);
+      return;
+    }
+
+    const order = buildResultOrderFromExposure(exposure, seed.seed);
+    setVisualRace({
+      raceId: seed.raceId,
+      raceCode: seed.code,
+      startedAt: Date.now(),
+      durationMs: RACE_VISUAL_DURATION_MS,
+      resultOrder: order,
+      selectedHorse: activeBet.selectedHorse,
+      amount: activeBet.amount,
+      status: 'running',
+    });
+    setMarketMessage('Puertas cerradas. Carrera visual iniciada: duracion real de 60 segundos.');
+  }, [seed?.raceId, activeBet?.id, exposure.totalBets, exposure.totalVolume, now]);
+
+  useEffect(() => {
+    if (!visualRace || visualRace.status !== 'running') return;
+
+    const remaining = Math.max(0, visualRace.durationMs - (Date.now() - visualRace.startedAt));
+    const timer = window.setTimeout(() => {
+      setVisualRace(prev => prev && prev.raceId === visualRace.raceId
+        ? { ...prev, status: 'finished' }
+        : prev
+      );
+    }, remaining);
+
+    return () => window.clearTimeout(timer);
+  }, [visualRace?.raceId, visualRace?.status, visualRace?.startedAt]);
+
+  useEffect(() => {
+    if (!visualRace || visualRace.status !== 'finished') return;
+    if (resolvedVisualRaceId === visualRace.raceId) return;
+
+    setResolvedVisualRaceId(visualRace.raceId);
+    applyVisualRaceResult(visualRace).catch(err => {
+      setMessage(err instanceof Error ? err.message : 'Error aplicando resultado de la carrera visual');
+    });
+  }, [visualRace?.raceId, visualRace?.status, resolvedVisualRaceId]);
+
+  return <div className="play-card glass derby-card local-first-card">
+    <div className="play-hero derby-hero">
+      <div className="big-icon">DERBY</div>
+      <div>
+        <h2>Derby Minute Local-First</h2>
+        <p>La wallet sirve para comprar fichas. La carrera usa fichas locales, calcula el Top 3 por menor exposicion y registra movimientos auditables.</p>
+      </div>
+      <div className="derby-status"><span className={bettingOpen ? 'live-dot' : 'lock-dot'}></span>{phase === 'betting' ? 'Apuestas abiertas' : phase === 'locked' ? 'Carrera en vivo' : 'Resultado revelado'}</div>
+    </div>
+
+    <div className="derby-grid">
+      <div className="derby-info"><Clock3 size={17}/><span>Carrera</span><strong>{seed?.code || '...'}</strong></div>
+      <div className="derby-info"><ShieldCheck size={17}/><span>Seed commit</span><code>{seed?.seedCommit.slice(0, 18)}...</code></div>
+      <div className="derby-info"><Trophy size={17}/><span>Top 3</span><strong>{top3.length ? top3.join(' - ') : 'Pendiente'}</strong></div>
+      <div className="derby-info"><Database size={17}/><span>DB principal</span><strong>Dispositivo</strong></div>
+    </div>
+
+    <div className="market-calculator-panel">
+      <div className="market-header">
+        <div>
+          <strong>Calculadora de exposicion</strong>
+          <small>El sistema espera apuestas, aplica tope y selecciona como Top 3 los caballos menos apostados.</small>
+        </div>
+        <span className={marketStatus.canAcceptBet ? 'market-badge open' : 'market-badge closed'}>
+          {marketStatus.label}
+        </span>
+      </div>
+
+      <div className="market-limits">
+        <span>Apuestas: <strong>{exposure.totalBets}</strong> / {MARKET_CONFIG.maxBetsPerRace}</span>
+        <span>Volumen: <strong>{money(exposure.totalVolume)}</strong> / {money(MARKET_CONFIG.maxVolumePerRace)}</span>
+        <span>Minimo para cerrar: {MARKET_CONFIG.minBetsToResolve} apuestas o {money(MARKET_CONFIG.minVolumeToResolve)}</span>
+      </div>
+
+      <div className="horse-exposure-grid">
+        {[1,2,3,4,5,6].map(n => {
+          const isLeast = calculateLeastBetTop3(exposure).includes(n);
+          return <div key={n} className={isLeast ? 'horse-exposure least' : 'horse-exposure'}>
+            <span>#{n}</span>
+            <strong>{money(exposure.totals[n] || 0)}</strong>
+            <small>{exposure.counts[n] || 0} apuestas</small>
+          </div>;
+        })}
+      </div>
+
+      {(marketMessage || !marketStatus.canResolve) && <div className="market-note">
+        {marketMessage || `La calculadora todavia espera mas participacion: ${marketStatus.reason}`}
+      </div>}
+    </div>
+
+    <div className="mode-toggle">
+      <button className={mode === 'demo' ? 'active' : ''} onClick={() => setMode('demo')}>Demo</button>
+      <button className={mode === 'real' ? 'active' : ''} onClick={() => setMode('real')}>Real</button>
+    </div>
+
+    <div className="form-grid two">
+      <label>Monto<input type="number" min={1} value={amount} onChange={e => setAmount(Number(e.target.value))} disabled={!bettingOpen} /></label>
+      <label>Caballo<select value={horse} onChange={e => setHorse(Number(e.target.value))} disabled={!bettingOpen}>{[1,2,3,4,5,6].map(n => <option key={n} value={n}>Caballo #{n}</option>)}</select></label>
+    </div>
+
+    <div className="derby-countdown-board">
+      <div className="board-item active"><span>01</span><strong>Boleto</strong><small>{activeBet ? 'Generado' : bettingOpen ? 'Disponible' : 'Cerrado'}</small></div>
+      <div className="board-line"></div>
+      <div className={phase === 'locked' || phase === 'revealed' ? 'board-item active' : 'board-item'}><span>02</span><strong>Carrera</strong><small>{phase === 'locked' ? 'Corriendo' : phase === 'revealed' ? 'Terminada' : 'Pendiente'}</small></div>
+      <div className="board-line"></div>
+      <div className={phase === 'revealed' ? 'board-item active' : 'board-item'}><span>03</span><strong>Contabilidad</strong><small>{phase === 'revealed' ? 'Aplicada' : 'Pendiente'}</small></div>
+    </div>
+
+    <RaceTrack seed={seed} selectedHorse={activeBet?.selectedHorse || horse} hasTicket={Boolean(activeBet)} now={now} marketOrder={marketOrder} visualRace={visualRace} />
+
+    <button className="primary wide" onClick={bet} disabled={!bettingOpen || loading}>{loading ? 'Firmando...' : activeBet ? 'Boleto generado' : `Apostar local al #${horse}`}</button>
+    <div className="action-row">
+      <button className="secondary" onClick={loadSeed}><RefreshCcw size={16}/> Refrescar semilla</button>
+      <button className="secondary" onClick={syncNow} disabled={syncing}>{syncing ? 'Sincronizando...' : 'Sincronizar contabilidad'}</button>
+    </div>
+
+    {message && <div className="result-card neutral"><strong>{message}</strong></div>}
+    {activeBet && <div className={activeBet.status === 'pending' ? 'result-card neutral' : activeBet.status === 'won' ? 'result-card win' : 'result-card lose'}>
+      <strong>{activeBet.status === 'pending' ? 'Boleto activo' : activeBet.status === 'won' ? 'Ganaste Top 3' : 'Fuera del Top 3'}</strong>
+      <span>Caballo #{activeBet.selectedHorse} - {money(activeBet.amount)} - Pago {money(activeBet.payout)}</span>
+    </div>}
+
+    {resultOrder.length > 0 && <div className="derby-result"><strong>Resultado calculado en el dispositivo:</strong> {resultOrder.map((h, i) => <span key={h} className={i < 3 ? 'podium' : ''}>{i + 1}o: #{h}</span>)}</div>}
+    {lastBet && <small className="muted">Ultimo boleto: {lastBet.raceCode} - {lastBet.status} - {money(lastBet.profitLoss)}</small>}
+    <small className="muted">Balance local disponible: {mode === 'demo' ? money(wallet?.demoBalance || 0) : money(wallet?.realBalance || 0)}</small>
+  </div>;
+}
+
+function PoolPanel() {
+  const [pool, setPool] = useState<any>(null);
+  const [ref, setRef] = useState('');
+  const [token, setTokenState] = useState('');
+  const [purchaseAmount, setPurchaseAmount] = useState(500);
+
+  async function load() { setPool(await api.pool()); }
+  useEffect(() => { load().catch(() => null); const t = setInterval(() => load().catch(() => null), 15000); return () => clearInterval(t); }, []);
+
+  async function create() { const res = await api.createReferral(); setRef(res.referral.url); }
+  async function confirmPurchase() { await api.confirmPurchase(token, purchaseAmount); await load(); }
+
+  return <section className="pool-grid">
+    <div className="glass pool-card"><h2><Trophy /> Pool de Invitacion</h2><p>Este modulo sigue sincronizado con backend. La wallet del juego principal sigue siendo local-first.</p><div className="pool-money">{money(pool?.round?.poolAmount || 0)}</div><small>Ronda: {pool?.round?.code || '...'}</small></div>
+    <div className="glass pool-card"><h3><Copy /> Mi link</h3><button className="primary" onClick={create}>Generar link</button>{ref && <><input value={ref} readOnly /><button className="secondary" onClick={() => navigator.clipboard.writeText(ref)}>Copiar</button></>}</div>
+    <div className="glass pool-card"><h3>Simular compra referida</h3><input placeholder="Token" value={token} onChange={e => setTokenState(e.target.value)} /><input type="number" value={purchaseAmount} onChange={e => setPurchaseAmount(Number(e.target.value))} /><button className="primary" onClick={confirmPurchase}>Confirmar</button></div>
+    <div className="glass pool-card leaderboard"><h3>Ranking</h3>{(pool?.leaderboard || []).map((row: any, i: number) => <div className="leader-row" key={row.userId}><span>#{i + 1}</span><strong>{row.userId}</strong><em>{row.scoreCount} compras</em></div>)}</div>
+  </section>;
+}
+
+function HistoryPanel({ userId }: { userId: string }) {
+  const [bets, setBets] = useState<LocalDerbyBet[]>([]);
+  const [movements, setMovements] = useState<LocalLedgerMovement[]>([]);
+  async function load() {
+    setBets(await localDerbyHistory(userId));
+    const all = await dbGetAll<LocalLedgerMovement>('ledger_movements');
+    setMovements(all.filter(m => m.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+  }
+  useEffect(() => { load(); const t = setInterval(load, 3000); return () => clearInterval(t); }, [userId]);
+  return <section className="glass history-card"><h2><History /> Historial local del dispositivo</h2>
+    <h3>Boletos Derby</h3>{bets.length === 0 ? <p>No hay boletos locales.</p> : bets.map(b => <div className="history-row" key={b.id}><strong>{b.raceCode}</strong><span>{b.mode}</span><span>Caballo #{b.selectedHorse}</span><span>{money(b.amount)}</span><span className={b.profitLoss >= 0 ? 'pos' : 'neg'}>{b.status} - {money(b.profitLoss)}</span><small>{new Date(b.createdAt).toLocaleString()}</small></div>)}
+    <h3>Ledger local</h3>{movements.map(m => <div className="history-row" key={m.movementId}><strong>{m.type}</strong><span>{m.mode}</span><span>-{money(m.amountSpent)} / +{money(m.amountAdded)}</span><span>{m.syncStatus}</span><small>{m.movementId}</small></div>)}
+  </section>;
+}
+
+function AuditPanel() {
+  const [queue, setQueue] = useState<SyncQueueItem[]>([]);
+  const [audits, setAudits] = useState<any[]>([]);
+  async function load() {
+    setQueue(await dbGetAll<SyncQueueItem>('sync_queue'));
+    api.audits().then(r => setAudits(r.audits || [])).catch(() => setAudits([]));
+  }
+  useEffect(() => { load(); const t = setInterval(load, 3000); return () => clearInterval(t); }, []);
+  return <section className="glass history-card"><h2><Blocks /> Auditoria local + blockchain-ready</h2>
+    <h3>Cola local IndexedDB</h3>{queue.length === 0 ? <p>No hay movimientos en cola.</p> : queue.map(q => <div className="audit-row" key={q.id}><strong>{q.payload.type}</strong><code>{q.payload.payloadHash}</code><span>{q.status}</span></div>)}
+    <h3>Auditoria recibida por backend</h3>{audits.length === 0 ? <p>No hay hashes pendientes en backend.</p> : audits.map(a => <div className="audit-row" key={a.id}><strong>{a.eventType}</strong><code>{a.chainHash}</code><span>{a.blockchainStatus}</span></div>)}
+  </section>;
+}
+
+export function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [serverWallet, setServerWallet] = useState<Wallet | null>(null);
+  const [localWallet, setLocalWallet] = useState<LocalWalletState | null>(null);
+  const [syncCount, setSyncCount] = useState(0);
+  const [online, setOnline] = useState(navigator.onLine);
+  const [tab, setTab] = useState<Tab>('games');
+  const [loading, setLoading] = useState(true);
+
+  async function refreshLocal(userId = user?.id) {
+    if (!userId) return;
+    const wallet = await getLocalWallet(userId);
+    setLocalWallet(wallet);
+    setSyncCount((await pendingSyncItems()).length);
+  }
+
+  async function bootstrap(u: User, w: Wallet) {
+    setUser(u); setServerWallet(w);
+    const local = await initLocalWallet(u.id, { demoBalance: w.demoBalance, realBalance: w.realBalance, giftLocked: w.giftLocked });
+    setLocalWallet(local);
+    setSyncCount((await pendingSyncItems()).length);
+  }
+
+  useEffect(() => {
+    const on = () => setOnline(true); const off = () => setOnline(false);
+    addEventListener('online', on); addEventListener('offline', off);
+    api.me().then(res => bootstrap(res.user, res.wallet)).catch(() => null).finally(() => setLoading(false));
+    return () => { removeEventListener('online', on); removeEventListener('offline', off); };
+  }, []);
+
+  const refToken = useMemo(() => new URLSearchParams(location.search).get('ref'), []);
+
+  if (loading) return <div className="loading"><Radio className="spin" /> Cargando wallet local...</div>;
+  if (!user) return <Login onLogin={(u, w) => { bootstrap(u, w); }} />;
+
+  return <div className="app-shell local-first-shell">
+    <header className="topbar glass">
+      <div className="brand"><span>DERBY</span><div><strong>Juega123 Local-First</strong><small>DB local + sync blockchain-ready</small></div></div>
+      <nav>
+        <button className={tab === 'games' ? 'active' : ''} onClick={() => setTab('games')}><Dice5 size={17}/> Derby</button>
+        <button className={tab === 'pool' ? 'active' : ''} onClick={() => setTab('pool')}><Trophy size={17}/> Pool</button>
+        <button className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}><History size={17}/> Historial</button>
+        <button className={tab === 'audit' ? 'active' : ''} onClick={() => setTab('audit')}><Blocks size={17}/> Auditoria</button>
+      </nav>
+      <button className="ghost" onClick={() => { logout(); location.reload(); }}><LogOut size={18}/> Salir</button>
+    </header>
+
+    {refToken && <div className="ref-banner glass">Entraste con token de referido: <strong>{refToken}</strong>.</div>}
+    <div className="local-first-banner glass">{online ? <Wifi size={18}/> : <WifiOff size={18}/>} Base de datos principal: <strong>IndexedDB en este telefono</strong>. Hacia afuera solo se envian movimientos firmados.</div>
+
+    <main>
+      <WalletCards wallet={localWallet} syncCount={syncCount} online={online} />
+      {tab === 'games' && <DerbyLocalFirstPanel user={user} wallet={localWallet} refreshLocal={() => refreshLocal(user.id)} />}
+      {tab === 'pool' && <PoolPanel />}
+      {tab === 'history' && <HistoryPanel userId={user.id} />}
+      {tab === 'audit' && <AuditPanel />}
+      <div className="danger-zone glass"><small>Inicial del servidor: Real {money(serverWallet?.realBalance || 0)} - Demo {money(serverWallet?.demoBalance || 0)}</small><button className="danger" onClick={async () => { if (confirm('Borrar DB local de este navegador?')) { await clearLocalFirstDb(); location.reload(); } }}>Reset DB local</button></div>
+    </main>
+  </div>;
+}
+

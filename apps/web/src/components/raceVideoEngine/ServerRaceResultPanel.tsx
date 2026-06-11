@@ -1,0 +1,119 @@
+import './raceVideoEngine.css';
+import type { ServerPlayerResult } from '../../hipiplayServerApi';
+
+type ServerWinner = {
+  position: number;
+  horseId: number;
+  name?: string;
+  color?: string;
+  totalAmount?: number;
+  totalBets?: number;
+};
+
+type ServerRaceResultPanelProps = {
+  winners: ServerWinner[];
+  selectedHorse?: number;
+  betAmount?: number;
+  secondsLeft: number;
+  serverPlayerResult?: ServerPlayerResult | null;
+};
+
+function coins(value: number) {
+  return new Intl.NumberFormat('es-DO', {
+    maximumFractionDigits: 0
+  }).format(Math.max(0, Math.floor(Number(value || 0))));
+}
+
+export function ServerRaceResultPanel({
+  winners,
+  selectedHorse,
+  betAmount = 0,
+  secondsLeft,
+  serverPlayerResult
+}: ServerRaceResultPanelProps) {
+  const top3 = [...(winners || [])]
+    .sort((a, b) => a.position - b.position)
+    .map((winner) => winner.horseId)
+    .slice(0, 3);
+
+  const hasLocalTicket =
+    typeof selectedHorse === 'number' &&
+    selectedHorse > 0 &&
+    Number(betAmount || 0) > 0;
+
+  const settlements = serverPlayerResult?.settlements || [];
+
+  const hasServerTicket =
+    Boolean(serverPlayerResult?.available) &&
+    settlements.length > 0 &&
+    Number(serverPlayerResult?.totalBetAmount || 0) > 0;
+
+  const waitingForServerResult = hasLocalTicket && !serverPlayerResult;
+  const won = Boolean(hasServerTicket && serverPlayerResult?.won);
+  const payout = Number(serverPlayerResult?.totalPayout || 0);
+  const resultClass = !hasServerTicket ? 'no-ticket' : won ? 'win' : 'loss';
+
+  return (
+    <section className="server-results-fullscreen">
+      <img src="/race-images/result-background.jpg" alt="" className="server-results-bg-img" />
+
+      <div className="result-panel-compact server-results-panel">
+        <span className="result-kicker">RESULTADO OFICIAL</span>
+        <h2>Top 3</h2>
+
+        {top3.length >= 3 ? (
+          <div className="result-top3-grid">
+            <div>
+              <small>1.º</small>
+              <strong>#{top3[0]}</strong>
+            </div>
+
+            <div>
+              <small>2.º</small>
+              <strong>#{top3[1]}</strong>
+            </div>
+
+            <div>
+              <small>3.º</small>
+              <strong>#{top3[2]}</strong>
+            </div>
+          </div>
+        ) : (
+          <div className="server-result-waiting">
+            Esperando resultado oficial del servidor...
+          </div>
+        )}
+
+        <div className={'result-coins-box ' + resultClass}>
+          <small>Resultado de monedas</small>
+
+          {waitingForServerResult ? (
+            <>
+              <strong>...</strong>
+              <span>Consultando resultado económico...</span>
+            </>
+          ) : !hasServerTicket ? (
+            <>
+              <strong>0</strong>
+              <span>No generaste boleto en esta carrera.</span>
+            </>
+          ) : won ? (
+            <>
+              <strong>+{coins(payout)}</strong>
+              <span>Ganaste. Tus monedas fueron actualizadas.</span>
+            </>
+          ) : (
+            <>
+              <strong>0</strong>
+              <span>Siga intentando.</span>
+            </>
+          )}
+        </div>
+
+        <div className="server-results-countdown">
+          Nueva ronda en {secondsLeft}s
+        </div>
+      </div>
+    </section>
+  );
+}

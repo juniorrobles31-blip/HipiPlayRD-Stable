@@ -1,0 +1,1381 @@
+﻿.race-video-engine {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #050b08;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+  color: white;
+}
+
+.race-video-engine.loading,
+.race-video-engine.error {
+  padding: 28px;
+}
+
+.race-video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(90deg, rgba(5, 46, 22, 0.95), rgba(12, 18, 12, 0.95));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.race-video-header span {
+  display: block;
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.race-video-header strong {
+  font-size: 16px;
+}
+
+.race-video-status {
+  background: #facc15;
+  color: #052e16;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.race-video-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: black;
+  overflow: hidden;
+}
+
+.race-video-player {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  background: black;
+}
+
+.race-video-overlay {
+  position: absolute;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 9px 12px;
+}
+
+.race-video-overlay span {
+  display: block;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.race-video-overlay strong {
+  display: block;
+  color: #fff;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.race-video-overlay.top-left {
+  left: 14px;
+  top: 14px;
+}
+
+.race-video-overlay.top-right {
+  right: 14px;
+  top: 14px;
+  text-align: right;
+}
+
+.race-video-start-panel,
+.race-video-result-panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 10;
+  width: min(88%, 440px);
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(250, 204, 21, 0.18), transparent 35%),
+    rgba(3, 10, 6, 0.88);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 24px;
+  padding: 22px;
+  text-align: center;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.5);
+}
+
+.race-video-start-panel h2,
+.race-video-result-panel h2 {
+  margin: 0 0 8px;
+  font-size: 26px;
+}
+
+.race-video-start-panel p {
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.45;
+  margin: 0 0 18px;
+}
+
+.race-video-start-panel button,
+.race-video-result-panel button {
+  border: 0;
+  border-radius: 16px;
+  padding: 13px 18px;
+  background: #facc15;
+  color: #052e16;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.race-video-live-badge {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(127, 29, 29, 0.88);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 9px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.race-video-live-badge span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #ef4444;
+  box-shadow: 0 0 16px #ef4444;
+  animation: raceLivePulse 1s infinite ease-in-out;
+}
+
+.race-video-closeup-label {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 6;
+  background: rgba(250, 204, 21, 0.94);
+  color: #052e16;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.race-video-result-panel > span {
+  display: inline-block;
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  margin-bottom: 6px;
+}
+
+.race-video-podium {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.race-video-podium div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px 14px;
+  border-radius: 16px;
+}
+
+.race-video-podium small {
+  color: rgba(255, 255, 255, 0.68);
+  font-weight: 700;
+}
+
+.race-video-podium strong {
+  color: #facc15;
+  font-size: 18px;
+}
+
+.race-video-footer {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr auto;
+  gap: 10px;
+  padding: 13px 16px;
+  background: rgba(0, 0, 0, 0.42);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.race-video-footer span {
+  display: block;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 11px;
+}
+
+.race-video-footer strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  word-break: break-word;
+}
+
+@keyframes raceLivePulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@media (max-width: 768px) {
+  .race-video-engine {
+    border-radius: 22px;
+  }
+
+  .race-video-header {
+    align-items: flex-start;
+  }
+
+  .race-video-stage {
+    aspect-ratio: 16 / 9;
+  }
+
+  .race-video-player {
+    object-fit: cover;
+  }
+
+  .race-video-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .race-video-start-panel,
+  .race-video-result-panel {
+    width: min(90%, 360px);
+    padding: 18px;
+  }
+
+  .race-video-start-panel h2,
+  .race-video-result-panel h2 {
+    font-size: 22px;
+  }
+}
+
+/* FASE 4.5 - Mascaras sobre video */
+.race-video-mask {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.race-video-mask.dark {
+  background: rgba(0, 0, 0, 0.88);
+}
+
+.race-video-mask.brand {
+  background:
+    linear-gradient(90deg, rgba(5, 46, 22, 0.96), rgba(12, 18, 12, 0.92));
+  border-bottom: 1px solid rgba(250, 204, 21, 0.32);
+}
+
+.race-video-mask.blur {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.race-video-mask.with-blur {
+  backdrop-filter: blur(12px);
+}
+
+.race-video-mask span {
+  color: #facc15;
+  font-size: clamp(11px, 2vw, 17px);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.race-video-announced-result {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  z-index: 12;
+  transform: translateX(-50%);
+  min-width: min(92%, 520px);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(250, 204, 21, 0.24), transparent 32%),
+    rgba(3, 10, 6, 0.9);
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  border-radius: 20px;
+  padding: 14px 18px;
+  text-align: center;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+}
+
+.race-video-announced-result span {
+  display: block;
+  color: #facc15;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.race-video-announced-result strong {
+  display: block;
+  color: #fff;
+  font-size: clamp(15px, 3vw, 24px);
+  font-weight: 900;
+}
+
+@media (max-width: 768px) {
+  .race-video-mask span {
+    font-size: 11px;
+  }
+
+  .race-video-announced-result {
+    bottom: 12px;
+    padding: 12px;
+  }
+}
+
+
+/* =========================================================
+   HIPIPLAY_MOBILE_YOUTUBE_VIDEO_SIZE
+   Video tipo YouTube en móvil vertical
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .race-video-engine {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 18px !important;
+  }
+
+  .race-video-stage {
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: 260px !important;
+    background: #000 !important;
+  }
+
+  .race-video-player {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .race-video-start-panel,
+  .race-video-result-panel {
+    width: min(88%, 340px) !important;
+    max-height: 82% !important;
+    overflow-y: auto !important;
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .race-video-start-panel h2,
+  .race-video-result-panel h2 {
+    font-size: 20px !important;
+  }
+
+  .race-video-overlay {
+    padding: 6px 8px !important;
+    border-radius: 10px !important;
+  }
+
+  .race-video-overlay span {
+    font-size: 9px !important;
+  }
+
+  .race-video-overlay strong {
+    font-size: 11px !important;
+  }
+
+  .race-video-live-badge,
+  .race-video-closeup-label {
+    padding: 6px 9px !important;
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .race-video-stage {
+    max-height: 235px !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .race-video-stage {
+    max-height: 220px !important;
+  }
+}
+
+
+/* =========================================================
+   HIPIPLAY_HIDE_REPLAY_RESULT_BUTTON
+   Oculta botón "Reproducir de nuevo" en resultados
+   ========================================================= */
+
+.race-video-result-panel button {
+  display: none !important;
+}
+
+
+/* =========================================================
+   HIPIPLAY_NO_VIDEO_RESULT_RACE
+   Carrera sin video: barra 20s + llegada GIF 5s + resultado
+   ========================================================= */
+
+.race-result-engine .race-result-stage {
+  position: relative;
+  min-height: 390px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(250, 204, 21, 0.12), transparent 34%),
+    linear-gradient(180deg, #06140d 0%, #0a1a12 55%, #3f2a18 100%);
+}
+
+.race-progress-panel {
+  position: relative;
+  z-index: 3;
+  padding: 24px;
+  text-align: center;
+}
+
+.race-progress-panel span {
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.race-progress-panel h2 {
+  margin: 8px 0;
+  color: #fff;
+  font-size: clamp(24px, 4vw, 38px);
+}
+
+.race-progress-panel p {
+  max-width: 620px;
+  margin: 0 auto 18px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.45;
+}
+
+.race-progress-panel > strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  min-width: 72px;
+  height: 42px;
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.95);
+  color: #052e16;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.race-progress-bar {
+  width: min(100%, 720px);
+  height: 16px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.race-progress-bar div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22c55e, #facc15);
+  transition: width 0.2s linear;
+}
+
+.finish-gif-stage {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 24px;
+  height: 190px;
+  z-index: 4;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 48px),
+    linear-gradient(180deg, rgba(123, 78, 37, .95), rgba(67, 39, 20, .98));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.finish-gif-stage::before {
+  content: "";
+  position: absolute;
+  inset: 18px 0 auto 0;
+  height: 4px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 56px rgba(255,255,255,.18), 0 112px rgba(255,255,255,.18);
+}
+
+.finish-meta-line {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  right: 9%;
+  width: 28px;
+  z-index: 6;
+  background:
+    repeating-linear-gradient(0deg, #fff 0 12px, #111827 12px 24px);
+  border: 2px solid rgba(255,255,255,.75);
+}
+
+.finish-meta-line span {
+  position: absolute;
+  top: -5px;
+  left: -46px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #facc15;
+  color: #052e16;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.finish-lane {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 54px;
+}
+
+.finish-runner {
+  position: absolute;
+  top: 0;
+  width: 120px;
+  transition: left 0.18s linear;
+  transform: translateX(-50%);
+}
+
+.finish-runner img {
+  width: 112px;
+  display: block;
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,.45));
+}
+
+.finish-runner-number {
+  position: absolute;
+  top: -10px;
+  left: 42px;
+  z-index: 4;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  border: 2px solid #fff;
+}
+
+.finish-runner small {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  z-index: 4;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.race-result-final-panel {
+  width: min(92%, 480px);
+}
+
+.race-result-coins-message {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.race-result-coins-message.win {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.race-result-coins-message.loss {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.race-result-coins-message strong {
+  display: block;
+  color: rgba(255,255,255,.7);
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.race-result-coins-message span {
+  display: block;
+  color: #facc15;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.race-result-coins-message small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.68);
+}
+
+.race-result-footer {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .race-result-engine .race-result-stage {
+    min-height: 360px;
+  }
+
+  .race-progress-panel {
+    padding: 18px;
+  }
+
+  .finish-gif-stage {
+    left: 10px;
+    right: 10px;
+    bottom: 16px;
+    height: 170px;
+  }
+
+  .finish-runner {
+    width: 96px;
+  }
+
+  .finish-runner img {
+    width: 92px;
+  }
+
+  .race-result-footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+   HIPIPLAY_CLIENTE_COMPACT_NO_VIDEO_PATCH
+   Apuestas con 6 caballos + carrera 20s + final 5s + resultado compacto
+   ========================================================= */
+
+.betting-panel-compact {
+  padding: 16px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(250, 204, 21, 0.11), transparent 35%),
+    linear-gradient(180deg, rgba(7,22,15,.96), rgba(8,30,19,.98));
+  border: 1px solid rgba(250, 204, 21, 0.18);
+}
+
+.betting-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.betting-kicker {
+  display: block;
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  margin-bottom: 4px;
+}
+
+.betting-panel-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(22px, 2vw, 34px);
+}
+
+.betting-panel-header small {
+  color: rgba(255,255,255,.58);
+  font-weight: 700;
+}
+
+.betting-time-pill {
+  min-width: 70px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(250, 204, 21, .14);
+  border: 1px solid rgba(250, 204, 21, .35);
+  color: #facc15;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.betting-horses-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.betting-horse-card {
+  position: relative;
+  min-height: 120px;
+  border-radius: 18px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(18,30,24,.95), rgba(10,19,15,.98));
+  border: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.betting-horse-card.selected {
+  border-color: rgba(250, 204, 21, .7);
+  box-shadow: 0 0 0 1px rgba(250, 204, 21, .25), 0 14px 40px rgba(250, 204, 21, .08);
+}
+
+.betting-horse-number {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  min-width: 38px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  border: 2px solid rgba(255,255,255,.85);
+}
+
+.betting-horse-image {
+  width: 90px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,.35));
+}
+
+.betting-horse-label {
+  margin-top: 8px;
+  color: rgba(255,255,255,.9);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.race-result-engine .race-result-stage {
+  position: relative;
+  min-height: 360px;
+  padding: 14px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(250, 204, 21, 0.12), transparent 34%),
+    linear-gradient(180deg, #06140d 0%, #0a1a12 55%, #3f2a18 100%);
+}
+
+.race-progress-simple {
+  padding: 18px 20px;
+  text-align: center;
+}
+
+.race-mini-kicker {
+  display: inline-block;
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  margin-bottom: 8px;
+}
+
+.race-progress-simple h2 {
+  margin: 0 0 14px;
+  color: #fff;
+  font-size: clamp(24px, 2.4vw, 36px);
+}
+
+.race-progress-bar-simple {
+  width: min(100%, 560px);
+  height: 14px;
+  margin: 0 auto 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.race-progress-bar-simple > div {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #facc15);
+  transition: width .18s linear;
+}
+
+.race-progress-simple strong {
+  color: #facc15;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.finish-preview-compact {
+  position: relative;
+  height: 210px;
+  margin-top: 12px;
+  border-radius: 20px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 48px),
+    linear-gradient(180deg, #7b4e25 0%, #51301a 100%);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.finish-preview-compact::before {
+  content: "";
+  position: absolute;
+  inset: 20px 0 auto 0;
+  height: 3px;
+  background: rgba(255,255,255,.7);
+  box-shadow: 0 62px rgba(255,255,255,.16), 0 124px rgba(255,255,255,.16);
+}
+
+.finish-line-marker {
+  position: absolute;
+  top: 12px;
+  right: 8%;
+  bottom: 12px;
+  width: 26px;
+  background: repeating-linear-gradient(0deg, #fff 0 10px, #111827 10px 20px);
+  border: 2px solid rgba(255,255,255,.8);
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 6px;
+  z-index: 6;
+}
+
+.finish-preview-lane {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 54px;
+}
+
+.finish-preview-runner {
+  position: absolute;
+  transform: translateX(-50%);
+  width: 120px;
+  transition: left .18s linear;
+}
+
+.finish-preview-runner img {
+  width: 105px;
+  display: block;
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,.4));
+}
+
+.finish-preview-number {
+  position: absolute;
+  top: -10px;
+  left: 36px;
+  min-width: 34px;
+  height: 26px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  border: 2px solid #fff;
+  z-index: 3;
+}
+
+.result-panel-compact {
+  width: min(100%, 440px);
+  margin: 0 auto;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(7,18,14,.95);
+  border: 1px solid rgba(255,255,255,.08);
+  text-align: center;
+}
+
+.result-kicker {
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.result-panel-compact h2 {
+  margin: 5px 0 10px;
+  color: #fff;
+  font-size: 26px;
+}
+
+.result-top3-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.result-top3-grid div {
+  border-radius: 14px;
+  padding: 9px;
+  background: rgba(255,255,255,.06);
+}
+
+.result-top3-grid small {
+  display: block;
+  color: rgba(255,255,255,.65);
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.result-top3-grid strong {
+  color: #fff;
+  font-size: 20px;
+}
+
+.result-coins-box {
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.result-coins-box.win {
+  background: rgba(34,197,94,.12);
+  border: 1px solid rgba(34,197,94,.35);
+}
+
+.result-coins-box.loss {
+  background: rgba(239,68,68,.10);
+  border: 1px solid rgba(239,68,68,.28);
+}
+
+.result-coins-box small {
+  display: block;
+  color: rgba(255,255,255,.72);
+  font-size: 12px;
+}
+
+.result-coins-box strong {
+  display: block;
+  color: #facc15;
+  font-size: 24px;
+  margin: 3px 0;
+}
+
+.result-coins-box span {
+  display: block;
+  color: rgba(255,255,255,.8);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.race-result-footer {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .betting-panel-compact {
+    padding: 12px;
+  }
+
+  .betting-panel-header {
+    margin-bottom: 10px;
+  }
+
+  .betting-horses-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .betting-horse-card {
+    min-height: 98px;
+    padding: 9px;
+  }
+
+  .betting-horse-image {
+    width: 72px;
+  }
+
+  .betting-horse-label {
+    font-size: 12px;
+  }
+
+  .race-result-engine .race-result-stage {
+    min-height: 330px;
+    padding: 10px;
+  }
+
+  .finish-preview-compact {
+    height: 180px;
+  }
+
+  .finish-preview-runner {
+    width: 98px;
+  }
+
+  .finish-preview-runner img {
+    width: 88px;
+  }
+
+  .result-panel-compact {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .result-panel-compact h2 {
+    font-size: 22px;
+  }
+
+  .race-result-footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+   HIPIPLAY_APUESTAS_SOLO_TIEMPO_LOGO_CARRERA
+   Apuestas: solo tiempo / Carrera: logo sin contador
+   ========================================================= */
+
+.betting-time-only-panel {
+  border-radius: 24px;
+  padding: 20px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(250, 204, 21, 0.10), transparent 32%),
+    linear-gradient(180deg, rgba(6, 22, 15, 0.98), rgba(7, 28, 18, 0.98));
+  border: 1px solid rgba(132, 204, 22, 0.20);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.betting-time-only-label {
+  color: #facc15;
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.betting-time-only-box {
+  min-width: 116px;
+  border-radius: 20px;
+  padding: 12px 16px;
+  text-align: center;
+  background: rgba(250, 204, 21, 0.10);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+}
+
+.betting-time-only-box span {
+  display: block;
+  color: rgba(255,255,255,.65);
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.betting-time-only-box strong {
+  display: block;
+  color: #facc15;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.race-progress-logo-only {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.race-progress-main-logo {
+  width: min(220px, 52vw);
+  height: auto;
+  display: block;
+  margin-bottom: 18px;
+  filter:
+    drop-shadow(0 16px 22px rgba(0,0,0,.45))
+    drop-shadow(0 0 24px rgba(250,204,21,.12));
+}
+
+.race-progress-logo-only h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(28px, 5vw, 46px);
+  font-weight: 900;
+  text-align: center;
+}
+
+.race-progress-logo-only .race-mini-kicker,
+.race-progress-logo-only .race-progress-bar-simple,
+.race-progress-logo-only strong {
+  display: none !important;
+}
+
+.race-result-footer {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .betting-time-only-panel {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .betting-time-only-label {
+    font-size: 18px;
+  }
+
+  .betting-time-only-box {
+    min-width: 92px;
+    padding: 10px 12px;
+  }
+
+  .betting-time-only-box strong {
+    font-size: 26px;
+  }
+
+  .race-progress-logo-only {
+    min-height: 240px;
+  }
+
+  .race-progress-main-logo {
+    width: min(180px, 56vw);
+  }
+
+  .race-progress-logo-only h2 {
+    font-size: 30px;
+  }
+}
+
+
+/* =========================================================
+   HIPIPLAY_APUESTAS_ABIERTAS_SOLO_TIEMPO_FINAL
+   Pantalla de espera: solo apuestas abiertas + tiempo
+   ========================================================= */
+
+.betting-time-only-panel {
+  border-radius: 24px;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(250, 204, 21, 0.10), transparent 32%),
+    linear-gradient(180deg, rgba(6, 22, 15, 0.98), rgba(7, 28, 18, 0.98));
+  border: 1px solid rgba(132, 204, 22, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 120px;
+}
+
+.betting-time-only-title {
+  color: #facc15;
+  font-size: clamp(22px, 5vw, 36px);
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.betting-time-only-counter {
+  min-width: 120px;
+  border-radius: 20px;
+  padding: 12px 16px;
+  text-align: center;
+  background: rgba(250, 204, 21, 0.10);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+}
+
+.betting-time-only-counter span {
+  display: block;
+  color: rgba(255,255,255,.65);
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.betting-time-only-counter strong {
+  display: block;
+  color: #facc15;
+  font-size: 32px;
+  font-weight: 900;
+}
+
+/* Seguridad: si queda alguna versión vieja cacheada, ocultamos los caballos de esa pantalla */
+.betting-panel-compact .betting-horses-grid,
+.betting-preview-panel .betting-preview-grid,
+.betting-preview-grid,
+.betting-horses-grid {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .betting-time-only-panel {
+    min-height: 105px;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .betting-time-only-title {
+    font-size: 20px;
+  }
+
+  .betting-time-only-counter {
+    min-width: 92px;
+    padding: 10px 12px;
+  }
+
+  .betting-time-only-counter strong {
+    font-size: 26px;
+  }
+}
+
+
+/* =========================================================
+   HIPIPLAY_FULLSCREEN_GIF_15S_RACE
+   Carrera 15s fullscreen con GIF + resultado
+   ========================================================= */
+
+.race-gif-fullscreen-engine {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #020807;
+  color: #fff;
+  overflow: hidden;
+}
+
+.race-gif-running-screen,
+.race-gif-result-screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(250, 204, 21, 0.08), transparent 34%),
+    #020807;
+}
+
+.race-gif-running-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.race-gif-running-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.08) 40%, rgba(0,0,0,.45)),
+    radial-gradient(circle at center, transparent 40%, rgba(0,0,0,.28));
+  pointer-events: none;
+}
+
+.race-gif-running-overlay {
+  position: absolute;
+  left: 50%;
+  top: 48px;
+  z-index: 2;
+  transform: translateX(-50%);
+  width: min(92%, 560px);
+  text-align: center;
+  padding: 16px 20px;
+  border-radius: 24px;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(250, 204, 21, 0.22);
+  backdrop-filter: blur(10px);
+}
+
+.race-gif-running-overlay span {
+  display: block;
+  color: #facc15;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .16em;
+  margin-bottom: 6px;
+}
+
+.race-gif-running-overlay h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(32px, 6vw, 64px);
+  font-weight: 900;
+  text-shadow: 0 10px 30px rgba(0,0,0,.55);
+}
+
+.race-gif-result-screen {
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.race-gif-result-panel {
+  width: min(92%, 460px) !important;
+  max-height: calc(100dvh - 36px);
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,.5);
+}
+
+@media (max-width: 768px) {
+  .race-gif-running-overlay {
+    top: 36px;
+    padding: 14px 16px;
+    border-radius: 20px;
+  }
+
+  .race-gif-running-overlay h2 {
+    font-size: 36px;
+  }
+
+  .race-gif-result-panel {
+    width: min(94%, 390px) !important;
+  }
+}
+

@@ -1,0 +1,336 @@
+﻿.cinematic-race-shell {
+  width: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.08), transparent 28%),
+    linear-gradient(180deg, #0c1723 0%, #07140f 100%);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 24px 70px rgba(0,0,0,.38);
+  color: #fff;
+}
+
+.cinematic-race-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(0,0,0,.28);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.cinematic-race-topbar span {
+  display: block;
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.cinematic-race-topbar strong {
+  font-size: 15px;
+}
+
+.cinematic-race-topbar em {
+  font-style: normal;
+  color: #052e16;
+  background: #facc15;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.cinematic-race-viewport {
+  position: relative;
+  width: 100%;
+  height: 510px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #102f44 0%, #102f44 22%, #17361e 22%, #17361e 30%, #6d4a25 30%, #4a321f 100%);
+}
+
+.cinematic-race-world {
+  position: relative;
+  height: 100%;
+  transition: transform .18s linear;
+  will-change: transform;
+}
+
+.cinematic-skyline {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3200px;
+  height: 116px;
+  display: flex;
+  align-items: flex-end;
+  gap: 140px;
+  padding-left: 80px;
+  box-sizing: border-box;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.09) 0 5px, transparent 5px 18px),
+    linear-gradient(180deg, rgba(255,255,255,.08), transparent);
+  color: rgba(255,255,255,.42);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.cinematic-track-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 118px;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 1px, transparent 1px 52px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 2px, transparent 2px 52px),
+    linear-gradient(180deg, #876139 0%, #5f3c23 100%);
+}
+
+.cinematic-rail {
+  position: absolute;
+  left: 0;
+  width: 3200px;
+  height: 7px;
+  background: linear-gradient(90deg, #e5e7eb, #f8fafc, #cbd5e1);
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  z-index: 2;
+}
+
+.cinematic-rail.top {
+  top: 22px;
+}
+
+.cinematic-rail.bottom {
+  bottom: 28px;
+}
+
+.cinematic-start-gate {
+  position: absolute;
+  left: 42px;
+  top: 44px;
+  width: 120px;
+  bottom: 48px;
+  display: grid;
+  grid-template-rows: 22px repeat(6, 1fr);
+  gap: 4px;
+  z-index: 5;
+  transition: opacity .6s ease, transform .6s ease;
+}
+
+.cinematic-start-gate.opening {
+  opacity: .18;
+  transform: translateX(-80px);
+}
+
+.cinematic-start-gate strong {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111827;
+  border: 1px solid rgba(250,204,21,.75);
+  color: #facc15;
+  border-radius: 8px;
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.cinematic-start-gate span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: repeating-linear-gradient(90deg, #172554 0 8px, #0f172a 8px 16px);
+  border: 1px solid rgba(255,255,255,.25);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.cinematic-finish-line {
+  position: absolute;
+  left: 2940px;
+  top: 26px;
+  bottom: 26px;
+  width: 34px;
+  background:
+    repeating-linear-gradient(0deg, #fff 0 14px, #111827 14px 28px);
+  border: 2px solid rgba(255,255,255,.7);
+  z-index: 4;
+}
+
+.cinematic-finish-line strong {
+  position: absolute;
+  top: -30px;
+  left: -20px;
+  background: #facc15;
+  color: #052e16;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.cinematic-horse {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 128px;
+  height: 74px;
+  z-index: 8;
+  transition: transform .12s linear;
+  will-change: transform;
+}
+
+.cinematic-horse img {
+  position: relative;
+  width: 124px;
+  height: auto;
+  display: block;
+  z-index: 2;
+  filter: drop-shadow(0 10px 8px rgba(0,0,0,.42));
+}
+
+.cinematic-horse b {
+  position: absolute;
+  left: 52px;
+  top: -8px;
+  width: 28px;
+  height: 28px;
+  background: #facc15;
+  color: #052e16;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  border: 2px solid #fff;
+  z-index: 3;
+}
+
+.cinematic-horse i {
+  position: absolute;
+  right: 0;
+  top: -8px;
+  font-style: normal;
+  background: #22c55e;
+  color: white;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 900;
+  z-index: 4;
+}
+
+.cinematic-horse.winner img {
+  filter: drop-shadow(0 0 12px rgba(250,204,21,.42)) drop-shadow(0 10px 8px rgba(0,0,0,.45));
+}
+
+.cinematic-horse-shadow {
+  position: absolute;
+  left: 24px;
+  bottom: 4px;
+  width: 86px;
+  height: 16px;
+  background: rgba(0,0,0,.34);
+  border-radius: 999px;
+  filter: blur(5px);
+  z-index: 1;
+}
+
+.cinematic-dust {
+  position: absolute;
+  width: 280px;
+  height: 90px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(241, 194, 125, .18), transparent 68%);
+  filter: blur(10px);
+  pointer-events: none;
+  animation: cinematicDust 2.6s infinite ease-in-out;
+  z-index: 3;
+}
+
+.dust-one {
+  left: 260px;
+  top: 260px;
+}
+
+.dust-two {
+  left: 650px;
+  top: 350px;
+  animation-delay: 1.1s;
+}
+
+.cinematic-race-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(0,0,0,.32);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.cinematic-race-footer span {
+  display: block;
+  color: rgba(255,255,255,.64);
+  font-size: 12px;
+}
+
+.cinematic-race-footer strong {
+  font-size: 17px;
+}
+
+.cinematic-race-footer button {
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #facc15;
+  color: #052e16;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+@keyframes cinematicDust {
+  0%, 100% {
+    opacity: .25;
+    transform: translateX(0) scale(.92);
+  }
+  50% {
+    opacity: .7;
+    transform: translateX(36px) scale(1.12);
+  }
+}
+
+@media (max-width: 768px) {
+  .cinematic-race-viewport {
+    height: 430px;
+  }
+
+  .cinematic-skyline {
+    height: 88px;
+    font-size: 16px;
+  }
+
+  .cinematic-track-ground {
+    top: 90px;
+  }
+
+  .cinematic-horse {
+    width: 104px;
+  }
+
+  .cinematic-horse img {
+    width: 100px;
+  }
+
+  .cinematic-race-footer {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cinematic-race-footer button {
+    grid-column: 1 / -1;
+  }
+}

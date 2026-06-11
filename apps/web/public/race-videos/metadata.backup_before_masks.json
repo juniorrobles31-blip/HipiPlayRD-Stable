@@ -1,0 +1,87 @@
+﻿[
+    {
+        "id":  "race-template-001",
+        "src":  "/race-videos/race-template-001.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "closeUpStart":  55,
+        "closeUpEnd":  60,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "notes":  "Metadata inicial. Ajustar tiempos según el video real."
+    },
+    {
+        "id":  "race-template-002",
+        "src":  "/race-videos/race-template-002.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "closeUpStart":  55,
+        "closeUpEnd":  60,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "notes":  "Metadata inicial. Ajustar tiempos según el video real."
+    },
+    {
+        "id":  "race-template-003",
+        "src":  "/race-videos/race-template-003.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "closeUpStart":  55,
+        "closeUpEnd":  60,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "notes":  "Metadata inicial. Ajustar tiempos según el video real."
+    },
+    {
+        "id":  "race-template-004",
+        "src":  "/race-videos/race-template-004.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "closeUpStart":  55,
+        "closeUpEnd":  60,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "notes":  "Metadata inicial. Ajustar tiempos según el video real."
+    },
+    {
+        "id":  "race-template-005",
+        "src":  "/race-videos/race-template-005.mp4",
+        "duration":  60,
+        "visualWinnerSlots":  [
+                                  "A",
+                                  "B",
+                                  "C"
+                              ],
+        "finishMoment":  54,
+        "closeUpStart":  55,
+        "closeUpEnd":  60,
+        "cameraType":  "oval_follow",
+        "startGateVisible":  true,
+        "finishLineVisible":  true,
+        "notes":  "Metadata inicial. Ajustar tiempos según el video real."
+    }
+]

@@ -1,0 +1,142 @@
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { z } from 'zod';
+import { authMiddleware, login } from './auth.js';
+import { ensureDb, getWallet, loadDb, saveDb } from './db.js';
+import { gameHistory, placeBet } from './games.js';
+import { currentDerby, derbyHistory, ensureDerbyState, placeDerbyBet } from './derby.js';
+import { closeRound, confirmPurchase, createReferral, currentPool } from './pool.js';
+import { currentSeedPayload, registerLocalBatch, registerLocalMovement } from './sync.js';
+
+ensureDb();
+ensureDerbyState();
+
+const app = express();
+const PORT = Number(process.env.PORT || 4000);
+const WEB_ORIGIN = process.env.WEB_ORIGIN || 'http://localhost:5173';
+
+app.use(cors({ origin: WEB_ORIGIN, credentials: true }));
+app.use(express.json());
+
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'OK', app: 'juega123-modern-api', time: new Date().toISOString() });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const schema = z.object({ username: z.string().min(1), password: z.string().min(1) });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ status: 'ERROR', message: 'Datos inválidos' });
+  const result = login(parsed.data.username, parsed.data.password);
+  if (!result) return res.status(401).json({ status: 'ERROR', message: 'Usuario o clave incorrecta' });
+  const { user, token } = result;
+  const db = loadDb();
+  const wallet = getWallet(db, user.id);
+  saveDb(db);
+  res.json({ status: 'OK', token, user: { id: user.id, username: user.username }, wallet });
+});
+
+app.get('/api/me', authMiddleware, (req, res) => {
+  const db = loadDb();
+  const user = db.users.find(u => u.id === req.userId);
+  if (!user) return res.status(404).json({ status: 'ERROR', message: 'Usuario no encontrado' });
+  const wallet = getWallet(db, user.id);
+  saveDb(db);
+  res.json({ status: 'OK', user: { id: user.id, username: user.username }, wallet });
+});
+
+app.get('/api/games/history', authMiddleware, (req, res) => {
+  res.json({ status: 'OK', ...gameHistory(req.userId!) });
+});
+
+app.post('/api/games/bet', authMiddleware, (req, res) => {
+  try {
+    const result = placeBet(req.userId!, req.body);
+    res.json({ status: 'OK', ...result });
+  } catch (err) {
+    res.status(400).json({ status: 'ERROR', message: err instanceof Error ? err.message : 'Error al apostar' });
+  }
+});
+
+app.get('/api/races/current', authMiddleware, (req, res) => {
+  res.json({ status: 'OK', ...currentDerby(req.userId!) });
+});
+
+app.post('/api/races/bet', authMiddleware, (req, res) => {
+  try {
+    const result = placeDerbyBet(req.userId!, req.body);
+    res.json({ status: 'OK', ...result });
+  } catch (err) {
+    res.status(400).json({ status: 'ERROR', message: err instanceof Error ? err.message : 'Error al apostar Derby Minute' });
+  }
+});
+
+app.get('/api/races/history', authMiddleware, (req, res) => {
+  res.json({ status: 'OK', ...derbyHistory(req.userId!) });
+});
+
+app.post('/api/referral/create', authMiddleware, (req, res) => {
+  const baseUrl = String(req.body?.baseUrl || WEB_ORIGIN);
+  res.json({ status: 'OK', referral: createReferral(req.userId!, baseUrl) });
+});
+
+app.post('/api/referral/purchase-confirm', authMiddleware, (req, res) => {
+  try {
+    const schema = z.object({ token: z.string().min(4), amount: z.number().positive() });
+    const input = schema.parse(req.body);
+    res.json({ status: 'OK', ...confirmPurchase(input.token, input.amount, req.userId!) });
+  } catch (err) {
+    res.status(400).json({ status: 'ERROR', message: err instanceof Error ? err.message : 'Error confirmando compra' });
+  }
+});
+
+app.get('/api/pool/current', authMiddleware, (req, res) => {
+  res.json({ status: 'OK', ...currentPool(req.userId!) });
+});
+
+app.post('/api/pool/close', authMiddleware, (_req, res) => {
+  res.json({ status: 'OK', ...closeRound() });
+});
+
+
+app.get('/api/local-first/current-seed', authMiddleware, (_req, res) => {
+  res.json({ status: 'OK', seed: currentSeedPayload(Date.now()) });
+});
+
+app.post('/api/local-first/sync-movement', authMiddleware, (req, res) => {
+  try {
+    const result = registerLocalMovement(req.userId!, req.body?.movement);
+    res.json({ status: 'OK', ...result });
+  } catch (err) {
+    res.status(400).json({ status: 'ERROR', message: err instanceof Error ? err.message : 'Error sincronizando movimiento local' });
+  }
+});
+
+app.post('/api/local-first/sync-batch', authMiddleware, (req, res) => {
+  try {
+    const movements = Array.isArray(req.body?.movements) ? req.body.movements : [];
+    const results = registerLocalBatch(req.userId!, movements);
+    res.json({ status: 'OK', results });
+  } catch (err) {
+    res.status(400).json({ status: 'ERROR', message: err instanceof Error ? err.message : 'Error sincronizando lote local' });
+  }
+});
+
+app.get('/api/audits/pending', authMiddleware, (_req, res) => {
+  const db = loadDb();
+  res.json({ status: 'OK', audits: db.audits.filter(a => a.blockchainStatus === 'pending') });
+});
+
+app.post('/api/audits/:id/mark-sent', authMiddleware, (req, res) => {
+  const db = loadDb();
+  const audit = db.audits.find(a => a.id === req.params.id);
+  if (!audit) return res.status(404).json({ status: 'ERROR', message: 'Auditoría no encontrada' });
+  audit.blockchainStatus = 'sent';
+  audit.txHash = String(req.body?.txHash || 'manual');
+  saveDb(db);
+  res.json({ status: 'OK', audit });
+});
+
+app.listen(PORT, () => {
+  console.log(`Juega123 Modern API running on http://localhost:${PORT}`);
+});
