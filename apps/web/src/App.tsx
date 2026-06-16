@@ -1,18 +1,45 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react';
-import { Coins, History, LogOut, Sparkles, Trophy } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
+import { ArrowLeftRight, Download, HandCoins, History, Landmark, LogOut, Menu, MoveRight, ShoppingCart, Sparkles, Trophy, Wallet as WalletIcon } from 'lucide-react';
 import { syncLocalUserAfterLogin } from './localUserSync';
 import { clearLocalUser, getLocalUser } from './localUserDb';
 import { api, logout, setToken, Wallet } from './api';
+
 import hipiPlayLogo from './assets/hipiplay-logo.png';
-import { dbGetAll, LocalDerbyBet, LocalLedgerMovement, LocalWalletState } from './localDb';
+
+import {
+  dbGetAll,
+  LocalDerbyBet,
+  LocalLedgerMovement,
+  LocalWalletState,
+} from './localDb';
+
 import { getLocalWallet, initLocalWallet } from './localWallet';
-import { localDerbyHistory, placeLocalDerbyBet, resolvePendingLocalBets } from './localLedger';
+import {
+  localDerbyHistory,
+  placeLocalDerbyBet,
+  resolvePendingLocalBets,
+} from './localLedger';
+
 import { syncPendingQueue } from './syncQueue';
+
 import { RaceVideoEngine } from './components/raceVideoEngine/RaceVideoEngine';
 import { ServerRaceResultPanel } from './components/raceVideoEngine/ServerRaceResultPanel';
 import { BettingHorsesPreview } from './components/raceVideoEngine/BettingHorsesPreview';
-import { getServerRaceState, ServerRaceState, getServerRaceHistory, ServerPublicRaceHistory, sendServerBet, getServerPlayerResult, ServerPlayerResult } from './hipiplayServerApi';
 import { HorseBetGrid } from './components/HorseBetGrid';
+
+
+import {
+  getServerRaceState,
+  ServerRaceState,
+  getServerRaceHistory,
+  ServerPublicRaceHistory,
+  sendServerBet,
+  getServerPlayerResult,
+  ServerPlayerResult,
+  getServerPlayerBalance,
+} from './hipiplayServerApi';
+
 import {
   addBetToExposure,
   buildResultOrderFromExposure,
@@ -24,6 +51,7 @@ import {
 
 type User = { id: string; username: string };
 type Tab = 'games' | 'history';
+type WalletAction = 'transfer' | 'bet' | 'withdraw' | 'deposit' | 'sell-p2p' | 'buy-p2p';
 type CyclePhase = 'betting' | 'running' | 'result';
 
 type CycleInfo = {
@@ -143,21 +171,132 @@ function normalizeError(err: unknown) {
     .replace('Ya tienes un boleto pendiente en esta carrera. Espera el resultado o la prÃ³xima carrera.', 'Ya tienes un boleto activo en esta carrera.');
 }
 
+
+async function passwordAuthRequest(action: 'login' | 'register', payload: any) {
+  const url = action === 'login' ? '/api/auth/login' : '/api/auth/register';
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok || data.status === 'ERROR' || data.ok === false) {
+    throw new Error(data.error || data.message || data.detail || 'No se pudo completar la autenticación.');
+  }
+
+  return normalizePasswordAuthResponse(data, payload.username);
+}
+
+function normalizePasswordAuthResponse(data: any, fallbackUsername: string) {
+  const token = data.token || data.accessToken || data.jwt;
+
+  if (!token) {
+    throw new Error('El servidor autenticó la solicitud, pero no devolvió token.');
+  }
+
+  const user = data.user || data.player || data.account || {
+    id: data.userId || data.playerId || fallbackUsername,
+    username: data.username || fallbackUsername
+  };
+
+  const wallet = data.wallet || data.localWallet || {
+    userId: user.id,
+    demoBalance: Number(data.balance || data.demoBalance || 0),
+    realBalance: Number(data.realBalance || 0),
+    giftLocked: Number(data.giftLocked || 0)
+  };
+
+  return {
+    ...data,
+    token,
+    user,
+    wallet
+  };
+}
 function Login({ onLogin }: { onLogin: (user: User, wallet: Wallet) => void }) {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const savedUsernameKey = 'hipiplay_passkey_username';
+
+  const [mode, setMode] = useState<'quick' | 'login' | 'register'>(() => {
+    return localStorage.getItem(savedUsernameKey) ? 'quick' : 'login';
+  });
+
+  const [username, setUsername] = useState(() => localStorage.getItem(savedUsernameKey) || '');
+  const [password, setPassword] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
+  const savedUsername = localStorage.getItem(savedUsernameKey) || '';
+
+  async function finishAuth(response: any, fallbackUsername?: string) {
+    setToken(response.token);
+
+    const finalUsername = response?.user?.username || fallbackUsername || username.trim();
+
+    if (finalUsername) {
+      localStorage.setItem(savedUsernameKey, finalUsername);
+      await syncLocalUserAfterLogin(finalUsername);
+    }
+
+    onLogin(response.user, response.wallet);
+  }
+
+  async function loginWithPasskey(e?: React.FormEvent) {
+    e?.preventDefault();
     setError('');
+
+    const cleanUsername = username.trim();
+    const cleanPassword = password.trim();
+
+    if (!cleanUsername) {
+      setError('Escribe tu usuario para iniciar sesión.');
+      return;
+    }
+
+    if (!cleanPassword) {
+      setError('Escribe tu clave.');
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await api.login(username, password);
-      setToken(res.token);
-      await syncLocalUserAfterLogin(res.user.username || username);
-      onLogin(res.user, res.wallet);
+      const passwordResponse = await passwordAuthRequest('login', {
+        username: cleanUsername,
+        password: cleanPassword
+      });
+
+      setToken(passwordResponse.token);
+
+      try {
+        const optionsResponse = await api.passkeyRegisterOptions({
+          username: cleanUsername,
+          termsAccepted: true
+        } as any);
+
+        const credential = await startRegistration({
+          optionsJSON: optionsResponse.options
+        } as any);
+
+        const passkeyResponse = await api.passkeyRegisterVerify({
+          challengeId: optionsResponse.challengeId,
+          credential
+        } as any);
+
+        await finishAuth({
+          ...passwordResponse,
+          ...passkeyResponse,
+          token: passkeyResponse?.token || passwordResponse.token,
+          user: passkeyResponse?.user || passwordResponse.user,
+          wallet: passkeyResponse?.wallet || passwordResponse.wallet
+        }, cleanUsername);
+      } catch (passkeyError) {
+        console.warn('No se pudo registrar huella en este dispositivo:', passkeyError);
+        await finishAuth(passwordResponse, cleanUsername);
+      }
     } catch (err) {
       setError(normalizeError(err));
     } finally {
@@ -165,25 +304,878 @@ function Login({ onLogin }: { onLogin: (user: User, wallet: Wallet) => void }) {
     }
   }
 
-  return <div className="login-shell">
-    <div className="login-card glass clean-login-card">
+  async function quickLogin() {
+    setError('');
+
+    const cleanUsername = savedUsername || username.trim();
+
+    if (!cleanUsername) {
+      setMode('login');
+      return;
+    }
+
+    setUsername(cleanUsername);
+    setLoading(true);
+
+    try {
+      const optionsResponse = await api.passkeyLoginOptions({
+        username: cleanUsername
+      });
+
+      const credential = await startAuthentication({
+        optionsJSON: optionsResponse.options
+      } as any);
+
+      const verifyResponse = await api.passkeyLoginVerify({
+        challengeId: optionsResponse.challengeId,
+        credential,
+        username: cleanUsername
+      } as any);
+
+      await finishAuth(verifyResponse, cleanUsername);
+    } catch (err) {
+      setError(normalizeError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function createAccount(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+
+    const cleanUsername = username.trim();
+    const cleanPassword = password.trim();
+
+    if (!cleanUsername) {
+      setError('Escribe tu usuario.');
+      return;
+    }
+
+    if (cleanUsername.toLowerCase() === 'admin') {
+      setError('Ese usuario no está disponible.');
+      return;
+    }
+
+    if (!cleanPassword || cleanPassword.length < 6) {
+      setError('La clave debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    if (!termsAccepted) {
+      setError('Debes aceptar los términos y condiciones de HipiPlay.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const passwordResponse = await passwordAuthRequest('register', {
+        username: cleanUsername,
+        password: cleanPassword,
+        termsAccepted: true
+      });
+
+      setToken(passwordResponse.token);
+
+      const optionsResponse = await api.passkeyRegisterOptions({
+        username: cleanUsername,
+        termsAccepted: true
+      } as any);
+
+      const credential = await startRegistration({
+        optionsJSON: optionsResponse.options
+      } as any);
+
+      const passkeyResponse = await api.passkeyRegisterVerify({
+        challengeId: optionsResponse.challengeId,
+        credential
+      } as any);
+
+      localStorage.setItem(savedUsernameKey, cleanUsername);
+
+      await finishAuth({
+        ...passwordResponse,
+        ...passkeyResponse,
+        token: passkeyResponse?.token || passwordResponse.token,
+        user: passkeyResponse?.user || passwordResponse.user,
+        wallet: passkeyResponse?.wallet || passwordResponse.wallet
+      }, cleanUsername);
+    } catch (err) {
+      setError(normalizeError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function useOtherAccount() {
+    localStorage.removeItem(savedUsernameKey);
+    setUsername('');
+    setPassword('');
+    setTermsAccepted(false);
+    setError('');
+    setMode('login');
+  }
+
+  if (mode === 'quick' && savedUsername) {
+return <div className="player-screen">
+      <div className="login-card glass clean-login-card passkey-create-card">
+        <div className="login-brand-lockup">
+          <img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo login-logo" />
+          <div>
+            <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
+            <h1>Bienvenido</h1>
+            <p>Inicia sesión con la seguridad de tu móvil.</p>
+          </div>
+        </div>
+
+        <div className="saved-passkey-user">
+          <span>Usuario guardado</span>
+          <strong>{savedUsername}</strong>
+        </div>
+
+        {error && <div className="error-box">{error}</div>}
+
+        <button className="primary" onClick={quickLogin} disabled={loading}>
+          {loading ? 'Validando huella...' : 'Entrar con huella / PIN'}
+        </button>
+
+        <button className="secondary" onClick={useOtherAccount} disabled={loading}>
+          Usar otra cuenta
+        </button>
+      </div>
+    </div>;
+  }
+
+  if (mode === 'register') {
+return <div className="player-screen">
+      <div className="login-card glass clean-login-card passkey-create-card">
+        <div className="login-brand-lockup">
+          <img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo login-logo" />
+          <div>
+            <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
+            <h1>Crear cuenta</h1>
+            <p>Registra tu acceso usando la seguridad de tu móvil.</p>
+          </div>
+        </div>
+
+        <form onSubmit={createAccount} className="form-grid passkey-create-form">
+          <label>Nombre de usuario
+            <input
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              autoComplete="username webauthn"
+            />
+          </label>
+
+          <label>Clave
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              autoComplete="new-password"
+              minLength={6}
+              placeholder="Mínimo 6 caracteres"
+            />
+          </label>
+
+          <label className="terms-check-row">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={e => setTermsAccepted(e.target.checked)}
+            />
+            <span>Acepto los términos y condiciones de HipiPlay.</span>
+          </label>
+
+          {error && <div className="error-box">{error}</div>}
+
+          <button className="primary" disabled={loading}>
+            {loading ? 'Creando cuenta segura...' : 'Crear cuenta'}
+          </button>
+
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              setError('');
+              setMode('login');
+            }}
+            disabled={loading}
+          >
+            Ya tengo cuenta
+          </button>
+        </form>
+      </div>
+    </div>;
+  }
+return <div className="player-screen">
+    <div className="login-card glass clean-login-card passkey-create-card">
       <div className="login-brand-lockup">
         <img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo login-logo" />
         <div>
           <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
-          <h1>HipiPlay</h1>
-          <p>Carreras Hí­picas con monedas. Apuesta, espera la salida y vive una carrera automÃ¡tica de 60 segundos.</p>
+          <h1>Iniciar sesión</h1>
+          <p>Escribe tu usuario y entra con huella, Face ID o PIN.</p>
         </div>
       </div>
-      <form onSubmit={submit} className="form-grid">
-        <label>Usuario<input value={username} onChange={e => setUsername(e.target.value)} /></label>
-        <label>Clave<input type="password" value={password} onChange={e => setPassword(e.target.value)} /></label>
+
+      <form onSubmit={loginWithPasskey} className="form-grid passkey-create-form">
+        <label>Usuario
+          <input
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            autoComplete="username webauthn"
+          />
+        </label>
+
+        <label>Clave
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            autoComplete="current-password"
+            placeholder="Tu clave"
+          />
+        </label>
+
         {error && <div className="error-box">{error}</div>}
-        <button className="primary" disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
+
+        <button className="primary" disabled={loading}>
+          {loading ? 'Validando acceso...' : 'Entrar'}
+        </button>
+
+        <button
+          type="button"
+          className="secondary"
+          onClick={() => {
+            setError('');
+            setTermsAccepted(false);
+            setMode('register');
+          }}
+          disabled={loading}
+        >
+          Crear cuenta
+        </button>
       </form>
-      <small>Prueba local: admin / admin123</small>
     </div>
   </div>;
+}
+
+function WalletActionsPanel({ user, onAction }: { user: User; onAction: (action: WalletAction) => void }) {
+  const player = user as any;
+
+  useEffect(() => {
+    document.body.classList.add('hipiplay-home-mode');
+    document.body.classList.remove('hipiplay-race-mode');
+
+    window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+      detail: { view: 'home' }
+    }));
+  }, []);
+
+  function openAction(action: WalletAction) {
+    if (action === 'bet') {
+      document.body.classList.remove('hipiplay-home-mode');
+      document.body.classList.add('hipiplay-race-mode');
+
+      window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+        detail: { view: 'race' }
+      }));
+
+      setTimeout(() => {
+        const raceSection = document.querySelector('.horse-bet-panel, .race-panel, .race-card, .horse-grid, .horses-grid, .race-horses-grid, .horse-select-grid');
+        if (raceSection) {
+          raceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 120);
+
+      return;
+    }
+
+    onAction(action);
+
+    window.dispatchEvent(new CustomEvent('hipiplay-wallet-action', {
+      detail: {
+        action,
+        userId: player?.id,
+        username: player?.username
+      }
+    }));
+  }
+
+  const actions: Array<{ action: WalletAction; label: string; caption: string; icon: JSX.Element }> = [
+    { action: 'transfer', label: 'TRANSFERENCIA', caption: 'ENTRE USUARIOS', icon: <ArrowLeftRight size={54} /> },
+    { action: 'bet', label: 'APUESTA', caption: 'CARRERAS', icon: <Trophy size={54} /> },
+    { action: 'withdraw', label: 'RETIRO USDT', caption: 'BSC/BEP20', icon: <Landmark size={54} /> },
+    { action: 'deposit', label: 'RECARGA USDT', caption: 'COMPRAR COIN', icon: <WalletIcon size={54} /> },
+    { action: 'sell-p2p', label: 'VENTA P2P', caption: 'PUBLICAR OFERTA', icon: <HandCoins size={54} /> },
+    { action: 'buy-p2p', label: 'COMPRA P2P', caption: 'VER OFERTAS', icon: <ShoppingCart size={54} /> }
+  ];
+
+  return (
+    <section className="wallet-mobile-home-shell" aria-label="Menú principal HipiPlay">
+      <div className="wallet-phone-menu">
+        <div className="wallet-phone-brand">
+          <img src={hipiPlayLogo} alt="HipiPlay" className="wallet-phone-logo" />
+          <h1>HipiPlay</h1>
+          <p>Centro de monedas</p>
+        </div>
+
+        <div className="wallet-phone-grid">
+          {actions.map(item => (
+            <button
+              key={item.action}
+              type="button"
+              className="wallet-action-card"
+              onClick={() => openAction(item.action)}
+            >
+              <span className="wallet-action-icon">{item.icon}</span>
+              <strong>{item.label}</strong>
+              <small>{item.caption}</small>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WalletActionModal({
+  action,
+  user,
+  wallet,
+  onClose,
+  onDone
+}: {
+  action: WalletAction;
+  user: User;
+  wallet: LocalWalletState | null;
+  onClose: () => void;
+  onDone: () => Promise<void>;
+}) {
+  const [amount, setAmount] = useState('');
+  const [targetUser, setTargetUser] = useState('');
+  const [address, setAddress] = useState('');
+  const [price, setPrice] = useState('1');
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('');
+  const [offers, setOffers] = useState<any[]>([]);
+  const [mySales, setMySales] = useState<any[]>([]);
+  const [sellView, setSellView] = useState<'menu' | 'new' | 'active'>('menu');
+
+  const titles: Record<WalletAction, string> = {
+    transfer: 'Transferencia entre usuarios',
+    bet: 'Apuesta',
+    withdraw: 'Retiro USDT',
+    deposit: 'Recarga USDT',
+    'sell-p2p': 'Venta P2P',
+    'buy-p2p': 'Compra P2P'
+  };
+
+  const subtitles: Record<WalletAction, string> = {
+    transfer: 'Envía monedas internas a otro usuario.',
+    bet: 'Entrar a la pantalla de apuestas.',
+    withdraw: 'Solicita retiro USDT por red BSC/BEP20.',
+    deposit: 'Genera una orden de recarga USDT.',
+    'sell-p2p': 'Elige si quieres publicar una nueva venta o revisar tus ventas activas.',
+    'buy-p2p': 'Consulta ofertas P2P disponibles.'
+  };
+
+  function offerCoinsValue(offer: any) {
+    const raw =
+      offer?.remainingCoins ??
+      offer?.coinAmount ??
+      offer?.amount ??
+      offer?.coins ??
+      offer?.quantity ??
+      0;
+
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function offerStatus(offer: any) {
+    return String(offer?.status || 'OPEN').toUpperCase();
+  }
+
+  function formatOfferCoins(offer: any) {
+    return `${coins(offerCoinsValue(offer))} monedas`;
+  }
+
+  function formatOfferUsdt(offer: any) {
+    const raw =
+      offer?.remainingUsdt ??
+      offer?.totalUsdt ??
+      Number(offerCoinsValue(offer)) * Number(offer?.pricePerCoin || offer?.rate || 1);
+
+    const value = Number(raw);
+    return Number.isFinite(value) ? value.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '0';
+  }
+
+  async function postJson(url: string, payload: any) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || data.status === 'ERROR' || data.ok === false) {
+      throw new Error(data.error || data.message || data.detail || 'No se pudo completar la operación.');
+    }
+
+    return data;
+  }
+
+  async function loadOffers() {
+    setLoading(true);
+    setStatus('');
+
+    try {
+      const response = await fetch('/api/p2p/offers');
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.status === 'ERROR' || data.ok === false) {
+        throw new Error(data.error || data.message || 'No se pudieron cargar las ofertas P2P.');
+      }
+
+      const list = Array.isArray(data) ? data : (data.offers || data.data || []);
+      setOffers(list);
+
+      if (!list.length) {
+        setStatus('No hay ofertas P2P disponibles ahora.');
+      }
+    } catch (error) {
+      setStatus(normalizeError(error));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadMySales() {
+    setLoading(true);
+    setStatus('');
+
+    try {
+      const response = await fetch(`/api/p2p/my-trades/${encodeURIComponent(user.id)}`);
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok && data && (data.ok === true || Array.isArray(data.offers))) {
+        const list = Array.isArray(data.offers) ? data.offers : [];
+        setMySales(list);
+        return;
+      }
+
+      const fallbackResponse = await fetch('/api/p2p/offers');
+      const fallbackData = await fallbackResponse.json().catch(() => ({}));
+      const fallbackList = Array.isArray(fallbackData) ? fallbackData : (fallbackData.offers || fallbackData.data || []);
+
+      setMySales(
+        fallbackList.filter((offer: any) => String(offer.sellerId || offer.userId || offer.playerId || '') === String(user.id))
+      );
+    } catch (error) {
+      setStatus(normalizeError(error));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    setStatus('');
+    setSellView('menu');
+
+    if (action === 'buy-p2p') {
+      loadOffers();
+    }
+
+    if (action === 'sell-p2p') {
+      loadMySales();
+    }
+  }, [action]);
+
+  async function submit() {
+    const safeAmount = Math.floor(Number(amount || 0));
+
+    if (action !== 'buy-p2p' && (!Number.isFinite(safeAmount) || safeAmount <= 0)) {
+      setStatus('Ingresa una cantidad válida.');
+      return;
+    }
+
+    setLoading(true);
+    setStatus('');
+
+    try {
+      let data: any = null;
+
+      if (action === 'transfer') {
+        if (!targetUser.trim()) {
+          setStatus('Escribe el usuario o ID destino.');
+          setLoading(false);
+          return;
+        }
+
+        data = await postJson('/api/wallet/transfer', {
+          playerId: user.id,
+          userId: user.id,
+          fromPlayerId: user.id,
+          senderId: user.id,
+          toPlayerId: targetUser.trim(),
+          recipientId: targetUser.trim(),
+          toUsername: targetUser.trim(),
+          username: targetUser.trim(),
+          amount: safeAmount
+        });
+
+        setStatus(data.message || 'Transferencia enviada correctamente.');
+      }
+
+      if (action === 'withdraw') {
+        if (!address.trim()) {
+          setStatus('Escribe la dirección USDT/BSC destino.');
+          setLoading(false);
+          return;
+        }
+
+        data = await postJson('/api/wallet/withdraw/request', {
+          playerId: user.id,
+          userId: user.id,
+          amount: safeAmount,
+          address: address.trim(),
+          walletAddress: address.trim(),
+          network: 'BSC',
+          token: 'USDT'
+        });
+
+        setStatus(data.message || 'Solicitud de retiro creada correctamente.');
+      }
+
+      if (action === 'deposit') {
+        data = await postJson('/api/player/deposit/request', {
+          playerId: user.id,
+          userId: user.id,
+          amount: safeAmount,
+          network: 'BSC',
+          token: 'USDT'
+        });
+
+        const order = data.order || data.deposit || data;
+        const payAddress = order.address || order.depositAddress || order.walletAddress || order.toAddress || '';
+        const orderId = order.orderId || order.id || data.orderId || '';
+
+        setStatus(
+          `Orden de recarga creada.${orderId ? `\nOrden: ${orderId}` : ''}${payAddress ? `\nDirección: ${payAddress}` : ''}`
+        );
+      }
+
+      if (action === 'sell-p2p') {
+        const safePrice = Number(price || 1);
+
+        if (!Number.isFinite(safePrice) || safePrice <= 0) {
+          setStatus('Ingresa un precio válido.');
+          setLoading(false);
+          return;
+        }
+
+        data = await postJson('/api/p2p/offers/create', {
+          playerId: user.id,
+          userId: user.id,
+          sellerId: user.id,
+          sellerName: user.username || user.id,
+          coinAmount: safeAmount,
+          amount: safeAmount,
+          pricePerCoin: safePrice,
+          rate: safePrice,
+          network: 'BSC',
+          token: 'USDT',
+          currency: 'USDT'
+        });
+
+        setAmount('');
+        setPrice('1');
+        setSellView('active');
+        setStatus(data.message || `Oferta publicada correctamente${data?.offer?.offerId ? `: ${data.offer.offerId}` : '.'}`);
+        await loadMySales();
+      }
+
+      await onDone();
+    } catch (error) {
+      setStatus(normalizeError(error));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function takeOffer(offer: any) {
+    const offerId = offer.id || offer.offerId || offer._id;
+    const requestedCoins = offerCoinsValue(offer);
+
+    if (!offerId) {
+      setStatus('La oferta no tiene ID válido.');
+      return;
+    }
+
+    if (!Number.isFinite(requestedCoins) || requestedCoins <= 0) {
+      setStatus('Esta oferta no tiene monedas disponibles.');
+      return;
+    }
+
+    setLoading(true);
+    setStatus('');
+
+    try {
+      const data = await postJson(`/api/p2p/offers/${offerId}/take`, {
+        playerId: user.id,
+        userId: user.id,
+        buyerId: user.id,
+        buyerName: user.username || user.id,
+        coinAmount: requestedCoins,
+        amount: requestedCoins
+      });
+
+      const trade = data.trade || data;
+      const payAddress = trade.paymentAddress || trade.address || trade.walletAddress || '';
+      const tradeId = trade.tradeId || trade.id || '';
+
+      setStatus(
+        `Compra creada.${tradeId ? `\nTrade: ${tradeId}` : ''}${payAddress ? `\nEnvía USDT a: ${payAddress}` : ''}`
+      );
+
+      await loadOffers();
+      await onDone();
+    } catch (error) {
+      setStatus(normalizeError(error));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function cancelOffer(offer: any) {
+    const offerId = offer.offerId || offer.id || offer._id;
+
+    if (!offerId) {
+      setStatus('La venta no tiene ID válido.');
+      return;
+    }
+
+    setLoading(true);
+    setStatus('');
+
+    try {
+      const data = await postJson(`/api/p2p/offers/${offerId}/cancel`, {
+        playerId: user.id,
+        userId: user.id,
+        sellerId: user.id,
+        reason: 'Cancelada por el vendedor'
+      });
+
+      setStatus(data.message || 'Venta cancelada correctamente.');
+      await loadMySales();
+      await onDone();
+    } catch (error) {
+      setStatus(normalizeError(error));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const activeSales = mySales.filter((offer: any) => {
+    const status = offerStatus(offer);
+    return !['CANCELLED', 'COMPLETED', 'CONFIRMED'].includes(status);
+  });
+
+  const buyOffers = offers.filter((offer: any) => {
+    const status = offerStatus(offer);
+    const sellerId = String(offer.sellerId || offer.userId || offer.playerId || '');
+    return sellerId !== String(user.id) && ['OPEN', 'PARTIAL'].includes(status) && offerCoinsValue(offer) > 0;
+  });
+
+  return (
+    <div className="wallet-action-modal-backdrop">
+      <section className="wallet-action-modal-card">
+        <button className="wallet-action-modal-close" type="button" onClick={onClose}>
+          ×
+        </button>
+
+        <h2>{titles[action]}</h2>
+        <p>{subtitles[action]}</p>
+
+        {wallet && (
+          <div className="wallet-action-balance">
+            Balance disponible: <strong>{coins(Number(wallet.demoBalance || 0))} monedas</strong>
+          </div>
+        )}
+
+        {action === 'transfer' && (
+          <>
+            <label>
+              Usuario destino
+              <input value={targetUser} onChange={e => setTargetUser(e.target.value)} placeholder="usuario123" />
+            </label>
+            <label>
+              Cantidad de monedas
+              <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} placeholder="100" />
+            </label>
+          </>
+        )}
+
+        {action === 'withdraw' && (
+          <>
+            <label>
+              Cantidad USDT
+              <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} placeholder="50" />
+            </label>
+            <label>
+              Dirección BSC / BEP20
+              <input value={address} onChange={e => setAddress(e.target.value)} placeholder="0x..." />
+            </label>
+          </>
+        )}
+
+        {action === 'deposit' && (
+          <label>
+            Cantidad USDT a recargar
+            <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} placeholder="100" />
+          </label>
+        )}
+
+        {action === 'sell-p2p' && sellView === 'menu' && (
+          <div className="wallet-action-sell-menu">
+            <button
+              type="button"
+              className="wallet-action-big-choice wallet-action-new-sale"
+              onClick={() => {
+                setStatus('');
+                setSellView('new');
+              }}
+              disabled={loading}
+            >
+              <HandCoins size={30} />
+              <strong>Nueva venta</strong>
+              <small>Publicar monedas para vender</small>
+            </button>
+
+            <button
+              type="button"
+              className="wallet-action-big-choice wallet-action-active-sales"
+              onClick={() => {
+                setStatus('');
+                setSellView('active');
+                loadMySales();
+              }}
+              disabled={loading}
+            >
+              <History size={30} />
+              <strong>Ventas activas</strong>
+              <small>Ver y cancelar ofertas publicadas</small>
+            </button>
+          </div>
+        )}
+
+        {action === 'sell-p2p' && sellView === 'new' && (
+          <>
+            <label>
+              Cantidad de monedas a vender
+              <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} placeholder="100" />
+            </label>
+            <label>
+              Precio por moneda en USDT
+              <input type="number" min={0.01} step="0.01" value={price} onChange={e => setPrice(e.target.value)} placeholder="1" />
+            </label>
+            <small className="wallet-action-help-text">
+              Las monedas se bloquean hasta que la venta sea completada o cancelada.
+            </small>
+          </>
+        )}
+
+        {action === 'sell-p2p' && sellView === 'active' && (
+          <div className="wallet-action-offers wallet-action-active-sale-list">
+            <button type="button" className="secondary wallet-action-refresh-btn" onClick={loadMySales} disabled={loading}>
+              Actualizar ventas
+            </button>
+
+            {activeSales.length === 0 ? (
+              <div className="wallet-action-empty-state">
+                No tienes ventas activas ahora mismo.
+              </div>
+            ) : (
+              activeSales.map((offer, index) => (
+                <div className="wallet-action-offer wallet-action-sale-card" key={offer.offerId || offer.id || index}>
+                  <div>
+                    <strong>{formatOfferCoins(offer)}</strong>
+                    <small>Precio: {offer.pricePerCoin || offer.rate || 1} USDT por moneda</small>
+                    <small>Total: {formatOfferUsdt(offer)} USDT</small>
+                    <small>Estado: {offerStatus(offer)}</small>
+                    {offer.offerId && <small>Oferta: {offer.offerId}</small>}
+                  </div>
+
+                  {['OPEN', 'PARTIAL'].includes(offerStatus(offer)) ? (
+                    <button className="secondary danger" type="button" disabled={loading} onClick={() => cancelOffer(offer)}>
+                      Cancelar
+                    </button>
+                  ) : (
+                    <small className="wallet-action-sale-note">En proceso</small>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {action === 'buy-p2p' && (
+          <div className="wallet-action-offers">
+            {buyOffers.length === 0 ? (
+              <div className="wallet-action-empty-state">
+                No hay ofertas disponibles ahora mismo.
+              </div>
+            ) : (
+              buyOffers.map((offer, index) => (
+                <div className="wallet-action-offer" key={offer.id || offer.offerId || index}>
+                  <strong>{formatOfferCoins(offer)}</strong>
+                  <small>Precio: {offer.pricePerCoin || offer.rate || 1} USDT</small>
+                  <small>Vendedor: {offer.sellerName || offer.sellerId || 'P2P'}</small>
+                  <button className="primary" disabled={loading} onClick={() => takeOffer(offer)}>
+                    Comprar
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {status && <div className="wallet-action-modal-status">{status}</div>}
+
+        <div className="wallet-action-modal-actions">
+          <button className="secondary" type="button" onClick={onClose} disabled={loading}>
+            Cerrar
+          </button>
+
+          {action === 'sell-p2p' && sellView !== 'menu' && (
+            <button
+              className="secondary"
+              type="button"
+              onClick={() => {
+                setStatus('');
+                setSellView('menu');
+              }}
+              disabled={loading}
+            >
+              Atrás
+            </button>
+          )}
+
+          {action !== 'buy-p2p' && !(action === 'sell-p2p' && sellView !== 'new') && (
+            <button className="primary" type="button" onClick={submit} disabled={loading}>
+              {loading ? 'Procesando...' : action === 'sell-p2p' ? 'Publicar venta' : 'Continuar'}
+            </button>
+          )}
+        </div>
+      </section>
+    </div>
+  );
 }
 
 function PlayerSummary({ wallet }: { wallet: LocalWalletState | null; pendingCount: number; lastBet?: LocalDerbyBet; lastResult?: RaceResult | null }) {
@@ -435,21 +1427,93 @@ function RaceTrack({ cycle, resultOrder, selectedHorse, lastResult }: { cycle: C
   const betting = cycle.phase === 'betting';
   const resultPhase = cycle.phase === 'result';
   const secondsLeft = Math.ceil(cycle.phaseRemaining / 1000);
-  const showRaceStartCountdown = betting && secondsLeft <= 10;
+  const showRaceStartCountdown = false;
   const countdownValue = Math.max(0, Math.min(10, secondsLeft));
   const top3 = resultOrder.slice(0, 3);
   const finalSprint = running && cycle.raceProgress >= 0.78;
+
+  useEffect(() => {
+    const phase = String(cycle?.phase || '').toUpperCase();
+
+    const isLiveRace =
+      phase.includes('RACE') ||
+      phase.includes('RUNNING') ||
+      phase.includes('LIVE');
+
+    const isResults =
+      phase.includes('RESULT') ||
+      phase.includes('REVEALED') ||
+      phase.includes('FINISHED');
+
+    document.body.classList.toggle('hipiplay-race-live-phase', isLiveRace);
+    document.body.classList.toggle('hipiplay-race-results-phase', isResults);
+
+    return () => {
+      document.body.classList.remove('hipiplay-race-live-phase');
+      document.body.classList.remove('hipiplay-race-results-phase');
+    };
+  }, [cycle?.phase]);
+
+
+  /* HIPIPLAY_HIDE_BOTTOM_NAV_RUNTIME */
+  useEffect(() => {
+    const shouldHideBottomNav = Boolean(selectedHorse && (running || resultPhase));
+
+    document.body.classList.toggle('hipiplay-race-fullscreen-phase', shouldHideBottomNav);
+    document.body.classList.toggle('hipiplay-race-running-phase', Boolean(running));
+    document.body.classList.toggle('hipiplay-race-result-phase', Boolean(resultPhase));
+
+    window.dispatchEvent(new CustomEvent('hipiplay-race-screen-state', {
+      detail: {
+        hideBottomNav: shouldHideBottomNav,
+        running: Boolean(running),
+        resultPhase: Boolean(resultPhase)
+      }
+    }));
+
+    return () => {
+      document.body.classList.remove('hipiplay-race-fullscreen-phase');
+      document.body.classList.remove('hipiplay-race-running-phase');
+      document.body.classList.remove('hipiplay-race-result-phase');
+
+      window.dispatchEvent(new CustomEvent('hipiplay-race-screen-state', {
+        detail: { hideBottomNav: false }
+      }));
+    };
+  }, [running, resultPhase]);
+
   const photoFinish = running && cycle.raceProgress >= 0.94;
   const userWon = selectedHorse ? top3.includes(selectedHorse) : undefined;
 
   return <section className={`race-tv glass broadcast-race-tv ${running ? 'race-running' : betting ? 'race-betting' : 'race-result'} ${finalSprint ? 'final-sprint' : ''} ${photoFinish ? 'photo-finish' : ''}`}>
     <div className="race-tv-header broadcast-header">
       <div>
-        <span className={running ? 'live-badge' : resultPhase ? 'result-badge' : 'betting-badge'}>{running ? 'EN VIVO' : resultPhase ? 'RESULTADO' : 'APUESTAS'}</span>
-        <strong>{running ? 'Carrera hÃ­pica en desarrollo' : resultPhase ? 'Resultado oficial' : 'Apuestas abiertas - selecciona tu caballo'}</strong>
-        <small>{running ? `Tiempo restante de carrera: ${secondsLeft}s` : resultPhase ? `Nueva ronda en ${secondsLeft}s` : `Cierre de apuestas en ${secondsLeft}s`}</small>
+        <span className={running ? 'live-badge' : resultPhase ? 'result-badge' : 'betting-badge'}>
+          {running ? 'EN VIVO' : resultPhase ? 'RESULTADO' : 'APUESTAS'}
+        </span>
+
+        <strong>
+          {running
+            ? 'Carrera hípica en desarrollo'
+            : resultPhase
+              ? 'Resultado oficial'
+              : 'Apuestas abiertas - selecciona tu caballo'}
+        </strong>
+
+        <small>
+          {running
+            ? 'Carrera en curso'
+            : resultPhase
+              ? 'Resultado disponible'
+              : 'Apuestas abiertas'}
+        </small>
       </div>
-      <div className="race-clock"><span>{secondsLeft}</span></div>
+
+      {!betting && (
+        <div className="race-clock">
+          <span>{secondsLeft}</span>
+        </div>
+      )}
     </div>
 
     <div className="hipica-broadcast-stage clean-gate-stage">
@@ -547,8 +1611,44 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
   const serverRoundRef = useRef<number | null>(null);
   const settledServerResultRef = useRef<string | null>(null);
   const resultHoldTimerRef = useRef<number | null>(null);
+  const [raceScreenActive, setRaceScreenActive] = useState(false);
+  const [pendingNextServerBet, setPendingNextServerBet] = useState<null | {
+    horse: number;
+    amount: number;
+    queuedFromRoundId: number;
+  }>(null);
+  const pendingNextServerBetProcessingRef = useRef(false);
 
   const cycle = useMemo(() => getCycleInfo(now, undefined, sessionEpochRef.current), [now]);
+
+  useEffect(() => {
+    function syncRaceScreenActive(event?: Event) {
+      const detail = event instanceof CustomEvent ? event.detail : undefined;
+
+      if (detail?.view === 'race' || detail?.view === 'bet') {
+        setRaceScreenActive(true);
+        return;
+      }
+
+      if (detail?.view === 'home') {
+        setRaceScreenActive(false);
+        return;
+      }
+
+      setRaceScreenActive(
+        document.body.classList.contains('hipiplay-race-mode') &&
+        !document.body.classList.contains('hipiplay-home-mode')
+      );
+    }
+
+    syncRaceScreenActive();
+
+    window.addEventListener('hipiplay-view-change', syncRaceScreenActive as EventListener);
+
+    return () => {
+      window.removeEventListener('hipiplay-view-change', syncRaceScreenActive as EventListener);
+    };
+  }, []);
 
   async function loadLocalBets() {
     const all = await localDerbyHistory(user.id);
@@ -636,6 +1736,31 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
     };
   }, []);
 
+  useEffect(() => {
+  let alive = true;
+
+  async function syncServerPlayerBalance() {
+    try {
+      const serverWallet = await getServerPlayerBalance(user.id);
+
+      if (!alive) return;
+
+      await applyServerWalletBalance(serverWallet.balance);
+    } catch (error) {
+      console.warn('No se pudo sincronizar el balance del servidor:', error);
+    }
+  }
+
+  syncServerPlayerBalance();
+
+  const timer = window.setInterval(syncServerPlayerBalance, 5000);
+
+  return () => {
+    alive = false;
+    window.clearInterval(timer);
+  };
+}, [user.id]);
+
   const localCurrentUserBet = userBetForRace(cycle.raceId, cycle.raceCode);
   const currentUserBet =
     serverOnline && serverRaceState
@@ -652,7 +1777,7 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
   const lastBet = bets[0];
 
   useEffect(() => {
-    if (!serverOnline || !serverRaceState || serverRaceState.phase !== 'RESULTS') return;
+    if (!serverOnline || !serverRaceState || serverRaceState.phase !== 'RESULTS' || !currentUserBet) return;
 
     let alive = true;
 
@@ -692,6 +1817,68 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
   }, [serverOnline, serverRaceState?.phase, serverRaceState?.roundId, user.id]);
 
   const bettingOpen = Boolean(serverOnline && serverRaceState && serverRaceState.phase === 'BETTING' && !currentUserBet);
+
+  /* HIPIPLAY_SERVER_FULLSCREEN_PHASE_CONTROL */
+  const hasVisibleBetInCurrentRound = Boolean(
+    raceScreenActive &&
+    serverOnline &&
+    serverRaceState &&
+    currentUserBet &&
+    currentUserBet.raceId === `server-round-${serverRaceState.roundId}`
+  );
+
+  const isFullscreenServerRacePhase = Boolean(
+    hasVisibleBetInCurrentRound &&
+    serverRaceState &&
+    (serverRaceState.phase === 'RACE' || serverRaceState.phase === 'RESULTS')
+  );
+
+  useEffect(() => {
+    const isRace = Boolean(
+      isFullscreenServerRacePhase &&
+      serverRaceState?.phase === 'RACE'
+    );
+
+    const isResults = Boolean(
+      isFullscreenServerRacePhase &&
+      serverRaceState?.phase === 'RESULTS'
+    );
+
+    document.body.classList.toggle('hipiplay-race-fullscreen-phase', isFullscreenServerRacePhase);
+    document.body.classList.toggle('hipiplay-server-race-phase', isRace);
+    document.body.classList.toggle('hipiplay-server-results-phase', isResults);
+
+    if (!isFullscreenServerRacePhase) {
+      document.body.classList.remove(
+        'hipiplay-race-fullscreen-phase',
+        'hipiplay-server-race-phase',
+        'hipiplay-server-results-phase',
+        'hipiplay-race-running-phase',
+        'hipiplay-race-result-phase',
+        'hipiplay-race-live-phase',
+        'hipiplay-race-results-phase'
+      );
+    }
+
+    return () => {
+      document.body.classList.remove(
+        'hipiplay-race-fullscreen-phase',
+        'hipiplay-server-race-phase',
+        'hipiplay-server-results-phase',
+        'hipiplay-race-running-phase',
+        'hipiplay-race-result-phase',
+        'hipiplay-race-live-phase',
+        'hipiplay-race-results-phase'
+      );
+    };
+  }, [
+    isFullscreenServerRacePhase,
+    raceScreenActive,
+    hasVisibleBetInCurrentRound,
+    serverRaceState?.phase,
+    serverRaceState?.roundId
+  ]);
+
 
   
   const [videoRaceSession, setVideoRaceSession] = useState<{
@@ -789,7 +1976,20 @@ useEffect(() => {
     }));
   }
 
-  function getCurrentWalletBalance() {
+  async function syncServerBalanceQuietly() {
+  try {
+    const serverBalancePayload = await getServerPlayerBalance(user.id);
+    const nextBalance = Number(serverBalancePayload.balance);
+
+    if (Number.isFinite(nextBalance)) {
+      await applyServerWalletBalance(nextBalance);
+    }
+  } catch (error) {
+    console.warn('No se pudo sincronizar el balance del servidor:', error);
+  }
+}
+
+function getCurrentWalletBalance() {
     try {
       const storedWalletRaw = localStorage.getItem('hipiplay_wallet_' + user.id);
 
@@ -833,79 +2033,66 @@ useEffect(() => {
   }
 
   /* El balance real lo valida el servidor. La PWA solo envía la apuesta. */
-    setLoading(true);
-    setMessage('');
-    
-    try {
-      const res = await sendServerBet({
-        playerId: user.id,
-        clientName: user.username,
-        horseId: horse,
-        amount: safeAmount,
-        balanceApostado: safeAmount,
-        balanceTotal
-      });
+  setLoading(true);
+  setMessage('');
 
-      const roundId = res.bet?.roundId || res.bet?.raceNumber || serverRaceState.roundId;
-      const betId = res.bet?.id || `SERVER-${roundId}-${Date.now()}`;
+  try {
+    const res = await sendServerBet({
+      playerId: user.id,
+      clientName: user.username,
+      horseId: horse,
+      amount: safeAmount,
+      balanceApostado: safeAmount,
+      balanceTotal
+    });
 
-      const placedBet: UserRaceBet = {
-        raceId: `server-round-${roundId}`,
-        raceCode: `Carrera ${roundId}`,
-        betId,
-        selectedHorse: horse,
-        amount: safeAmount
-      };
+    const roundId = res.bet?.roundId || res.bet?.raceNumber || serverRaceState.roundId;
+    const betId = res.bet?.id || `SERVER-${roundId}-${Date.now()}`;
 
-      setServerUserBet(placedBet);
-      setUserBetsByRace(prev => ({
-        ...prev,
-        [placedBet.raceId]: placedBet
-      }));
+    const placedBet: UserRaceBet = {
+      raceId: `server-round-${roundId}`,
+      raceCode: `Carrera ${roundId}`,
+      betId,
+      selectedHorse: horse,
+      amount: safeAmount
+    };
 
-      const balanceAfterBet = Number(
-        res.bet?.balanceAfterBet ??
-        (res as any).balanceAfterBet ??
-        (res as any).walletBalance ??
-        (res as any).finalBalance
-      );
+    setServerUserBet(placedBet);
+    setUserBetsByRace(prev => ({
+      ...prev,
+      [placedBet.raceId]: placedBet
+    }));
 
-      if (Number.isFinite(balanceAfterBet)) {
-        await applyServerWalletBalance(balanceAfterBet);
-      }
+    const balanceAfterBet = Number(
+      res.bet?.balanceAfterBet ??
+      (res as any).balanceAfterBet ??
+      (res as any).walletBalance ??
+      (res as any).finalBalance
+    );
 
-      if (res.state) {
-        setServerRaceState(res.state);
-      }
-
-      setMessage(`Boleto enviado al servidor: ${betId}`);
-    } catch (err) {
-      setMessage(normalizeError(err));
-    } finally {
-      setLoading(false);
+    if (Number.isFinite(balanceAfterBet)) {
+      await applyServerWalletBalance(balanceAfterBet);
     }
+
+    if (res.state) {
+      setServerRaceState(res.state);
+    }
+
+    setMessage(`Boleto enviado al servidor: ${betId}`);
+  } catch (err) {
+    setMessage(normalizeError(err));
+  } finally {
+    setLoading(false);
   }
+  }
+  const [walletAction, setWalletAction] = useState<WalletAction | null>(null);
 
-  return <div className="player-screen">
+return <div className={`player-screen ${currentUserBet && serverRaceState?.phase === 'BETTING' ? 'hipiplay-prep-screen' : ''}`}>
     <PlayerSummary wallet={wallet} pendingCount={pendingCount} lastBet={lastBet} lastResult={lastResult} />
-<div className="cycle-steps glass">
-      <div className={cycle.phase === 'betting' ? 'step active' : 'step done'}><span>01</span><strong>Apuestas</strong><small>60 segundos</small></div>
-      <div className="step-line"></div>
-      <div className={cycle.phase === 'running' ? 'step active' : 'step'}><span>02</span><strong>Carrera</strong><small>20 segundos</small></div>
-      <div className="step-line"></div>
-      <div className={cycle.phase === 'result' ? 'step active' : lastResult ? 'step done' : 'step'}><span>03</span><strong>Resultado</strong><small>Al terminar</small></div>
-    </div>
-        <div className={`server-sync-card ${serverOnline ? 'online' : 'offline'}`}>
-      <strong>{serverOnline ? 'Servidor conectado' : 'Sin conexiÃ³n con el servidor'}</strong>
-      <span>
-        {serverOnline && serverRaceState
-          ? `Ronda ${serverRaceState.roundId} Â· ${serverRaceState.phase === 'BETTING' ? 'Apuestas abiertas' : serverRaceState.phase === 'RACE' ? 'Carrera en curso' : 'Resultado oficial'} Â· ${serverRaceState.secondsRemaining}s`
-          : serverSyncError || 'Esperando sincronizaciÃ³n...'}
-      </span>
-    </div>
-
-    <div className="horse-bet-panel glass">
-      <h3 className="horse-bet-title">Selecciona tu caballo y apuesta</h3>
+    <WalletActionsPanel user={user} onAction={setWalletAction} />
+    {walletAction && <WalletActionModal action={walletAction} user={user} wallet={wallet} onClose={() => setWalletAction(null)} onDone={async () => { await refreshLocal(); }} />}
+<div className="horse-bet-panel glass">
+      
 
       <HorseBetGrid
         selectedHorse={horse}
@@ -1060,58 +2247,198 @@ type InstallPromptEvent = Event & {
 function PwaInstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
+
+  function isRunningStandalone() {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      Boolean((window.navigator as any).standalone)
+    );
+  }
 
   useEffect(() => {
+    const checkInstalled = () => {
+      setInstalled(isRunningStandalone());
+    };
+
+    checkInstalled();
+
     const onBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
       setDeferredPrompt(event as InstallPromptEvent);
+      setInstalled(false);
     };
 
     const onInstalled = () => {
       setInstalled(true);
       setDeferredPrompt(null);
+      setShowInstallHelp(false);
     };
 
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
     window.addEventListener('appinstalled', onInstalled);
+    window.matchMedia('(display-mode: standalone)').addEventListener?.('change', checkInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
       window.removeEventListener('appinstalled', onInstalled);
+      window.matchMedia('(display-mode: standalone)').removeEventListener?.('change', checkInstalled);
     };
   }, []);
 
   async function install() {
-    if (!deferredPrompt) return;
-    await deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    setDeferredPrompt(null);
+    if (isRunningStandalone()) {
+      setInstalled(true);
+      return;
+    }
+
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      setDeferredPrompt(null);
+      return;
+    }
+
+    setShowInstallHelp(true);
   }
 
-  if (installed || !deferredPrompt) return null;
-  return <button className="mobile-install-btn" onClick={install}>Instalar</button>;
+  if (installed) return null;
+
+  return (
+    <>
+      <button
+        className="mobile-install-btn mobile-icon-btn"
+        type="button"
+        onClick={install}
+        aria-label="Instalar HipiPlay"
+        title="Instalar"
+      >
+        <Download size={24} />
+      </button>
+
+      {showInstallHelp && (
+        <div className="pwa-install-help-backdrop" onClick={() => setShowInstallHelp(false)}>
+          <section className="pwa-install-help-card" onClick={event => event.stopPropagation()}>
+            <strong>Instalar HipiPlay</strong>
+            <p>Para instalar la app, toca el menú de Chrome ⋮ y selecciona <b>Instalar app</b> o <b>Agregar a pantalla principal</b>.</p>
+            <button type="button" onClick={() => setShowInstallHelp(false)}>Entendido</button>
+          </section>
+        </div>
+      )}
+    </>
+  );
 }
 export function App() {
   const [user, setUser] = useState<User | null>(null);
   const [localWallet, setLocalWallet] = useState<LocalWalletState | null>(null);
   const [tab, setTab] = useState<Tab>('games');
-  const [loading, setLoading] = useState(true);
-
-  async function refreshLocal(userId = user?.id) {
+const [loading, setLoading] = useState(true);
+async function refreshLocal(userId = user?.id) {
     if (!userId) return;
-    const wallet = await getLocalWallet(userId);
-    setLocalWallet(wallet);
+
+    let safeBalance = 0;
+    let syncedFromServer = false;
+
+    try {
+      const serverWallet = await getServerPlayerBalance(userId);
+      const rawBalance =
+        (serverWallet as any)?.balance ??
+        (serverWallet as any)?.serverBalance ??
+        (serverWallet as any)?.walletBalance ??
+        (serverWallet as any)?.finalBalance ??
+        (serverWallet as any)?.demoBalance ??
+        0;
+
+      const numericBalance = Number(rawBalance);
+      safeBalance = Number.isFinite(numericBalance) ? Math.max(0, Math.floor(numericBalance)) : 0;
+      syncedFromServer = true;
+    } catch {
+      safeBalance = 0;
+    }
+
+    const local = await initLocalWallet(userId, {
+      demoBalance: safeBalance,
+      realBalance: 0,
+      giftLocked: 0,
+    });
+
+    const syncedWallet = {
+      ...local,
+      userId,
+      demoBalance: safeBalance,
+      realBalance: 0,
+      serverManaged: syncedFromServer,
+      balanceSource: syncedFromServer ? 'server' : 'unavailable',
+    } as LocalWalletState & { serverManaged: boolean; balanceSource: string };
+
+    try {
+      localStorage.setItem('hipiplay_wallet_' + userId, JSON.stringify(syncedWallet));
+    } catch {
+      // No bloquear la app si localStorage falla.
+    }
+
+    setLocalWallet(syncedWallet);
+
+    window.dispatchEvent(
+      new CustomEvent('hipiplay-wallet-balance-updated', {
+        detail: { balance: safeBalance },
+      })
+    );
   }
 
   async function bootstrap(u: User, w: Wallet) {
-    setUser(u);
-    const local = await initLocalWallet(u.id, {
-      demoBalance: w.demoBalance,
-      realBalance: w.realBalance,
-      giftLocked: w.giftLocked,
-    });
-    setLocalWallet(local);
+  setUser(u);
+
+  let serverBalance = 0;
+
+  try {
+    const serverWallet = await getServerPlayerBalance(u.id);
+    serverBalance = Number(
+      (serverWallet as any)?.balance ??
+      (serverWallet as any)?.serverBalance ??
+      (serverWallet as any)?.walletBalance ??
+      (serverWallet as any)?.finalBalance ??
+      (serverWallet as any)?.demoBalance ??
+      0
+    );
+  } catch (error) {
+    console.warn('No se pudo consultar el balance inicial del servidor:', error);
   }
+
+  const safeBalance = Math.max(0, Math.floor(Number(serverBalance || 0)));
+
+  const local = await initLocalWallet(u.id, {
+    demoBalance: safeBalance,
+    realBalance: 0,
+    giftLocked: w.giftLocked,
+  });
+
+  const syncedWallet = {
+    ...local,
+    demoBalance: safeBalance,
+    serverManaged: true,
+  } as LocalWalletState & { serverManaged: boolean };
+
+  try {
+    localStorage.setItem('hipiplay_wallet_' + u.id, JSON.stringify(syncedWallet));
+  } catch {
+    // No interrumpir la app si localStorage falla.
+  }
+
+  setLocalWallet(syncedWallet);
+
+  window.dispatchEvent(
+    new CustomEvent('hipiplay-wallet-balance-updated', {
+      detail: { balance: safeBalance },
+    })
+  );
+
+  window.dispatchEvent(
+    new CustomEvent('hipiplay-wallet-updated', {
+      detail: { balance: safeBalance },
+    })
+  );
+}
 
   useEffect(() => {
     const localUser = getLocalUser();
@@ -1121,21 +2448,50 @@ export function App() {
     api.me().then(res => bootstrap(res.user, res.wallet)).catch(() => null).finally(() => setLoading(false));
   }, []);
 
+  function goToHomeMenu() {
+    document.body.classList.add('hipiplay-home-mode');
+    document.body.classList.remove(
+      'hipiplay-race-mode',
+      'hipiplay-race-fullscreen-phase',
+      'hipiplay-server-race-phase',
+      'hipiplay-server-results-phase'
+    );
+
+    window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+      detail: { view: 'home' }
+    }));
+
+    setTab('games');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   if (loading) return <div className="loading"><Sparkles className="spin" /> Cargando HipiPlay...</div>;
   if (!user) return <Login onLogin={(u, w) => { bootstrap(u, w); }} />;
 
   return <div className="app-shell clean-player-shell">
     <header className="mobile-app-header">
-      <div className="mobile-brand-lockup">
+            <div className="mobile-brand-lockup mobile-brand-lockup-compact">
         <img src={hipiPlayLogo} alt="HipiPlay" />
-        <div>
-          <strong>HipiPlay</strong>
-          <small>Carreras Hí­picas</small>
+        <div className="mobile-brand-text-balance">
+          <div className="mobile-brand-text">
+            <strong>HipiPlay</strong>
+            <small>Carreras Hípicas</small>
+          </div>
+          <span className="mobile-header-balance" title="Monedas disponibles">
+            🪙 {coins(Number(localWallet?.demoBalance || 0))}
+          </span>
         </div>
       </div>
       <div className="mobile-header-actions">
         <PwaInstallButton />
-        
+        <button
+          className="mobile-menu-btn mobile-icon-btn"
+          type="button"
+          onClick={goToHomeMenu}
+          aria-label="Volver al menú"
+          title="Menú"
+        >
+          <Menu size={24} />
+        </button>
       </div>
     </header>
     <header className="topbar glass clean-topbar">
@@ -1150,14 +2506,17 @@ export function App() {
       {tab === 'games' && <DerbyGame user={user} wallet={localWallet} refreshLocal={() => refreshLocal(user.id)} />}
       {tab === 'history' && <HistoryPanel userId={user.id} />}
     </main>
-
-    <nav className="mobile-bottom-nav" aria-label="NavegaciÃƒÂ³n mÃƒÂ³vil HipiPlay">
-      <button className={tab === 'games' ? 'active' : ''} onClick={() => setTab('games')}><Trophy size={20} /><span>Carrera</span></button>
+    <nav className="mobile-bottom-nav" aria-label="Navegación móvil HipiPlay">
       <button className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}><History size={20} /><span>Historial</span></button>
       <button className="logout-mobile" onClick={() => { clearLocalUser(); logout(); location.reload(); }}><LogOut size={20} /><span>Salir</span></button>
     </nav>
   </div>;
 }
+
+
+
+
+
 
 
 

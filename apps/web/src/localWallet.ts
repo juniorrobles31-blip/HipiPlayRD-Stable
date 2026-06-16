@@ -3,14 +3,25 @@ import { newId, sha256Hex, signLocalPayload, stableStringify } from './signing';
 
 export async function initLocalWallet(userId: string, initial?: { demoBalance?: number; realBalance?: number; giftLocked?: number }) {
   const existing = await dbGet<LocalWalletState>('wallet_state', userId);
-  if (existing) return existing;
+  if (existing) {
+    const updatedAt = new Date().toISOString();
+    const sanitized: LocalWalletState = {
+      ...existing,
+      demoBalance: Number(initial?.demoBalance ?? 0),
+      realBalance: Number(initial?.realBalance ?? 0),
+      giftBalance: Number(initial?.giftLocked ?? 0),
+      updatedAt
+    };
+    await dbPut('wallet_state', sanitized);
+    return sanitized;
+  }
   const createdAt = new Date().toISOString();
   const stateSeed = await sha256Hex(`${userId}:${createdAt}:${Math.random()}`);
   const wallet: LocalWalletState = {
     userId,
     walletStateId: `WAL-${stateSeed.slice(0, 24).toUpperCase()}`,
-    demoBalance: initial?.demoBalance ?? 10000,
-    realBalance: initial?.realBalance ?? 5000,
+    demoBalance: initial?.demoBalance ?? 0,
+    realBalance: initial?.realBalance ?? 0,
     giftBalance: initial?.giftLocked ?? 0,
     nonce: 0,
     updatedAt: createdAt
