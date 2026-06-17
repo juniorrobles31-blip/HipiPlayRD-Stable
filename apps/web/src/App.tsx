@@ -164,11 +164,11 @@ function addUserBetToExposure(exposure: DerbyMarketExposure, bet: UserRaceBet | 
 function normalizeError(err: unknown) {
   const raw = err instanceof Error ? err.message : 'No se pudo generar el boleto.';
   return raw
-    .replace('Saldo local insuficiente en la wallet del telÃ©fono.', 'Monedas insuficientes.')
+    .replace('Saldo local insuficiente en la wallet del telÃƒÂ©fono.', 'Monedas insuficientes.')
     .replace('Saldo local insuficiente en la wallet del dispositivo.', 'Monedas insuficientes.')
-    .replace('Monto invÃ¡lido.', 'Cantidad invÃ¡lida.')
-    .replace('Apuestas cerradas para esta carrera. Espera la prÃ³xima.', 'Las apuestas estÃ¡n cerradas. Espera la prÃ³xima ventana.')
-    .replace('Ya tienes un boleto pendiente en esta carrera. Espera el resultado o la prÃ³xima carrera.', 'Ya tienes un boleto activo en esta carrera.');
+    .replace('Monto invÃƒÂ¡lido.', 'Cantidad invÃƒÂ¡lida.')
+    .replace('Apuestas cerradas para esta carrera. Espera la prÃƒÂ³xima.', 'Las apuestas estÃƒÂ¡n cerradas. Espera la prÃƒÂ³xima ventana.')
+    .replace('Ya tienes un boleto pendiente en esta carrera. Espera el resultado o la prÃƒÂ³xima carrera.', 'Ya tienes un boleto activo en esta carrera.');
 }
 
 
@@ -184,7 +184,7 @@ async function passwordAuthRequest(action: 'login' | 'register', payload: any) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok || data.status === 'ERROR' || data.ok === false) {
-    throw new Error(data.error || data.message || data.detail || 'No se pudo completar la autenticación.');
+    throw new Error(data.error || data.message || data.detail || 'No se pudo completar la autenticaciÃ³n.');
   }
 
   return normalizePasswordAuthResponse(data, payload.username);
@@ -194,7 +194,7 @@ function normalizePasswordAuthResponse(data: any, fallbackUsername: string) {
   const token = data.token || data.accessToken || data.jwt;
 
   if (!token) {
-    throw new Error('El servidor autenticó la solicitud, pero no devolvió token.');
+    throw new Error('El servidor autenticÃ³ la solicitud, pero no devolviÃ³ token.');
   }
 
   const user = data.user || data.player || data.account || {
@@ -252,7 +252,7 @@ function Login({ onLogin }: { onLogin: (user: User, wallet: Wallet) => void }) {
     const cleanPassword = password.trim();
 
     if (!cleanUsername) {
-      setError('Escribe tu usuario para iniciar sesión.');
+      setError('Escribe tu usuario para iniciar sesiÃ³n.');
       return;
     }
 
@@ -353,7 +353,7 @@ function Login({ onLogin }: { onLogin: (user: User, wallet: Wallet) => void }) {
     }
 
     if (cleanUsername.toLowerCase() === 'admin') {
-      setError('Ese usuario no está disponible.');
+      setError('Ese usuario no estÃ¡ disponible.');
       return;
     }
 
@@ -363,7 +363,7 @@ function Login({ onLogin }: { onLogin: (user: User, wallet: Wallet) => void }) {
     }
 
     if (!termsAccepted) {
-      setError('Debes aceptar los términos y condiciones de HipiPlay.');
+      setError('Debes aceptar los tÃ©rminos y condiciones de HipiPlay.');
       return;
     }
 
@@ -425,7 +425,7 @@ return <div className="player-screen">
           <div>
             <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
             <h1>Bienvenido</h1>
-            <p>Inicia sesión con la seguridad de tu móvil.</p>
+            <p>Inicia sesiÃ³n con la seguridad de tu mÃ³vil.</p>
           </div>
         </div>
 
@@ -455,7 +455,7 @@ return <div className="player-screen">
           <div>
             <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
             <h1>Crear cuenta</h1>
-            <p>Registra tu acceso usando la seguridad de tu móvil.</p>
+            <p>Registra tu acceso usando la seguridad de tu mÃ³vil.</p>
           </div>
         </div>
 
@@ -475,7 +475,7 @@ return <div className="player-screen">
               onChange={e => setPassword(e.target.value)}
               autoComplete="new-password"
               minLength={6}
-              placeholder="Mínimo 6 caracteres"
+              placeholder="MÃ­nimo 6 caracteres"
             />
           </label>
 
@@ -485,7 +485,7 @@ return <div className="player-screen">
               checked={termsAccepted}
               onChange={e => setTermsAccepted(e.target.checked)}
             />
-            <span>Acepto los términos y condiciones de HipiPlay.</span>
+            <span>Acepto los tÃ©rminos y condiciones de HipiPlay.</span>
           </label>
 
           {error && <div className="error-box">{error}</div>}
@@ -515,7 +515,7 @@ return <div className="player-screen">
         <img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo login-logo" />
         <div>
           <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
-          <h1>Iniciar sesión</h1>
+          <h1>Iniciar sesiÃ³n</h1>
           <p>Escribe tu usuario y entra con huella, Face ID o PIN.</p>
         </div>
       </div>
@@ -616,7 +616,7 @@ function WalletActionsPanel({ user, onAction }: { user: User; onAction: (action:
   ];
 
   return (
-    <section className="wallet-mobile-home-shell" aria-label="Menú principal HipiPlay">
+    <section className="wallet-mobile-home-shell" aria-label="MenÃº principal HipiPlay">
       <div className="wallet-phone-menu">
         <div className="wallet-phone-brand">
           <img src={hipiPlayLogo} alt="HipiPlay" className="wallet-phone-logo" />
@@ -665,6 +665,12 @@ function WalletActionModal({
   const [offers, setOffers] = useState<any[]>([]);
   const [mySales, setMySales] = useState<any[]>([]);
   const [sellView, setSellView] = useState<'menu' | 'new' | 'active'>('menu');
+  const [transferStep, setTransferStep] = useState<'form' | 'pending' | 'ready' | 'confirmed'>('form');
+  const [pendingTransfer, setPendingTransfer] = useState<any | null>(null);
+  const [transferPasskeyProof, setTransferPasskeyProof] = useState('');
+  const [targetUserStatus, setTargetUserStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
+  const [targetUserMessage, setTargetUserMessage] = useState('');
+  const [resolvedTargetUser, setResolvedTargetUser] = useState<any | null>(null);
 
   const titles: Record<WalletAction, string> = {
     transfer: 'Transferencia entre usuarios',
@@ -676,7 +682,7 @@ function WalletActionModal({
   };
 
   const subtitles: Record<WalletAction, string> = {
-    transfer: 'Envía monedas internas a otro usuario.',
+    transfer: 'EnvÃ­a monedas internas a otro usuario.',
     bet: 'Entrar a la pantalla de apuestas.',
     withdraw: 'Solicita retiro USDT por red BSC/BEP20.',
     deposit: 'Genera una orden de recarga USDT.',
@@ -725,7 +731,7 @@ function WalletActionModal({
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok || data.status === 'ERROR' || data.ok === false) {
-      throw new Error(data.error || data.message || data.detail || 'No se pudo completar la operación.');
+      throw new Error(data.error || data.message || data.detail || 'No se pudo completar la operaciÃ³n.');
     }
 
     return data;
@@ -787,6 +793,9 @@ function WalletActionModal({
   useEffect(() => {
     setStatus('');
     setSellView('menu');
+    setTransferStep('form');
+    setPendingTransfer(null);
+    setTransferPasskeyProof('');
 
     if (action === 'buy-p2p') {
       loadOffers();
@@ -797,11 +806,77 @@ function WalletActionModal({
     }
   }, [action]);
 
+  
+  
+  async function validateTargetUser() {
+    const query = targetUser.trim();
+
+    setResolvedTargetUser(null);
+
+    if (!query) {
+      setTargetUserStatus('idle');
+      setTargetUserMessage('');
+      return null;
+    }
+
+    setTargetUserStatus('checking');
+    setTargetUserMessage('Validando usuario...');
+
+    try {
+      const response = await fetch(
+        `/api/transfers/coins/resolve-user?query=${encodeURIComponent(query)}&currentPlayerId=${encodeURIComponent(user.id)}`,
+        { method: 'GET' }
+      );
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data?.exists || !data?.user?.playerId) {
+        throw new Error(data?.error || 'Usuario no encontrado.');
+      }
+
+      setResolvedTargetUser(data.user);
+      setTargetUserStatus('valid');
+      setTargetUserMessage(`Usuario validado: ${data.user.username}`);
+
+      return data.user;
+    } catch (error) {
+      setResolvedTargetUser(null);
+      setTargetUserStatus('invalid');
+      setTargetUserMessage(normalizeError(error));
+      return null;
+    }
+  }
+  async function requestTransferPasskeyProof(
+    purpose: 'COIN_TRANSFER_CREATE' | 'COIN_TRANSFER_CONFIRM',
+    payload: Record<string, any>
+  ) {
+    const optionsResponse = await postJson('/api/auth/passkey/transfer/options', {
+      username: user.username,
+      purpose,
+      ...payload
+    });
+
+    const credential = await startAuthentication({
+      optionsJSON: optionsResponse.options
+    } as any);
+
+    const verifyResponse = await postJson('/api/auth/passkey/transfer/verify', {
+      challengeId: optionsResponse.challengeId,
+      credential,
+      username: user.username
+    });
+
+    if (!verifyResponse?.passkeyProof) {
+      throw new Error('No se pudo validar la huella para esta transferencia.');
+    }
+
+    return verifyResponse.passkeyProof;
+  }
   async function submit() {
     const safeAmount = Math.floor(Number(amount || 0));
 
     if (action !== 'buy-p2p' && (!Number.isFinite(safeAmount) || safeAmount <= 0)) {
-      setStatus('Ingresa una cantidad válida.');
+      setStatus('Ingresa una cantidad vÃ¡lida.');
       return;
     }
 
@@ -812,30 +887,98 @@ function WalletActionModal({
       let data: any = null;
 
       if (action === 'transfer') {
+        if (transferStep === 'confirmed') {
+          onClose();
+          return;
+        }
+
         if (!targetUser.trim()) {
           setStatus('Escribe el usuario o ID destino.');
           setLoading(false);
           return;
         }
 
-        data = await postJson('/api/wallet/transfer', {
-          playerId: user.id,
-          userId: user.id,
-          fromPlayerId: user.id,
-          senderId: user.id,
-          toPlayerId: targetUser.trim(),
-          recipientId: targetUser.trim(),
-          toUsername: targetUser.trim(),
-          username: targetUser.trim(),
-          amount: safeAmount
-        });
+        const finalTargetUser = resolvedTargetUser || await validateTargetUser();
 
-        setStatus(data.message || 'Transferencia enviada correctamente.');
+        if (!finalTargetUser?.playerId) {
+          setStatus('Debes validar un usuario destino registrado antes de transferir.');
+          setLoading(false);
+          return;
+        }
+
+        if (transferStep === 'form') {
+          setStatus('Valida tu huella para crear la transferencia.');
+
+          const passkeyProof = await requestTransferPasskeyProof('COIN_TRANSFER_CREATE', {
+            toPlayerId: finalTargetUser.playerId,
+            amount: safeAmount
+          });
+
+          data = await postJson('/api/transfers/coins/create', {
+            fromPlayerId: user.id,
+            toPlayerId: finalTargetUser.playerId,
+            amount: safeAmount,
+            note: 'Transferencia entre usuarios',
+            passkeyProof
+          });
+
+          setPendingTransfer(data.transfer);
+          setTransferPasskeyProof('');
+          setTransferStep('pending');
+          setStatus('Transferencia pendiente. Cuando recibas el pago, presiona "Pago recibido".');
+
+          await onDone();
+          return;
+        }
+
+        if (transferStep === 'pending') {
+          if (!pendingTransfer?.transferId) {
+            setStatus('No hay una transferencia pendiente para confirmar.');
+            setLoading(false);
+            return;
+          }
+
+          setStatus('Valida tu huella para confirmar que recibiste el pago.');
+
+          const passkeyProof = await requestTransferPasskeyProof('COIN_TRANSFER_CONFIRM', {
+            transferId: pendingTransfer.transferId,
+            toPlayerId: pendingTransfer.toPlayerId || finalTargetUser.playerId,
+            amount: Number(pendingTransfer.amount || safeAmount)
+          });
+
+          setTransferPasskeyProof(passkeyProof);
+          setTransferStep('ready');
+          setStatus('Huella validada. Presiona "¿Estás seguro?" para completar la transferencia.');
+          return;
+        }
+
+        if (transferStep === 'ready') {
+          if (!pendingTransfer?.transferId || !transferPasskeyProof) {
+            setStatus('Primero debes validar la huella.');
+            setLoading(false);
+            return;
+          }
+
+          data = await postJson(`/api/transfers/coins/${pendingTransfer.transferId}/confirm`, {
+            confirmingPlayerId: user.id,
+            paymentReceived: true,
+            confirmationText: 'PAGO_RECIBIDO',
+            passkeyProof: transferPasskeyProof
+          });
+
+          setPendingTransfer(data.transfer);
+          setTransferPasskeyProof('');
+          setTransferStep('confirmed');
+          setStatus('Transferencia confirmada correctamente.');
+
+          await onDone();
+          return;
+        }
       }
 
       if (action === 'withdraw') {
         if (!address.trim()) {
-          setStatus('Escribe la dirección USDT/BSC destino.');
+          setStatus('Escribe la direcciÃ³n USDT/BSC destino.');
           setLoading(false);
           return;
         }
@@ -867,7 +1010,7 @@ function WalletActionModal({
         const orderId = order.orderId || order.id || data.orderId || '';
 
         setStatus(
-          `Orden de recarga creada.${orderId ? `\nOrden: ${orderId}` : ''}${payAddress ? `\nDirección: ${payAddress}` : ''}`
+          `Orden de recarga creada.${orderId ? `\nOrden: ${orderId}` : ''}${payAddress ? `\nDirecciÃ³n: ${payAddress}` : ''}`
         );
       }
 
@@ -875,7 +1018,7 @@ function WalletActionModal({
         const safePrice = Number(price || 1);
 
         if (!Number.isFinite(safePrice) || safePrice <= 0) {
-          setStatus('Ingresa un precio válido.');
+          setStatus('Ingresa un precio vÃ¡lido.');
           setLoading(false);
           return;
         }
@@ -914,7 +1057,7 @@ function WalletActionModal({
     const requestedCoins = offerCoinsValue(offer);
 
     if (!offerId) {
-      setStatus('La oferta no tiene ID válido.');
+      setStatus('La oferta no tiene ID vÃ¡lido.');
       return;
     }
 
@@ -941,7 +1084,7 @@ function WalletActionModal({
       const tradeId = trade.tradeId || trade.id || '';
 
       setStatus(
-        `Compra creada.${tradeId ? `\nTrade: ${tradeId}` : ''}${payAddress ? `\nEnvía USDT a: ${payAddress}` : ''}`
+        `Compra creada.${tradeId ? `\nTrade: ${tradeId}` : ''}${payAddress ? `\nEnvÃ­a USDT a: ${payAddress}` : ''}`
       );
 
       await loadOffers();
@@ -957,7 +1100,7 @@ function WalletActionModal({
     const offerId = offer.offerId || offer.id || offer._id;
 
     if (!offerId) {
-      setStatus('La venta no tiene ID válido.');
+      setStatus('La venta no tiene ID vÃ¡lido.');
       return;
     }
 
@@ -997,7 +1140,7 @@ function WalletActionModal({
     <div className="wallet-action-modal-backdrop">
       <section className="wallet-action-modal-card">
         <button className="wallet-action-modal-close" type="button" onClick={onClose}>
-          ×
+          Ã—
         </button>
 
         <h2>{titles[action]}</h2>
@@ -1013,7 +1156,27 @@ function WalletActionModal({
           <>
             <label>
               Usuario destino
-              <input value={targetUser} onChange={e => setTargetUser(e.target.value)} placeholder="usuario123" />
+              <div className={`transfer-user-check ${targetUserStatus}`}>
+                <input
+                  value={targetUser}
+                  onChange={e => {
+                    setTargetUser(e.target.value);
+                    setTargetUserStatus('idle');
+                    setTargetUserMessage('');
+                    setResolvedTargetUser(null);
+                  }}
+                  onBlur={validateTargetUser}
+                  placeholder="usuario123"
+                />
+                {targetUserStatus === 'checking' && <span className="transfer-user-badge checking">...</span>}
+                {targetUserStatus === 'valid' && <span className="transfer-user-badge valid">✓</span>}
+                {targetUserStatus === 'invalid' && <span className="transfer-user-badge invalid">!</span>}
+              </div>
+              {targetUserMessage && (
+                <small className={`transfer-user-message ${targetUserStatus}`}>
+                  {targetUserMessage}
+                </small>
+              )}
             </label>
             <label>
               Cantidad de monedas
@@ -1029,7 +1192,7 @@ function WalletActionModal({
               <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} placeholder="50" />
             </label>
             <label>
-              Dirección BSC / BEP20
+              DirecciÃ³n BSC / BEP20
               <input value={address} onChange={e => setAddress(e.target.value)} placeholder="0x..." />
             </label>
           </>
@@ -1160,16 +1323,31 @@ function WalletActionModal({
               onClick={() => {
                 setStatus('');
                 setSellView('menu');
+    setTransferStep('form');
+    setPendingTransfer(null);
+    setTransferPasskeyProof('');
               }}
               disabled={loading}
             >
-              Atrás
+              AtrÃ¡s
             </button>
           )}
 
           {action !== 'buy-p2p' && !(action === 'sell-p2p' && sellView !== 'new') && (
             <button className="primary" type="button" onClick={submit} disabled={loading}>
-              {loading ? 'Procesando...' : action === 'sell-p2p' ? 'Publicar venta' : 'Continuar'}
+              {loading
+                ? 'Procesando...'
+                : action === 'transfer'
+                  ? transferStep === 'pending'
+                    ? 'Pago recibido'
+                    : transferStep === 'ready'
+                      ? '¿Estás seguro?'
+                      : transferStep === 'confirmed'
+                        ? 'Cerrar'
+                        : 'Continuar'
+                  : action === 'sell-p2p'
+                    ? 'Publicar venta'
+                    : 'Continuar'}
             </button>
           )}
         </div>
@@ -1208,7 +1386,7 @@ function PlayerSummary({ wallet }: { wallet: LocalWalletState | null; pendingCou
     <section className="player-summary wallet-only-summary">
       <div className="wallet-only-card">
         <div className="wallet-only-info">
-          <span className="wallet-coin-icon">🪙</span>
+          <span className="wallet-coin-icon">ðŸª™</span>
           <span>Monedas disponibles</span>
         </div>
 
@@ -1233,7 +1411,7 @@ function getRaceLapProgress(cycle: CycleInfo, horse: number, rank: number) {
   const timeSeconds = cycle.phaseElapsed / 1000;
 
   // Movimiento visual abierto: variaciones de ritmo durante toda la carrera.
-  // El resultado oficial sigue siendo el Top 3 interno calculado por menor exposiciÃ³n.
+  // El resultado oficial sigue siendo el Top 3 interno calculado por menor exposiciÃƒÂ³n.
   const waveA = seededWave(cycle.seed, horse, timeSeconds, 1) * 0.018;
   const waveB = seededWave(cycle.seed, horse, timeSeconds, 2) * 0.012;
   const surge = seededWave(cycle.seed, horse, timeSeconds * 0.55, 3) * 0.02;
@@ -1241,7 +1419,7 @@ function getRaceLapProgress(cycle: CycleInfo, horse: number, rank: number) {
 
   const packProgress = smoothStep(progress) * 0.92 + visualNoise;
 
-  // El remate solo aparece al final para que no se vea estÃ¡tico ni predecible.
+  // El remate solo aparece al final para que no se vea estÃƒÂ¡tico ni predecible.
   const sprintMix = smoothStep((progress - 0.82) / 0.18);
   const officialFinish = rank === 1
     ? 1.035
@@ -1269,7 +1447,7 @@ function getTrackPoint(cycle: CycleInfo, horse: number, rank: number, running: b
   const lap = running ? getRaceLapProgress(cycle, horse, rank) : 0.004 + horse * 0.002;
   const angle = lap * Math.PI * 2;
 
-  // Carril ovalado, similar a pista hÃ­pica. Cada caballo corre en su propia lÃ­nea.
+  // Carril ovalado, similar a pista hÃƒÂ­pica. Cada caballo corre en su propia lÃƒÂ­nea.
   const rx = 38.5 + laneIndex * 1.12;
   const ry = 27.5 + laneIndex * 0.72;
   const cx = 50;
@@ -1278,7 +1456,7 @@ function getTrackPoint(cycle: CycleInfo, horse: number, rank: number, running: b
   const x = cx + rx * Math.cos(angle);
   const y = cy + ry * Math.sin(angle);
 
-  // Tangente del Ã³valo para orientar caballo y jinete con la curva.
+  // Tangente del ÃƒÂ³valo para orientar caballo y jinete con la curva.
   const dx = -rx * Math.sin(angle);
   const dy = ry * Math.cos(angle);
   const rotation = Math.atan2(dy, dx) * 180 / Math.PI;
@@ -1494,7 +1672,7 @@ function RaceTrack({ cycle, resultOrder, selectedHorse, lastResult }: { cycle: C
 
         <strong>
           {running
-            ? 'Carrera hípica en desarrollo'
+            ? 'Carrera hÃ­pica en desarrollo'
             : resultPhase
               ? 'Resultado oficial'
               : 'Apuestas abiertas - selecciona tu caballo'}
@@ -1570,7 +1748,7 @@ function RaceTrack({ cycle, resultOrder, selectedHorse, lastResult }: { cycle: C
           </div>
         </div>
         <strong>{top3.map((h, i) => `${i + 1}o #${h}`).join('   |   ')}</strong>
-        <small>{userWon === undefined ? 'Carrera finalizada.' : userWon ? 'GANASTE - tu caballo entrÃ³ en el Top 3.' : 'PERDISTE - tu caballo quedÃ³ fuera del Top 3.'}</small>
+        <small>{userWon === undefined ? 'Carrera finalizada.' : userWon ? 'GANASTE - tu caballo entrÃƒÂ³ en el Top 3.' : 'PERDISTE - tu caballo quedÃƒÂ³ fuera del Top 3.'}</small>
       </div>}
     </div>
 
@@ -1579,13 +1757,13 @@ function RaceTrack({ cycle, resultOrder, selectedHorse, lastResult }: { cycle: C
       <span>
         {running
           ? (photoFinish
-            ? ' los ganadores cruzan la lÃ­nea de meta y desaparecen de la pista para revelar el Top 3 oficial.'
+            ? ' los ganadores cruzan la lÃƒÂ­nea de meta y desaparecen de la pista para revelar el Top 3 oficial.'
             : finalSprint
               ? ' se abre la recta final, los caballos aceleran y el lote se estira antes de la meta.'
-              : ' el grupo corre por carriles, cambia el ritmo y nadie muestra todavÃ­a una ventaja definitiva.')
+              : ' el grupo corre por carriles, cambia el ritmo y nadie muestra todavÃƒÂ­a una ventaja definitiva.')
           : resultPhase
             ? ' se muestra el Top 3 durante 10 segundos y luego empieza una nueva ventana de apuestas.'
-            : ' los caballos permanecen ocultos en el partidor; al cerrar el contador se abrirÃ¡n las compuertas.'}
+            : ' los caballos permanecen ocultos en el partidor; al cerrar el contador se abrirÃƒÂ¡n las compuertas.'}
       </span>
     </div>
 
@@ -1659,7 +1837,7 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
     try {
       await syncPendingQueue(20);
     } catch {
-      // La sincronizaciÃ³n no debe interrumpir la carrera.
+      // La sincronizaciÃƒÂ³n no debe interrumpir la carrera.
     } finally {
       await refreshLocal();
     }
@@ -1771,7 +1949,7 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
         )
       : localCurrentUserBet;
   const currentExposure = exposureForRace(cycle, currentUserBet, cycle.phase === 'running' || cycle.phase === 'result' ? 1 : cycle.bettingProgress);
-  // Resultado interno: se calcula con la exposiciÃ³n del mercado, pero el jugador solo ve el resultado final.
+  // Resultado interno: se calcula con la exposiciÃƒÂ³n del mercado, pero el jugador solo ve el resultado final.
   const resultOrder = buildResultOrderFromExposure(currentExposure, cycle.seed);
   const pendingCount = bets.filter(b => b.status === 'pending').length;
   const lastBet = bets[0];
@@ -1910,7 +2088,7 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
   }, [cycle.phase, cycle.raceId, cycle.raceCode, resultOrder]);
 
   useEffect(() => {
-    // La sesiÃ³n del video se limpia desde onFinish, despuÃ©s de mostrar el resultado.
+    // La sesiÃƒÂ³n del video se limpia desde onFinish, despuÃƒÂ©s de mostrar el resultado.
   }, [videoRaceSession]);
 useEffect(() => {
     if (cycle.phase !== 'result') return;
@@ -2010,12 +2188,12 @@ function getCurrentWalletBalance() {
 
   async function bet() {
     if (!serverOnline || !serverRaceState) {
-      setMessage('No hay conexiÃ³n con el servidor. No se puede apostar.');
+      setMessage('No hay conexiÃƒÂ³n con el servidor. No se puede apostar.');
       return;
     }
 
     if (serverRaceState.phase !== 'BETTING') {
-      setMessage('Las apuestas estÃ¡n cerradas. Espera la prÃ³xima ronda.');
+      setMessage('Las apuestas estÃƒÂ¡n cerradas. Espera la prÃƒÂ³xima ronda.');
       return;
     }
 
@@ -2028,11 +2206,11 @@ function getCurrentWalletBalance() {
   const balanceTotal = getCurrentWalletBalance();
 
   if (!Number.isFinite(safeAmount) || safeAmount <= 0) {
-    setMessage('Ingresa una cantidad válida de monedas.');
+    setMessage('Ingresa una cantidad vÃ¡lida de monedas.');
     return;
   }
 
-  /* El balance real lo valida el servidor. La PWA solo envía la apuesta. */
+  /* El balance real lo valida el servidor. La PWA solo envÃ­a la apuesta. */
   setLoading(true);
   setMessage('');
 
@@ -2138,7 +2316,7 @@ return <div className={`player-screen ${currentUserBet && serverRaceState?.phase
             (serverRaceState.raceSeconds || 20) - serverRaceState.secondsRemaining
           )}
           onFinish={() => {
-            console.log('Carrera visual local terminÃ³, esperando fase RESULTS del servidor:', serverRaceState.roundId);
+            console.log('Carrera visual local terminÃƒÂ³, esperando fase RESULTS del servidor:', serverRaceState.roundId);
           }}
         />
       ) : (
@@ -2152,9 +2330,9 @@ return <div className={`player-screen ${currentUserBet && serverRaceState?.phase
       )
     ) : (
       <section className="server-required-panel glass">
-        <strong>Sin conexiÃ³n con el servidor</strong>
+        <strong>Sin conexiÃƒÂ³n con el servidor</strong>
         <span>
-          Las apuestas, el cronÃ³metro, la carrera y los resultados se mostrarÃ¡n cuando la PWA sincronice con el servidor central.
+          Las apuestas, el cronÃƒÂ³metro, la carrera y los resultados se mostrarÃƒÂ¡n cuando la PWA sincronice con el servidor central.
         </span>
       </section>
     )}
@@ -2320,7 +2498,7 @@ function PwaInstallButton() {
         <div className="pwa-install-help-backdrop" onClick={() => setShowInstallHelp(false)}>
           <section className="pwa-install-help-card" onClick={event => event.stopPropagation()}>
             <strong>Instalar HipiPlay</strong>
-            <p>Para instalar la app, toca el menú de Chrome ⋮ y selecciona <b>Instalar app</b> o <b>Agregar a pantalla principal</b>.</p>
+            <p>Para instalar la app, toca el menÃº de Chrome â‹® y selecciona <b>Instalar app</b> o <b>Agregar a pantalla principal</b>.</p>
             <button type="button" onClick={() => setShowInstallHelp(false)}>Entendido</button>
           </section>
         </div>
@@ -2474,10 +2652,10 @@ async function refreshLocal(userId = user?.id) {
         <div className="mobile-brand-text-balance">
           <div className="mobile-brand-text">
             <strong>HipiPlay</strong>
-            <small>Carreras Hípicas</small>
+            <small>Carreras HÃ­picas</small>
           </div>
           <span className="mobile-header-balance" title="Monedas disponibles">
-            🪙 {coins(Number(localWallet?.demoBalance || 0))}
+            ðŸª™ {coins(Number(localWallet?.demoBalance || 0))}
           </span>
         </div>
       </div>
@@ -2487,15 +2665,15 @@ async function refreshLocal(userId = user?.id) {
           className="mobile-menu-btn mobile-icon-btn"
           type="button"
           onClick={goToHomeMenu}
-          aria-label="Volver al menú"
-          title="Menú"
+          aria-label="Volver al menÃº"
+          title="MenÃº"
         >
           <Menu size={24} />
         </button>
       </div>
     </header>
     <header className="topbar glass clean-topbar">
-      <div className="brand brand-hipiplay"><img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo topbar-logo" /><div><strong>HipiPlay</strong><small>Carreras HÃ­picas con monedas</small></div></div>
+      <div className="brand brand-hipiplay"><img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo topbar-logo" /><div><strong>HipiPlay</strong><small>Carreras HÃƒÂ­picas con monedas</small></div></div>
       <nav>
         <button className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}><History size={17}/> Historial</button>
       </nav>
@@ -2506,12 +2684,13 @@ async function refreshLocal(userId = user?.id) {
       {tab === 'games' && <DerbyGame user={user} wallet={localWallet} refreshLocal={() => refreshLocal(user.id)} />}
       {tab === 'history' && <HistoryPanel userId={user.id} />}
     </main>
-    <nav className="mobile-bottom-nav" aria-label="Navegación móvil HipiPlay">
+    <nav className="mobile-bottom-nav" aria-label="NavegaciÃ³n mÃ³vil HipiPlay">
       <button className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}><History size={20} /><span>Historial</span></button>
       <button className="logout-mobile" onClick={() => { clearLocalUser(); logout(); location.reload(); }}><LogOut size={20} /><span>Salir</span></button>
     </nav>
   </div>;
 }
+
 
 
 

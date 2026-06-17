@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #e5e7eb;
   background: #050816;
@@ -4261,7 +4261,7 @@ code { color: #fde68a; word-break: break-all; }
 
 .track-surface {
   inset: 22% 6% 22% 7.2% !important;
-  border-radius: 18px !important;
+  border-radius: 22px !important;
   overflow: visible;
 }
 
@@ -4799,78 +4799,8 @@ code { color: #fde68a; word-break: break-all; }
 /* END_PATCH_HIPIPLAY_COUNTDOWN_10S */
 
 
-/* BEGIN_PATCH_MOBILE_APP_UI */
 
-html,
-body,
-#root {
-  width: 100%;
-  min-height: 100%;
-  margin: 0;
-  overflow-x: hidden;
-  background: #06160f;
-}
 
-body {
-  overscroll-behavior: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-@media (max-width: 768px) {
-  body {
-    background: #06160f;
-  }
-
-  button,
-  input,
-  select {
-    min-height: 44px;
-    font-size: 16px;
-  }
-
-  .topbar,
-  .desktop-only {
-    display: none !important;
-  }
-
-  .app-shell,
-  .app,
-  .main-shell {
-    width: 100%;
-    max-width: 480px;
-    min-height: 100dvh;
-    margin: 0 auto;
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: calc(76px + env(safe-area-inset-bottom));
-    background: #06160f;
-  }
-
-  .card,
-  .panel,
-  .bet-card,
-  .wallet-card,
-  .race-card {
-    border-radius: 18px;
-    padding: 14px;
-  }
-
-  .hipica-broadcast-stage,
-  .race-track,
-  .track-shell {
-    width: 100%;
-    overflow: hidden;
-    border-radius: 20px;
-  }
-
-  .race-start-countdown-overlay,
-  .result-overlay {
-    width: calc(100% - 32px);
-    max-width: 360px;
-  }
-}
-
-/* END_PATCH_MOBILE_APP_UI */
 
 /* BEGIN_PATCH_HIPIPLAY_PWA_MOBILE_APP */
 
@@ -5293,7 +5223,7 @@ body {
   .clean-track-surface,
   .track-surface {
     inset: 18% 6% 18% 4.5% !important;
-    border-radius: 18px !important;
+    border-radius: 22px !important;
   }
 
   .aligned-starting-gate,
@@ -5923,7 +5853,7 @@ body {
     max-width: calc(100vw - 24px) !important;
     display: flex !important;
     gap: 8px !important;
-    padding: 8px !important;
+    padding: 6px !important;
     border-radius: 20px !important;
     box-sizing: border-box !important;
     z-index: 9999 !important;
@@ -5935,7 +5865,7 @@ body {
   .mobile-nav > * {
     flex: 1 1 0 !important;
     min-width: 0 !important;
-    height: 58px !important;
+    height: 74px !important;
     padding: 6px 4px !important;
     border-radius: 16px !important;
     box-sizing: border-box !important;
@@ -7113,3 +7043,3789 @@ textarea {
   font-weight: 900;
   line-height: 1;
 }
+/* FIX - Ocultar reloj/contador visual de tiempo de apuestas */
+.cycle-steps,
+.betting-timer,
+.betting-countdown,
+.bet-countdown,
+.bet-timer,
+.countdown-betting,
+.server-betting-countdown {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+
+/* FIX - Ocultar reloj/contador visual de tiempo de apuestas */
+.cycle-steps,
+.betting-timer,
+.betting-countdown,
+.bet-countdown,
+.bet-timer,
+.countdown-betting,
+.server-betting-countdown {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+
+/* FIX DEFINITIVO - Ocultar reloj visual de apuestas abiertas */
+.cycle-steps,
+.race-countdown,
+.race-timer,
+.betting-timer,
+.betting-countdown,
+.bet-countdown,
+.bet-timer,
+.countdown-betting,
+.server-betting-countdown,
+.race-start-countdown,
+.race-track-countdown {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Imagen pantalla completa después de apostar */
+.race-wait-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999999 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #020611 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.race-wait-fullscreen-image {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+/* Optimización móvil */
+@media (max-width: 768px) {
+  .race-wait-fullscreen-image {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .race-wait-fullscreen-image {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+
+/* Loading sutil sobre imagen de espera */
+.race-wait-loading {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(36px, 8vh, 82px);
+  transform: translateX(-50%);
+  z-index: 1000000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 999px;
+  background: rgba(2, 8, 12, 0.58);
+  border: 1px solid rgba(255, 200, 87, 0.35);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 26px rgba(255, 200, 87, 0.18);
+}
+
+.race-wait-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.22);
+  border-top-color: #ffc857;
+  border-right-color: rgba(34, 197, 94, 0.95);
+  animation: raceWaitSpin 0.9s linear infinite;
+  box-shadow: 0 0 18px rgba(255, 200, 87, 0.35);
+}
+
+.race-wait-loading span {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+}
+
+@keyframes raceWaitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ajuste para móviles pequeños */
+@media (max-width: 480px) {
+  .race-wait-loading {
+    bottom: 34px;
+    padding: 12px 15px;
+    gap: 10px;
+  }
+
+  .race-wait-spinner {
+    width: 30px;
+    height: 30px;
+  }
+
+  .race-wait-loading span {
+    font-size: 0.74rem;
+  }
+}
+
+/* =========================================================
+   OPTIMIZACIÓN GENERAL PARA PWA MÓVIL
+   ========================================================= */
+
+/* Mejor comportamiento general en móvil */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+/* Contenedor principal más cómodo para celular */
+.player-screen {
+  width: 100%;
+  max-width: 100vw;
+  padding-left: clamp(10px, 3vw, 18px);
+  padding-right: clamp(10px, 3vw, 18px);
+  box-sizing: border-box;
+}
+
+/* Paneles principales adaptados a móvil */
+.glass,
+.horse-bet-panel,
+.betting-time-only-panel {
+  width: min(94vw, 520px);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* Título CABALLOS optimizado */
+.horse-bet-title {
+  font-size: clamp(1.15rem, 5vw, 1.45rem) !important;
+  line-height: 1.1;
+  text-align: center !important;
+  margin-bottom: 14px !important;
+}
+
+/* Input de apuesta cómodo para dedos */
+.horse-bet-amount-input {
+  width: 100%;
+  min-height: 48px;
+  font-size: 1rem;
+  border-radius: 14px;
+  box-sizing: border-box;
+}
+
+/* Botón apostar más táctil */
+.horse-bet-submit-btn {
+  width: 100%;
+  min-height: 52px;
+  font-size: clamp(1rem, 4vw, 1.15rem);
+  border-radius: 16px;
+  touch-action: manipulation;
+}
+
+/* Mensaje de apuestas abiertas */
+.betting-time-only-title {
+  font-size: clamp(1rem, 4.6vw, 1.25rem);
+  text-align: center;
+}
+
+.betting-time-only-message {
+  font-size: clamp(0.86rem, 3.7vw, 1rem);
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Imagen de espera pantalla completa optimizada para móvil */
+.race-wait-fullscreen,
+.race-wait-image-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999999 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #020611 !important;
+}
+
+.race-wait-fullscreen-image,
+.race-wait-image {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+/* Loading sobre imagen de espera, ajustado para móvil */
+.race-wait-loading {
+  bottom: clamp(28px, 7vh, 70px) !important;
+  padding: clamp(10px, 3vw, 14px) clamp(14px, 4vw, 20px) !important;
+  max-width: 88vw;
+}
+
+.race-wait-spinner {
+  width: clamp(28px, 8vw, 36px) !important;
+  height: clamp(28px, 8vw, 36px) !important;
+}
+
+.race-wait-loading span {
+  font-size: clamp(0.68rem, 3.2vw, 0.82rem) !important;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Ajustes específicos para pantallas pequeñas */
+@media (max-width: 480px) {
+  .player-screen {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .glass,
+  .horse-bet-panel,
+  .betting-time-only-panel {
+    width: 94vw;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .horse-bet-title {
+    font-size: 1.22rem !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  .horse-bet-amount-input {
+    min-height: 46px;
+    font-size: 0.96rem;
+  }
+
+  .horse-bet-submit-btn {
+    min-height: 50px;
+    font-size: 1rem;
+  }
+
+  .race-wait-fullscreen-image,
+  .race-wait-image {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+/* Ajustes para móviles muy estrechos */
+@media (max-width: 380px) {
+  .player-screen {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .glass,
+  .horse-bet-panel,
+  .betting-time-only-panel {
+    width: 95vw;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .horse-bet-title {
+    font-size: 1.08rem !important;
+  }
+
+  .race-wait-loading span {
+    font-size: 0.68rem !important;
+  }
+}
+
+
+.wallet-action-hub {
+  margin: 14px 0;
+  padding: 16px;
+  border-radius: 22px;
+  display: grid;
+  gap: 14px;
+}
+
+.wallet-hub-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.wallet-hub-top strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.wallet-hub-top span {
+  display: block;
+  opacity: .82;
+  font-size: .9rem;
+}
+
+.wallet-hub-balances {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.wallet-hub-balances span {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.24);
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  opacity: 1;
+}
+
+.wallet-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.wallet-action-grid button,
+.wallet-primary-btn,
+.payment-box button,
+.p2p-offer-card button {
+  border: 1px solid rgba(255, 215, 0, .45);
+  background: linear-gradient(180deg, rgba(255, 221, 87, .95), rgba(203, 151, 31, .95));
+  color: #150f02;
+  border-radius: 14px;
+  padding: 11px 12px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(0,0,0,.18);
+}
+
+.wallet-hub-message {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.28);
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+.wallet-hub-panel {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.24);
+  padding: 14px;
+  border-radius: 18px;
+}
+
+.wallet-hub-panel h3 {
+  margin: 0 0 4px;
+}
+
+.wallet-hub-panel label {
+  font-weight: 800;
+  font-size: .9rem;
+}
+
+.wallet-hub-panel input {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.34);
+  color: inherit;
+  border-radius: 14px;
+  padding: 12px;
+  font: inherit;
+}
+
+.payment-box {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(101, 255, 156, .28);
+  background: rgba(101, 255, 156, .08);
+}
+
+.payment-box code {
+  display: block;
+  word-break: break-all;
+  background: rgba(0,0,0,.34);
+  padding: 10px;
+  border-radius: 12px;
+  font-size: .82rem;
+}
+
+.p2p-offer-list {
+  display: grid;
+  gap: 10px;
+}
+
+.p2p-offer-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  padding: 12px;
+  border-radius: 16px;
+}
+
+.p2p-offer-card strong,
+.p2p-offer-card span,
+.p2p-offer-card small {
+  display: block;
+}
+
+@media (max-width: 720px) {
+  .wallet-hub-top {
+    flex-direction: column;
+  }
+
+  .wallet-hub-balances {
+    justify-content: flex-start;
+  }
+
+  .wallet-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .p2p-offer-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+
+/* ============================================================
+   HIPIPLAY MOBILE HOME MENU
+   Pantalla inicial tipo app móvil
+============================================================ */
+
+body.hipi-wallet-home-open {
+  overflow: hidden;
+}
+
+.wallet-mobile-home-shell {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  margin: 0 !important;
+  padding: 18px !important;
+  min-height: 100dvh;
+  display: grid !important;
+  place-items: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 215, 102, .26), transparent 28%),
+    radial-gradient(circle at bottom, rgba(48, 122, 74, .22), transparent 34%),
+    linear-gradient(180deg, #10120d 0%, #050705 100%) !important;
+  overflow-y: auto;
+}
+
+.wallet-phone-menu {
+  width: min(390px, calc(100vw - 22px));
+  min-height: min(820px, calc(100dvh - 28px));
+  padding: 22px 18px 58px;
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  border-radius: 34px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025)),
+    linear-gradient(180deg, #182016 0%, #050705 100%);
+  border: 1px solid rgba(255, 220, 118, .38);
+  box-shadow:
+    0 24px 80px rgba(0,0,0,.68),
+    inset 0 0 0 1px rgba(255,255,255,.05);
+}
+
+.wallet-phone-menu::before {
+  content: "";
+  width: 74px;
+  height: 8px;
+  border-radius: 999px;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.wallet-phone-brand {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.wallet-phone-horse {
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 8px;
+  border-radius: 999px;
+  font-size: 3.1rem;
+  color: #ffe59a;
+  text-shadow: 0 0 20px rgba(255, 219, 103, .45);
+  background:
+    radial-gradient(circle, rgba(255, 217, 95, .24), rgba(0,0,0,.12));
+  border: 1px solid rgba(255, 225, 139, .25);
+}
+
+.wallet-phone-brand h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 12vw, 3.3rem);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1;
+  color: #f7df9a;
+  letter-spacing: .055em;
+  text-shadow: 0 0 26px rgba(255, 218, 113, .23);
+}
+
+.wallet-phone-brand p {
+  margin: 6px 0 0;
+  color: rgba(255,255,255,.76);
+  font-weight: 700;
+}
+
+.wallet-phone-balances {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.wallet-phone-balances span {
+  border: 1px solid rgba(255, 219, 118, .18);
+  background: rgba(0,0,0,.28);
+  padding: 7px 9px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 900;
+  color: rgba(255,255,255,.92);
+}
+
+.wallet-phone-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 13px !important;
+}
+
+.wallet-action-card {
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  position: relative;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255, 224, 137, .42) !important;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, .22), transparent 26%),
+    linear-gradient(180deg, rgba(255, 218, 111, .18), rgba(0,0,0,.22)),
+    #1a1c14 !important;
+  color: #fff4c7 !important;
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.35),
+    inset 0 0 18px rgba(255, 209, 87, .12) !important;
+  overflow: hidden;
+  text-align: center;
+  padding: 6px !important;
+}
+
+.wallet-action-card::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 17px;
+  border: 1px solid rgba(255,255,255,.055);
+  pointer-events: none;
+}
+
+.wallet-action-icon {
+  font-size: 2.35rem;
+  line-height: 1;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.42));
+}
+
+.wallet-action-card strong {
+  display: block;
+  text-transform: uppercase;
+  font-size: .78rem;
+  letter-spacing: .035em;
+  line-height: 1.05;
+  color: #fff7d8;
+}
+
+.wallet-action-card small {
+  display: block;
+  color: rgba(255,255,255,.66);
+  font-size: .68rem;
+  text-transform: uppercase;
+}
+
+.wallet-has-panel .wallet-phone-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.wallet-has-panel .wallet-action-card {
+  min-height: 74px;
+}
+
+.wallet-has-panel .wallet-action-icon {
+  font-size: 1.45rem;
+}
+
+.wallet-has-panel .wallet-action-card small {
+  display: none;
+}
+
+.wallet-hub-panel {
+  max-height: 44dvh;
+  overflow: auto;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255, 224, 137, .22) !important;
+  background: rgba(0,0,0,.42) !important;
+  backdrop-filter: blur(14px);
+}
+
+.wallet-hub-panel h3 {
+  color: #ffe59a;
+}
+
+.wallet-hub-panel input {
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: #fff !important;
+}
+
+.wallet-hub-message {
+  background: rgba(255, 218, 95, .10) !important;
+  border: 1px solid rgba(255, 218, 95, .26) !important;
+  color: #ffe8a8;
+}
+
+.wallet-home-next {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px !important;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  line-height: 1;
+  color: #ffe59a !important;
+  background: rgba(0,0,0,.32) !important;
+  border: 1px solid rgba(255, 224, 137, .32) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.34);
+}
+
+.wallet-floating-home-button {
+  position: fixed;
+  right: 14px;
+  bottom: 18px;
+  z-index: 2147482500;
+  border: 1px solid rgba(255, 224, 137, .46);
+  background: linear-gradient(180deg, #f7da7b, #b98227);
+  color: #151006;
+  border-radius: 999px;
+  padding: 12px 16px;
+  font-weight: 1000;
+  box-shadow: 0 18px 40px rgba(0,0,0,.36);
+}
+
+@media (max-width: 380px) {
+  .wallet-mobile-home-shell {
+    padding: 6px !important;
+  }
+
+  .wallet-phone-menu {
+    width: calc(100vw - 12px);
+    min-height: calc(100dvh - 12px);
+    border-radius: 26px;
+    padding: 20px 12px 56px;
+  }
+
+  .wallet-action-card {
+    min-height: 98px;
+  }
+
+  .wallet-phone-brand h1 {
+    font-size: 2.25rem;
+  }
+}
+
+
+/* ============================================================
+   HIPIPLAY WALLET HOME REFINEMENT V2
+============================================================ */
+
+body.hipi-wallet-home-open {
+  overflow: hidden;
+}
+
+.wallet-mobile-home-shell {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  display: grid !important;
+  place-items: center;
+  background: #07110c !important;
+  overflow: hidden !important;
+  border-radius: 0 !important;
+}
+
+.wallet-mobile-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(98, 150, 112, 0.20), transparent 30%),
+    radial-gradient(circle at bottom, rgba(229, 184, 75, 0.12), transparent 28%),
+    linear-gradient(180deg, #0a140f 0%, #030705 100%);
+  opacity: 1;
+}
+
+.wallet-phone-menu {
+  position: relative;
+  z-index: 2;
+  width: min(430px, calc(100vw - 22px));
+  min-height: min(850px, calc(100dvh - 22px));
+  padding: 24px 18px 66px;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(229,184,75,.28);
+  background:
+    linear-gradient(180deg, rgba(21, 34, 27, .98), rgba(6, 11, 8, .99));
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.58),
+    inset 0 0 0 1px rgba(255,255,255,.03);
+}
+
+.wallet-phone-menu::before {
+  content: "";
+  width: 76px;
+  height: 8px;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(0,0,0,.55);
+}
+
+.wallet-phone-brand {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.wallet-phone-logo {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 10px;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,.35));
+}
+
+.wallet-phone-brand h1 {
+  margin: 0;
+  color: var(--gold);
+  font-size: clamp(2.3rem, 10vw, 3.1rem);
+  font-weight: 900;
+  letter-spacing: .01em;
+  line-height: 1;
+}
+
+.wallet-phone-brand p {
+  margin: 8px 0 0;
+  color: #d5ddd8;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.wallet-phone-balances {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wallet-phone-balances span {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.34);
+  border: 1px solid rgba(229,184,75,.20);
+  color: #eef3ef;
+  font-size: .83rem;
+  font-weight: 900;
+}
+
+.wallet-phone-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.wallet-grid-compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+}
+
+.wallet-action-card {
+  min-height: 118px;
+  padding: 14px 10px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 20px !important;
+  border: 1px solid rgba(229,184,75,.34) !important;
+  background:
+    linear-gradient(180deg, rgba(24, 39, 31, 1), rgba(9, 14, 11, 1)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 12px 26px rgba(0,0,0,.28);
+  color: #f6f3e7 !important;
+  text-align: center;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.wallet-action-card:hover,
+.wallet-action-card:active {
+  transform: translateY(-1px);
+  border-color: rgba(229,184,75,.55) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 16px 30px rgba(0,0,0,.34);
+}
+
+.wallet-action-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: var(--gold);
+  background: rgba(229,184,75,.10);
+  border: 1px solid rgba(229,184,75,.24);
+}
+
+.wallet-action-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.wallet-action-card strong {
+  display: block;
+  color: #fffaf0;
+  font-size: .90rem;
+  font-weight: 900;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.wallet-action-card small {
+  display: block;
+  color: #bfc9c2;
+  font-size: .76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.wallet-grid-compact .wallet-action-card {
+  min-height: 82px;
+  padding: 8px 6px !important;
+  gap: 5px;
+  border-radius: 16px !important;
+}
+
+.wallet-grid-compact .wallet-action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.wallet-grid-compact .wallet-action-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.wallet-grid-compact .wallet-action-card small {
+  display: none;
+}
+
+.wallet-hub-message {
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: rgba(229,184,75,.10) !important;
+  border: 1px solid rgba(229,184,75,.24) !important;
+  color: #f5df9f !important;
+  font-weight: 800;
+}
+
+.wallet-hub-panel {
+  display: grid;
+  gap: 10px;
+  max-height: 42dvh;
+  overflow: auto;
+  padding: 14px;
+  border-radius: 22px !important;
+  background: rgba(7, 12, 9, .96) !important;
+  border: 1px solid rgba(229,184,75,.16) !important;
+}
+
+.wallet-hub-panel h3 {
+  margin: 0 0 2px;
+  color: var(--gold);
+}
+
+.wallet-hub-panel label {
+  color: #dbe4df;
+  font-weight: 800;
+  font-size: .88rem;
+}
+
+.wallet-hub-panel input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  background: rgba(255,255,255,.05) !important;
+  color: #ffffff !important;
+  outline: none;
+}
+
+.wallet-primary-btn,
+.payment-box button,
+.p2p-offer-card button,
+.wallet-floating-home-button,
+.wallet-home-next {
+  border: 1px solid rgba(229,184,75,.34) !important;
+  background:
+    linear-gradient(180deg, rgba(30,47,37,1), rgba(10,17,13,1)) !important;
+  color: var(--gold) !important;
+  font-weight: 900;
+  box-shadow: 0 10px 22px rgba(0,0,0,.22);
+}
+
+.payment-box {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 15px;
+  background: rgba(229,184,75,.06);
+  border: 1px solid rgba(229,184,75,.18);
+}
+
+.payment-box code {
+  display: block;
+  word-break: break-all;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.34);
+  color: #f7f2dd;
+}
+
+.p2p-offer-list {
+  display: grid;
+  gap: 10px;
+}
+
+.p2p-offer-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.p2p-offer-card strong {
+  color: #fff4cf;
+}
+
+.p2p-offer-card span,
+.p2p-offer-card small {
+  display: block;
+  color: #d2dad5;
+}
+
+.wallet-home-next {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px !important;
+  display: grid;
+  place-items: center;
+}
+
+.wallet-home-next svg {
+  width: 22px;
+  height: 22px;
+}
+
+.wallet-floating-home-button {
+  position: fixed;
+  right: 14px;
+  bottom: 18px;
+  z-index: 2147482500;
+  border-radius: 999px !important;
+  padding: 12px 16px;
+}
+
+@media (max-width: 420px) {
+  .wallet-phone-menu {
+    width: calc(100vw - 12px);
+    min-height: calc(100dvh - 12px);
+    padding: 22px 14px 64px;
+    border-radius: 24px;
+  }
+
+  .wallet-action-card {
+    min-height: 108px;
+  }
+}
+
+
+/* ============================================================
+   HIDE WALLET HOME BALANCES
+============================================================ */
+
+.wallet-phone-brand p,
+.wallet-phone-balances {
+  display: none !important;
+}
+
+.wallet-phone-brand {
+  margin-bottom: 12px !important;
+}
+
+
+/* ============================================================
+   HIPIPLAY HEADER MENU BUTTON V1
+============================================================ */
+
+.hipiplay-header-menu-target {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.wallet-header-menu-button {
+  margin-left: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(229, 184, 75, .30);
+  background:
+    linear-gradient(180deg, rgba(26, 41, 33, .98), rgba(8, 14, 10, .98));
+  color: var(--gold, #e5b84b);
+  font-size: .88rem;
+  font-weight: 900;
+  letter-spacing: .01em;
+  cursor: pointer;
+  box-shadow:
+    0 8px 22px rgba(0,0,0,.26),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.wallet-header-menu-button:hover,
+.wallet-header-menu-button:active {
+  border-color: rgba(229, 184, 75, .52);
+  transform: translateY(-1px);
+}
+
+.wallet-header-menu-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+body.hipi-wallet-home-open .wallet-header-menu-button,
+body.hipi-hide-header-menu .wallet-header-menu-button {
+  display: none !important;
+}
+
+/* Se elimina por completo el botón flotante anterior */
+.wallet-floating-home-button {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  .wallet-header-menu-button {
+    min-height: 34px;
+    padding: 7px 11px;
+    font-size: .78rem;
+  }
+
+  .wallet-header-menu-icon {
+    font-size: .98rem;
+  }
+}
+
+
+/* ============================================================
+   HIPIPLAY HEADER INSTALL BUTTON V1
+============================================================ */
+
+.wallet-header-install-button {
+  margin-left: auto !important;
+  margin-right: 8px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(64, 214, 126, .36);
+  background:
+    linear-gradient(180deg, rgba(20, 72, 47, .98), rgba(7, 24, 16, .98));
+  color: #73ffad;
+  font-size: .86rem;
+  font-weight: 900;
+  letter-spacing: .01em;
+  cursor: pointer;
+  box-shadow:
+    0 8px 22px rgba(0,0,0,.26),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.wallet-header-install-button:hover,
+.wallet-header-install-button:active {
+  border-color: rgba(64, 214, 126, .62);
+  transform: translateY(-1px);
+}
+
+.wallet-header-install-button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.wallet-header-install-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+body.pwa-installed .wallet-header-install-button,
+body.hipi-wallet-home-open .wallet-header-install-button,
+body.hipi-hide-header-menu .wallet-header-install-button {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  .wallet-header-install-button {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: .76rem;
+    margin-right: 6px !important;
+  }
+
+  .wallet-header-install-icon {
+    font-size: .9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .wallet-header-install-button span:last-child {
+    display: none;
+  }
+
+  .wallet-header-install-button {
+    width: 34px;
+    padding: 7px 0;
+  }
+}
+
+
+/* ============================================================
+   HIPIPLAY MENU LOGO FIX V1
+============================================================ */
+
+.wallet-phone-logo {
+  display: block !important;
+  width: 86px !important;
+  height: 86px !important;
+  max-width: 86px !important;
+  max-height: 86px !important;
+  object-fit: contain !important;
+  margin: 0 auto 12px !important;
+  padding: 7px;
+  border-radius: 22px;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(229,184,75,.26);
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: drop-shadow(0 10px 22px rgba(0,0,0,.35));
+}
+
+.wallet-phone-brand h1 {
+  margin-top: 4px !important;
+}
+
+/* Evita que errores del botón instalar bloqueen interacción visual */
+.wallet-header-install-button {
+  pointer-events: auto;
+}
+
+
+/* ============================================================
+   HIPIPLAY SAFE HEADER INSTALL BUTTON V2
+============================================================ */
+
+.wallet-header-install-button {
+  margin-left: auto !important;
+  margin-right: 8px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(64, 214, 126, .36);
+  background:
+    linear-gradient(180deg, rgba(20, 72, 47, .98), rgba(7, 24, 16, .98));
+  color: #73ffad;
+  font-size: .86rem;
+  font-weight: 900;
+  letter-spacing: .01em;
+  cursor: pointer;
+  box-shadow:
+    0 8px 22px rgba(0,0,0,.26),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.wallet-header-install-button:hover,
+.wallet-header-install-button:active {
+  border-color: rgba(64, 214, 126, .62);
+  transform: translateY(-1px);
+}
+
+.wallet-header-install-button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.wallet-header-install-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+body.pwa-installed .wallet-header-install-button,
+body.hipi-wallet-home-open .wallet-header-install-button,
+body.hipi-hide-header-menu .wallet-header-install-button {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  .wallet-header-install-button {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: .76rem;
+    margin-right: 6px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .wallet-header-install-button span:last-child {
+    display: none;
+  }
+
+  .wallet-header-install-button {
+    width: 34px;
+    padding: 7px 0;
+  }
+}
+
+
+/* ============================================================
+   HIPIPLAY INSTALL HEADER ONLY FIX
+============================================================ */
+
+.wallet-action-hub #hipiplay-pwa-install-button,
+.wallet-mobile-home-shell #hipiplay-pwa-install-button,
+.wallet-phone-menu #hipiplay-pwa-install-button {
+  display: none !important;
+}
+
+.hipiplay-header-menu-target {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.wallet-header-install-button {
+  margin-left: auto !important;
+  margin-right: 8px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(64, 214, 126, .36);
+  background: linear-gradient(180deg, rgba(20, 72, 47, .98), rgba(7, 24, 16, .98));
+  color: #73ffad;
+  font-size: .86rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.wallet-header-install-button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+body.pwa-installed .wallet-header-install-button,
+body.hipi-wallet-home-open .wallet-header-install-button,
+body.hipi-hide-header-menu .wallet-header-install-button {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  .wallet-header-install-button {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: .76rem;
+    margin-right: 6px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .wallet-header-install-button span:last-child {
+    display: none;
+  }
+
+  .wallet-header-install-button {
+    width: 34px;
+    padding: 7px 0;
+  }
+}
+
+/* ============================================================
+   HIPIPLAY LOGIN REGISTER SWITCH V1
+============================================================ */
+
+.login-mode-switch {
+  width: 100%;
+  margin-top: 12px;
+  border: 1px solid rgba(229, 184, 75, .28);
+  background: rgba(255,255,255,.035);
+  color: #f8dfa4;
+  border-radius: 14px;
+  padding: 11px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.login-mode-switch:hover,
+.login-mode-switch:active {
+  background: rgba(229, 184, 75, .09);
+}
+
+/* ============================================================
+   HIPIPLAY PASSKEY CREATE UI V1
+============================================================ */
+
+.passkey-create-card .login-brand-lockup p {
+  max-width: 320px;
+}
+
+.passkey-create-form input[type="text"],
+.passkey-create-form input:not([type]) {
+  min-height: 52px;
+}
+
+.terms-check-row {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 15px;
+  border-radius: 16px;
+  border: 1px solid rgba(229, 184, 75, .24);
+  background: rgba(255, 255, 255, .035);
+  color: rgba(255, 255, 255, .88);
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.terms-check-row input {
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  accent-color: #61d313;
+  flex: 0 0 auto;
+}
+
+.terms-check-row span {
+  font-size: .94rem;
+  font-weight: 800;
+}
+
+.passkey-create-card .primary {
+  margin-top: 4px;
+}
+
+/* ============================================================
+   HIPIPLAY MOBILE APP DASHBOARD FIX V1
+   Convierte el menú principal de listado a layout tipo app móvil
+============================================================ */
+
+@media (max-width: 760px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .player-screen,
+  .game-screen,
+  .wallet-screen,
+  .home-screen,
+  .app-screen,
+  .main-screen {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-bottom: 118px !important;
+    box-sizing: border-box;
+  }
+
+  .wallet-summary-card,
+  .balance-card,
+  .player-balance-card,
+  .coins-card {
+    width: 100% !important;
+    min-height: 86px !important;
+    padding: 18px 20px !important;
+    border-radius: 24px !important;
+    margin: 18px auto 20px !important;
+  }
+
+  .wallet-actions-panel,
+  .wallet-actions-grid,
+  .actions-grid,
+  .dashboard-actions,
+  .menu-actions,
+  .quick-actions-grid,
+  .home-actions-grid,
+  .player-actions-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    width: 100% !important;
+    margin: 18px auto !important;
+  }
+
+  .wallet-actions-panel.glass,
+  .dashboard-actions.glass,
+  .menu-actions.glass {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .wallet-action-card,
+  .wallet-action-button,
+  .action-card,
+  .action-button,
+  .menu-action-card,
+  .menu-card,
+  .quick-action-card,
+  .home-action-card,
+  .player-action-card {
+    width: 100% !important;
+    min-height: 112px !important;
+    height: 112px !important;
+    max-height: 112px !important;
+    padding: 14px 10px !important;
+    border-radius: 24px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    background:
+      radial-gradient(circle at top left, rgba(64, 214, 82, .13), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025)) !important;
+    border: 1px solid rgba(229, 184, 75, .26) !important;
+    box-shadow: 0 14px 32px rgba(0,0,0,.28) !important;
+  }
+
+  .wallet-action-card svg,
+  .wallet-action-button svg,
+  .action-card svg,
+  .action-button svg,
+  .menu-action-card svg,
+  .menu-card svg,
+  .quick-action-card svg,
+  .home-action-card svg,
+  .player-action-card svg {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    opacity: .96 !important;
+  }
+
+  .wallet-action-card span,
+  .wallet-action-button span,
+  .action-card span,
+  .action-button span,
+  .menu-action-card span,
+  .menu-card span,
+  .quick-action-card span,
+  .home-action-card span,
+  .player-action-card span,
+  .wallet-action-card div,
+  .action-card div {
+    font-size: 1rem !important;
+    line-height: 1.15 !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+  }
+
+  /* Botón de Apuesta/Carrera más destacado */
+  .wallet-action-card:nth-child(2),
+  .action-card:nth-child(2),
+  .menu-action-card:nth-child(2),
+  .home-action-card:nth-child(2) {
+    background:
+      radial-gradient(circle at top left, rgba(255, 213, 77, .28), transparent 45%),
+      linear-gradient(180deg, rgba(229,184,75,.22), rgba(255,255,255,.035)) !important;
+    border-color: rgba(255, 213, 77, .48) !important;
+  }
+
+  /* Sección de caballos más compacta */
+  .horse-grid,
+  .horses-grid,
+  .race-horses-grid,
+  .horse-select-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  .horse-card,
+  .horse-option,
+  .horse-select-card {
+    min-height: auto !important;
+    padding: 6px !important;
+    border-radius: 20px !important;
+  }
+
+  .horse-card img,
+  .horse-option img,
+  .horse-select-card img {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+
+  /* Navegación inferior tipo app */
+  .bottom-nav,
+  .mobile-bottom-nav,
+  .player-bottom-nav {
+    position: fixed !important;
+    left: 50% !important;
+    bottom: 14px !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 28px) !important;
+    max-width: 430px !important;
+    z-index: 9999 !important;
+    border-radius: 28px !important;
+    padding: 6px !important;
+    background: rgba(3, 19, 13, .96) !important;
+    backdrop-filter: blur(18px) !important;
+    box-shadow: 0 20px 45px rgba(0,0,0,.48) !important;
+  }
+
+  .bottom-nav button,
+  .mobile-bottom-nav button,
+  .player-bottom-nav button {
+    min-height: 78px !important;
+    border-radius: 22px !important;
+    font-size: .92rem !important;
+    font-weight: 900 !important;
+  }
+
+  /* Evita que cards sueltas ocupen pantalla completa como listado */
+  .glass > button:not(.primary):not(.secondary):not(.danger),
+  .glass > .wallet-action-card,
+  .glass > .action-card {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* === HIPIPLAY FINAL CLEAN BUTTONS AND WALLET ACTIONS === */
+
+@media (max-width: 820px) {
+
+  body.hipiplay-home-mode {
+    background: #001b10 !important;
+    overflow-x: hidden !important;
+  }
+
+  body.hipiplay-home-mode .mobile-app-header,
+  body.hipiplay-home-mode .topbar,
+  body.hipiplay-home-mode .clean-topbar,
+  body.hipiplay-home-mode .mobile-bottom-nav,
+  body.hipiplay-home-mode .bottom-nav,
+  body.hipiplay-home-mode .player-bottom-nav,
+  body.hipiplay-home-mode .player-summary,
+  body.hipiplay-home-mode .summary-card,
+  body.hipiplay-home-mode .wallet-summary,
+  body.hipiplay-home-mode .wallet-balance,
+  body.hipiplay-home-mode .balance-card,
+  body.hipiplay-home-mode .coin-dashboard,
+  body.hipiplay-home-mode .game-hero,
+  body.hipiplay-home-mode .cycle-steps,
+  body.hipiplay-home-mode .horse-bet-panel,
+  body.hipiplay-home-mode .race-tv,
+  body.hipiplay-home-mode .broadcast-race-tv,
+  body.hipiplay-home-mode .server-required-panel,
+  body.hipiplay-home-mode .result-card {
+    display: none !important;
+  }
+
+  body.hipiplay-home-mode .clean-player-shell,
+  body.hipiplay-home-mode .app-shell {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #001b10 !important;
+  }
+
+  body.hipiplay-home-mode .clean-main {
+    width: 100% !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #001b10 !important;
+  }
+
+  body.hipiplay-home-mode .wallet-mobile-home-shell {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 2147483000 !important;
+    width: 100vw !important;
+    min-height: 100dvh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 14px !important;
+    box-sizing: border-box !important;
+    background:
+      radial-gradient(circle at top, rgba(55, 175, 82, .14), transparent 46%),
+      linear-gradient(180deg, #071c13 0%, #001b10 100%) !important;
+  }
+
+  body.hipiplay-home-mode .wallet-phone-menu {
+    width: min(430px, calc(100vw - 24px)) !important;
+    min-height: calc(100dvh - 28px) !important;
+    padding: 24px 18px 30px !important;
+    border-radius: 34px !important;
+    border: 1px solid rgba(229, 184, 75, .34) !important;
+    background:
+      radial-gradient(circle at top, rgba(55, 175, 82, .16), transparent 48%),
+      linear-gradient(180deg, rgba(6, 30, 20, .97), rgba(2, 14, 9, .99)) !important;
+    box-shadow: 0 24px 65px rgba(0,0,0,.52), inset 0 0 0 1px rgba(255,255,255,.04) !important;
+    display: grid !important;
+    align-content: start !important;
+    gap: 18px !important;
+    box-sizing: border-box !important;
+  }
+
+  body.hipiplay-home-mode .wallet-phone-brand {
+    text-align: center !important;
+    display: grid !important;
+    justify-items: center !important;
+    gap: 8px !important;
+  }
+
+  body.hipiplay-home-mode .wallet-phone-logo {
+    width: 88px !important;
+    height: 88px !important;
+    object-fit: contain !important;
+  }
+
+  body.hipiplay-home-mode .wallet-phone-brand h1 {
+    margin: 0 !important;
+    color: #fff7d8 !important;
+    font-size: 2.7rem !important;
+    line-height: .95 !important;
+    font-weight: 1000 !important;
+  }
+
+  body.hipiplay-home-mode .wallet-phone-brand p {
+    margin: 0 !important;
+    color: rgba(255,255,255,.82) !important;
+    font-size: .98rem !important;
+    font-weight: 800 !important;
+  }
+
+  body.hipiplay-home-mode .wallet-phone-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  body.hipiplay-home-mode .wallet-action-card {
+    width: 100% !important;
+    min-height: 142px !important;
+    padding: 14px 8px !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(255, 224, 137, .34) !important;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)) !important;
+    box-shadow: 0 14px 34px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-align: center !important;
+    color: #fff !important;
+  }
+
+  body.hipiplay-home-mode .wallet-action-icon {
+    width: 82px !important;
+    height: 82px !important;
+    min-width: 82px !important;
+    min-height: 82px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 22px !important;
+    background: rgba(255,255,255,.045) !important;
+    border: 1px solid rgba(229, 184, 75, .28) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 18px rgba(0,0,0,.22) !important;
+    color: #f4f4ee !important;
+  }
+
+  body.hipiplay-home-mode .wallet-action-icon svg {
+    width: 54px !important;
+    height: 54px !important;
+    stroke-width: 2.15 !important;
+    color: #f4f4ee !important;
+    stroke: currentColor !important;
+    fill: none !important;
+    filter: none !important;
+  }
+
+  body.hipiplay-home-mode .wallet-action-card strong {
+    display: block !important;
+    color: #fff7d8 !important;
+    font-size: .96rem !important;
+    line-height: 1.05 !important;
+    font-weight: 1000 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .025em !important;
+  }
+
+  body.hipiplay-home-mode .wallet-action-card small {
+    display: block !important;
+    color: rgba(255,255,255,.75) !important;
+    font-size: .72rem !important;
+    line-height: 1.05 !important;
+    font-weight: 850 !important;
+    text-transform: uppercase !important;
+  }
+
+  body.hipiplay-race-mode .wallet-mobile-home-shell {
+    display: none !important;
+  }
+
+  body.hipiplay-race-fullscreen-phase .mobile-app-header,
+  body.hipiplay-server-race-phase .mobile-app-header,
+  body.hipiplay-server-results-phase .mobile-app-header,
+  body.hipiplay-race-fullscreen-phase .mobile-bottom-nav,
+  body.hipiplay-server-race-phase .mobile-bottom-nav,
+  body.hipiplay-server-results-phase .mobile-bottom-nav,
+  body.hipiplay-race-fullscreen-phase .bottom-nav,
+  body.hipiplay-server-race-phase .bottom-nav,
+  body.hipiplay-server-results-phase .bottom-nav,
+  body.hipiplay-race-fullscreen-phase .player-bottom-nav,
+  body.hipiplay-server-race-phase .player-bottom-nav,
+  body.hipiplay-server-results-phase .player-bottom-nav,
+  body.hipiplay-race-fullscreen-phase .horse-bet-panel,
+  body.hipiplay-server-race-phase .horse-bet-panel,
+  body.hipiplay-server-results-phase .horse-bet-panel,
+  body.hipiplay-race-fullscreen-phase .player-summary,
+  body.hipiplay-server-race-phase .player-summary,
+  body.hipiplay-server-results-phase .player-summary {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  body.hipiplay-race-fullscreen-phase .clean-player-shell,
+  body.hipiplay-server-race-phase .clean-player-shell,
+  body.hipiplay-server-results-phase .clean-player-shell,
+  body.hipiplay-race-fullscreen-phase .clean-main,
+  body.hipiplay-server-race-phase .clean-main,
+  body.hipiplay-server-results-phase .clean-main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100vw !important;
+    min-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+}
+
+.wallet-action-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483600 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 18px !important;
+  background: rgba(0, 0, 0, .68) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+.wallet-action-modal {
+  width: min(430px, 100%) !important;
+  max-height: calc(100dvh - 36px) !important;
+  overflow: auto !important;
+  border-radius: 28px !important;
+  padding: 20px !important;
+  border: 1px solid rgba(229,184,75,.32) !important;
+  background: linear-gradient(180deg, rgba(6,30,20,.98), rgba(2,14,9,.99)) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.55) !important;
+  color: #fff !important;
+}
+
+.wallet-action-modal h3 {
+  margin: 0 0 6px !important;
+  color: #fff7d8 !important;
+}
+
+.wallet-action-modal p {
+  margin: 0 0 14px !important;
+  color: rgba(255,255,255,.74) !important;
+}
+
+.wallet-action-modal label {
+  margin-top: 12px !important;
+  display: grid !important;
+  gap: 6px !important;
+  color: rgba(255,255,255,.82) !important;
+  font-weight: 850 !important;
+}
+
+.wallet-action-modal input {
+  width: 100% !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  background: rgba(0,0,0,.34) !important;
+  color: #fff !important;
+  padding: 13px 14px !important;
+}
+
+.wallet-action-modal-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  margin-top: 16px !important;
+}
+
+.wallet-action-modal-status {
+  margin-top: 12px !important;
+  padding: 11px 12px !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.07) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  color: rgba(255,255,255,.86) !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+.wallet-action-offers {
+  display: grid !important;
+  gap: 10px !important;
+  margin-top: 12px !important;
+}
+
+.wallet-action-offer {
+  display: grid !important;
+  gap: 8px !important;
+  padding: 12px !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+}
+
+/* === END HIPIPLAY FINAL CLEAN BUTTONS AND WALLET ACTIONS === */
+
+
+
+
+
+
+
+
+
+
+
+/* === HIPIPLAY MOBILE 6.1 APP BETTING LAYOUT V6 === */
+
+@media (max-width: 820px) {
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) {
+    background: #001b10 !important;
+    overflow: hidden !important;
+  }
+
+  /* Mantener header superior visible y dejar el contenido debajo */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-player-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .app-shell {
+    width: 100% !important;
+    max-width: 430px !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 auto !important;
+    padding-top: calc(72px + env(safe-area-inset-top)) !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    padding-bottom: 8px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    background:
+      radial-gradient(circle at top, rgba(55, 175, 82, .13), transparent 42%),
+      linear-gradient(180deg, #071c13 0%, #001b10 100%) !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-main {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Pantalla completa tipo app: arriba apuesta, abajo franja */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) 58px !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-summary,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .wallet-mobile-home-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .bottom-nav,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-bottom-nav {
+    display: none !important;
+  }
+
+  /* Recuadro superior de apuesta */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel {
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 14px 12px !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-rows: auto auto auto auto !important;
+    align-content: center !important;
+    gap: 12px !important;
+  }
+
+  /* Grid de caballos más grande */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid button {
+    min-height: clamp(92px, 13.5svh, 114px) !important;
+    height: clamp(92px, 13.5svh, 114px) !important;
+    max-height: 114px !important;
+    padding: 6px !important;
+    border-radius: 22px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel img {
+    max-width: 100% !important;
+    max-height: clamp(68px, 10svh, 86px) !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel strong,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-number {
+    font-size: clamp(1.05rem, 4.8vw, 1.32rem) !important;
+    line-height: 1 !important;
+  }
+
+  /* Texto cantidad */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-field-label,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel label {
+    margin: 0 !important;
+    font-size: .82rem !important;
+    line-height: 1 !important;
+    letter-spacing: .08em !important;
+    text-transform: uppercase !important;
+  }
+
+  /* Input */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-amount-input,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel input[type="number"] {
+    width: 100% !important;
+    min-height: 50px !important;
+    height: 50px !important;
+    max-height: 50px !important;
+    padding: 8px 14px !important;
+    border-radius: 18px !important;
+    font-size: 1.05rem !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Botón apostar */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-submit-btn,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .primary,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .bet-button {
+    width: 100% !important;
+    min-height: 60px !important;
+    height: 60px !important;
+    max-height: 60px !important;
+    border-radius: 22px !important;
+    font-size: 1.08rem !important;
+    line-height: 1 !important;
+    letter-spacing: .04em !important;
+    text-transform: uppercase !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Franja inferior fija */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv {
+    grid-row: 2 !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    max-height: 58px !important;
+    margin: 0 !important;
+    padding: 0 14px !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    align-content: center !important;
+    background:
+      radial-gradient(circle at left, rgba(255, 212, 59, .13), transparent 42%),
+      rgba(8, 22, 30, .96) !important;
+    border: 1px solid rgba(255, 212, 59, .16) !important;
+  }
+
+  /* Ocultar contenido interno del panel inferior y crear texto controlado */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section > *,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv > *,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv > * {
+    display: none !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section::before,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv::before,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv::before {
+    content: "APUESTAS ABIERTAS" !important;
+    display: block !important;
+    color: #ffd43b !important;
+    font-size: .78rem !important;
+    line-height: 1 !important;
+    letter-spacing: .13em !important;
+    font-weight: 1000 !important;
+    text-transform: uppercase !important;
+    margin-bottom: 5px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section::after,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv::after,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv::after {
+    content: "Apuesta y duplica tu inversión" !important;
+    display: block !important;
+    color: rgba(255,255,255,.72) !important;
+    font-size: .72rem !important;
+    line-height: 1 !important;
+    font-weight: 800 !important;
+  }
+}
+
+/* Ajuste para móviles un poco más bajos */
+@media (max-width: 390px), (max-height: 760px) {
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-player-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .app-shell {
+    padding-top: calc(68px + env(safe-area-inset-top)) !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen {
+    grid-template-rows: minmax(0, 1fr) 54px !important;
+    gap: 5px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel {
+    padding: 6px !important;
+    gap: 8px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid button {
+    min-height: 86px !important;
+    height: 86px !important;
+    max-height: 86px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel img {
+    max-height: 64px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-submit-btn,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .primary,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .bet-button {
+    min-height: 54px !important;
+    height: 54px !important;
+    max-height: 54px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv {
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+  }
+}
+
+/* === END HIPIPLAY MOBILE 6.1 APP BETTING LAYOUT V6 === */
+
+/* === HIPIPLAY MOBILE TEXT SIZE V7 === */
+
+@media (max-width: 820px) {
+
+  /* Números de los caballos #1 #2 #3 */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel strong,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-number {
+    font-size: clamp(1.35rem, 6vw, 1.7rem) !important;
+    line-height: 1 !important;
+    font-weight: 1000 !important;
+  }
+
+  /* Texto CANTIDAD DE MONEDAS */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-field-label,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel label {
+    font-size: clamp(1rem, 4.6vw, 1.22rem) !important;
+    line-height: 1.1 !important;
+    font-weight: 1000 !important;
+    letter-spacing: .07em !important;
+  }
+
+  /* Número del monto: 100 */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-amount-input,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel input[type="number"] {
+    font-size: clamp(1.45rem, 6.5vw, 1.9rem) !important;
+    font-weight: 1000 !important;
+    text-align: center !important;
+  }
+
+  /* Botón APOSTAR */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-submit-btn,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .primary,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .bet-button {
+    font-size: clamp(1.35rem, 5.8vw, 1.7rem) !important;
+    font-weight: 1000 !important;
+    letter-spacing: .05em !important;
+  }
+
+  /* Franja inferior: APUESTAS ABIERTAS */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section::before,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv::before,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv::before {
+    font-size: clamp(.95rem, 4.2vw, 1.12rem) !important;
+    line-height: 1 !important;
+    font-weight: 1000 !important;
+    letter-spacing: .11em !important;
+  }
+
+  /* Franja inferior: Apuesta y duplica tu inversión */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section::after,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv::after,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv::after {
+    font-size: clamp(.82rem, 3.7vw, .98rem) !important;
+    line-height: 1.05 !important;
+    font-weight: 850 !important;
+  }
+}
+
+/* === END HIPIPLAY MOBILE TEXT SIZE V7 === */
+
+/* === HIPIPLAY MOBILE HEADER SIZE V8 === */
+
+@media (max-width: 820px) {
+
+  .mobile-app-header {
+    min-height: 84px !important;
+    padding: calc(10px + env(safe-area-inset-top)) 16px 10px !important;
+  }
+
+  .mobile-brand-lockup {
+    gap: 14px !important;
+  }
+
+  .mobile-brand-lockup img {
+    width: 62px !important;
+    height: 62px !important;
+    min-width: 62px !important;
+    min-height: 62px !important;
+    border-radius: 18px !important;
+  }
+
+  .mobile-brand-lockup strong {
+    font-size: 1.55rem !important;
+    line-height: 1 !important;
+    font-weight: 1000 !important;
+    letter-spacing: -0.02em !important;
+    color: #ffffff !important;
+  }
+
+  .mobile-brand-lockup small {
+    margin-top: 5px !important;
+    font-size: 1rem !important;
+    line-height: 1.05 !important;
+    font-weight: 800 !important;
+    color: rgba(255,255,255,.72) !important;
+    max-width: 210px !important;
+  }
+
+  /* Ajustar el espacio del contenido debajo del header nuevo */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-player-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .app-shell {
+    padding-top: calc(96px + env(safe-area-inset-top)) !important;
+  }
+}
+
+@media (max-width: 390px), (max-height: 760px) {
+  .mobile-app-header {
+    min-height: 78px !important;
+    padding: calc(9px + env(safe-area-inset-top)) 14px 9px !important;
+  }
+
+  .mobile-brand-lockup img {
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+  }
+
+  .mobile-brand-lockup strong {
+    font-size: 1.38rem !important;
+  }
+
+  .mobile-brand-lockup small {
+    font-size: .9rem !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-player-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .app-shell {
+    padding-top: calc(88px + env(safe-area-inset-top)) !important;
+  }
+}
+
+/* === END HIPIPLAY MOBILE HEADER SIZE V8 === */
+
+/* === HIPIPLAY HEADER INSTALL MENU BUTTONS V9 === */
+
+@media (max-width: 820px) {
+  .mobile-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .mobile-icon-btn,
+  .mobile-install-btn.mobile-icon-btn,
+  .mobile-menu-btn {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    padding: 0 !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 212, 90, .28) !important;
+    background: rgba(255,255,255,.08) !important;
+    color: #fff7d8 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.06) !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+  }
+
+  .mobile-icon-btn svg,
+  .mobile-install-btn.mobile-icon-btn svg,
+  .mobile-menu-btn svg {
+    width: 27px !important;
+    height: 27px !important;
+    stroke-width: 2.4 !important;
+  }
+
+  .mobile-menu-btn {
+    background: linear-gradient(135deg, rgba(255, 212, 90, .18), rgba(37, 160, 100, .18)) !important;
+  }
+
+  .mobile-install-btn.mobile-icon-btn {
+    background: rgba(255,255,255,.09) !important;
+  }
+
+  .mobile-brand-lockup {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .mobile-brand-lockup small {
+    max-width: 150px !important;
+  }
+}
+
+@media (max-width: 390px), (max-height: 760px) {
+  .mobile-icon-btn,
+  .mobile-install-btn.mobile-icon-btn,
+  .mobile-menu-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    border-radius: 15px !important;
+  }
+
+  .mobile-icon-btn svg,
+  .mobile-install-btn.mobile-icon-btn svg,
+  .mobile-menu-btn svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  .mobile-brand-lockup small {
+    max-width: 120px !important;
+  }
+}
+
+/* === END HIPIPLAY HEADER INSTALL MENU BUTTONS V9 === */
+
+/* === HIPIPLAY HORSES 2X3 MOBILE V11 === */
+
+@media (max-width: 820px) {
+
+  /*
+    Cambia los 6 caballos de 3x2 a 2x3:
+    2 arriba, 2 centro, 2 abajo.
+  */
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel {
+    align-content: stretch !important;
+    gap: 10px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(3, minmax(0, auto)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid button {
+    min-height: clamp(104px, 14svh, 128px) !important;
+    height: clamp(104px, 14svh, 128px) !important;
+    max-height: 128px !important;
+    padding: 6px !important;
+    border-radius: 24px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel img {
+    max-height: clamp(78px, 10.8svh, 96px) !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel strong,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-number {
+    font-size: clamp(1.45rem, 6.4vw, 1.85rem) !important;
+  }
+}
+
+/* Ajuste para pantallas más bajitas */
+@media (max-width: 390px), (max-height: 760px) {
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel {
+    gap: 7px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid {
+    gap: 8px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid button {
+    min-height: 92px !important;
+    height: 92px !important;
+    max-height: 92px !important;
+    padding: 6px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel img {
+    max-height: 70px !important;
+  }
+}
+
+/* === END HIPIPLAY HORSES 2X3 MOBILE V11 === */
+
+/* === HIPIPLAY MOBILE BET POLISH V12 === */
+
+@media (max-width: 820px) {
+
+  /*
+    Subir toda la app:
+    elimina el espacio verde muerto encima del header en modo apuesta.
+  */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-player-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .app-shell {
+    padding: 6px 8px 8px !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /*
+    Header dentro del flujo normal, no empujado hacia abajo.
+  */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-app-header {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 86px !important;
+    margin: 0 !important;
+    padding: 10px 14px !important;
+    border-radius: 0 !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-main {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /*
+    La pantalla interna se reparte:
+    - panel de apuesta grande
+    - franja inferior controlada
+  */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) 64px !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+  }
+
+  /*
+    Panel superior: aprovechar el alto real disponible.
+  */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    padding: 12px !important;
+    gap: 10px !important;
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) auto auto auto !important;
+    align-content: stretch !important;
+    overflow: hidden !important;
+  }
+
+  /*
+    Caballos 2 x 3 más grandes y ocupando mejor el vertical.
+  */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid {
+    height: 100% !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid button {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 112px !important;
+    max-height: none !important;
+    padding: 6px !important;
+    border-radius: 24px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel img {
+    width: auto !important;
+    max-width: 92% !important;
+    max-height: clamp(98px, 14.2svh, 132px) !important;
+    object-fit: contain !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-amount-input,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel input[type="number"] {
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-submit-btn,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .primary,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .bet-button {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+  }
+
+  /*
+    Franja inferior: que no se corte abajo.
+  */
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    padding: 8px 14px !important;
+    align-content: center !important;
+  }
+}
+
+@media (max-width: 390px), (max-height: 760px) {
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-player-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .app-shell {
+    padding: 4px 7px 7px !important;
+    gap: 5px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-app-header {
+    min-height: 80px !important;
+    padding: 8px 12px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen {
+    grid-template-rows: minmax(0, 1fr) 58px !important;
+    gap: 5px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel {
+    padding: 9px !important;
+    gap: 7px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid {
+    gap: 8px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel > div:first-child button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-bet-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horses-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .horse-select-grid button,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .race-horses-grid button {
+    min-height: 94px !important;
+    padding: 6px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel img {
+    max-height: 84px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-submit-btn,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .primary,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel .bet-button {
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+  }
+}
+
+/* === END HIPIPLAY MOBILE BET POLISH V12 === */
+
+/* === HIPIPLAY CENTER BOTTOM STRIP V13 === */
+
+@media (max-width: 820px) {
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    place-content: center !important;
+    justify-items: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 8px 12px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section::before,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv::before,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv::before {
+    width: 100% !important;
+    display: block !important;
+    text-align: center !important;
+    justify-self: center !important;
+    margin: 0 0 6px 0 !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .horse-bet-panel + section::after,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-tv::after,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .broadcast-race-tv::after {
+    width: 100% !important;
+    display: block !important;
+    text-align: center !important;
+    justify-self: center !important;
+    margin: 0 !important;
+  }
+}
+
+/* === END HIPIPLAY CENTER BOTTOM STRIP V13 === */
+
+/* === HIPIPLAY INSTALL HELP MODAL V14 === */
+
+@media (max-width: 820px) {
+  .pwa-install-help-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 2147483600 !important;
+    background: rgba(0, 0, 0, .58) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 18px !important;
+    box-sizing: border-box !important;
+  }
+
+  .pwa-install-help-card {
+    width: min(100%, 360px) !important;
+    border-radius: 26px !important;
+    padding: 22px !important;
+    background:
+      radial-gradient(circle at top, rgba(255, 212, 90, .12), transparent 44%),
+      linear-gradient(180deg, rgba(8, 28, 20, .98), rgba(2, 12, 9, .99)) !important;
+    border: 1px solid rgba(255, 212, 90, .26) !important;
+    box-shadow: 0 24px 60px rgba(0,0,0,.58) !important;
+    color: #fff !important;
+    text-align: center !important;
+  }
+
+  .pwa-install-help-card strong {
+    display: block !important;
+    color: #fff7d8 !important;
+    font-size: 1.4rem !important;
+    font-weight: 1000 !important;
+    margin-bottom: 10px !important;
+  }
+
+  .pwa-install-help-card p {
+    margin: 0 0 18px !important;
+    color: rgba(255,255,255,.78) !important;
+    font-size: 1rem !important;
+    line-height: 1.45 !important;
+    font-weight: 750 !important;
+  }
+
+  .pwa-install-help-card button {
+    width: 100% !important;
+    height: 50px !important;
+    border: 0 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(180deg, #22d265, #11aa4e) !important;
+    color: #fff !important;
+    font-weight: 1000 !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* === END HIPIPLAY INSTALL HELP MODAL V14 === */
+
+/* === HIPIPLAY MOBILE RACE SCREENS 6.1 V15 === */
+
+@media (max-width: 820px) {
+
+  /*
+    1) GENERANDO CARRERA
+    Cuando el usuario ya apostó y todavía el servidor está en BETTING,
+    convertimos la vista de preparación en una pantalla visual profesional.
+  */
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen .player-summary,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen .wallet-mobile-home-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen .horse-bet-panel,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen .result-card {
+    display: none !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen .horse-bet-panel + section,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen > section,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .betting-horses-preview,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .betting-preview-image-panel,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-wait-fullscreen,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-wait-image-panel,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-generating-screen,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .generating-race-screen {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    background: #020611 !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen .horse-bet-panel + section::before,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen .horse-bet-panel + section::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen .horse-bet-panel + section > *,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen > section > * {
+    display: revert !important;
+    visibility: visible !important;
+  }
+
+  /*
+    Imágenes de Generando carrera:
+    ocupar la caja completa sin deformarse.
+  */
+
+  .player-screen.hipiplay-prep-screen img,
+  .player-screen.hipiplay-prep-screen video,
+  .player-screen.hipiplay-prep-screen canvas,
+  .betting-horses-preview img,
+  .betting-preview-image-panel img,
+  .race-wait-fullscreen img,
+  .race-wait-image-panel img,
+  .race-generating-screen img,
+  .generating-race-screen img {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+    display: block !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    border-radius: inherit !important;
+  }
+
+  /*
+    2) CARRERA EN CURSO
+    3) RESULTADOS
+    Estas fases van tipo pantalla completa dentro del móvil 6.1".
+  */
+
+  body.hipiplay-server-race-phase,
+  body.hipiplay-server-results-phase {
+    background: #020611 !important;
+    overflow: hidden !important;
+  }
+
+  body.hipiplay-server-race-phase .clean-player-shell,
+  body.hipiplay-server-race-phase .app-shell,
+  body.hipiplay-server-results-phase .clean-player-shell,
+  body.hipiplay-server-results-phase .app-shell {
+    width: 100% !important;
+    max-width: 430px !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #020611 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.hipiplay-server-race-phase .mobile-app-header,
+  body.hipiplay-server-results-phase .mobile-app-header,
+  body.hipiplay-server-race-phase .topbar,
+  body.hipiplay-server-results-phase .topbar,
+  body.hipiplay-server-race-phase .mobile-bottom-nav,
+  body.hipiplay-server-results-phase .mobile-bottom-nav {
+    display: none !important;
+  }
+
+  body.hipiplay-server-race-phase .clean-main,
+  body.hipiplay-server-results-phase .clean-main,
+  body.hipiplay-server-race-phase .player-screen,
+  body.hipiplay-server-results-phase .player-screen {
+    width: 100% !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: block !important;
+    background: #020611 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.hipiplay-server-race-phase .player-summary,
+  body.hipiplay-server-results-phase .player-summary,
+  body.hipiplay-server-race-phase .wallet-mobile-home-shell,
+  body.hipiplay-server-results-phase .wallet-mobile-home-shell,
+  body.hipiplay-server-race-phase .horse-bet-panel,
+  body.hipiplay-server-results-phase .horse-bet-panel,
+  body.hipiplay-server-race-phase .result-card,
+  body.hipiplay-server-results-phase .result-card {
+    display: none !important;
+  }
+
+  body.hipiplay-server-race-phase .player-screen > *:not(.player-summary):not(.wallet-mobile-home-shell):not(.horse-bet-panel):not(.result-card):not(.wallet-action-modal-backdrop),
+  body.hipiplay-server-results-phase .player-screen > *:not(.player-summary):not(.wallet-mobile-home-shell):not(.horse-bet-panel):not(.result-card):not(.wallet-action-modal-backdrop) {
+    width: 100% !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    background: #020611 !important;
+    box-sizing: border-box !important;
+  }
+
+  /*
+    Carrera en curso: video/canvas/imagen a pantalla completa.
+  */
+
+  body.hipiplay-server-race-phase video,
+  body.hipiplay-server-race-phase canvas,
+  body.hipiplay-server-race-phase img,
+  body.hipiplay-server-race-phase .race-video,
+  body.hipiplay-server-race-phase .race-video-stage,
+  body.hipiplay-server-race-phase .race-video-engine,
+  body.hipiplay-server-race-phase .race-engine-stage {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  /*
+    Resultados: imagen/panel a formato móvil.
+  */
+
+  body.hipiplay-server-results-phase img,
+  body.hipiplay-server-results-phase video,
+  body.hipiplay-server-results-phase canvas,
+  body.hipiplay-server-results-phase .server-race-result-panel,
+  body.hipiplay-server-results-phase .server-result-panel,
+  body.hipiplay-server-results-phase .race-result-panel,
+  body.hipiplay-server-results-phase .result-panel,
+  body.hipiplay-server-results-phase .result-image,
+  body.hipiplay-server-results-phase .results-image {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    border-radius: 0 !important;
+  }
+
+  /*
+    Textos/overlays de esas pantallas:
+    que queden dentro del área visible.
+  */
+
+  body.hipiplay-server-race-phase [class*="overlay"],
+  body.hipiplay-server-results-phase [class*="overlay"],
+  body.hipiplay-server-race-phase [class*="caption"],
+  body.hipiplay-server-results-phase [class*="caption"],
+  body.hipiplay-server-race-phase [class*="message"],
+  body.hipiplay-server-results-phase [class*="message"] {
+    max-width: calc(100% - 28px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 390px), (max-height: 760px) {
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen.hipiplay-prep-screen > section,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .betting-horses-preview,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-wait-fullscreen,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .race-generating-screen {
+    border-radius: 22px !important;
+  }
+}
+
+/* === END HIPIPLAY MOBILE RACE SCREENS 6.1 V15 === */
+
+/* === HIPIPLAY MOBILE BOTTOM BUTTONS V16 === */
+
+@media (max-width: 820px) {
+
+  /*
+    En pantalla de apuesta móvil:
+    - se elimina la franja de texto
+    - se muestran botones útiles abajo: Menú, Historial, Salir
+  */
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-player-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .app-shell {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) 70px !important;
+    gap: 6px !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    padding: 6px 8px 8px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-main {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen:not(.hipiplay-prep-screen) {
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /*
+    Ocultar el panel inferior viejo donde estaba el texto de APUESTAS ABIERTAS.
+    Solo se oculta en la pantalla normal de apuesta, no en Generando carrera.
+  */
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen:not(.hipiplay-prep-screen) .horse-bet-panel + section,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen:not(.hipiplay-prep-screen) .race-tv,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen:not(.hipiplay-prep-screen) .broadcast-race-tv {
+    display: none !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen:not(.hipiplay-prep-screen) .horse-bet-panel + section::before,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .player-screen:not(.hipiplay-prep-screen) .horse-bet-panel + section::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  /*
+    Mostrar bottom nav como barra real de botones.
+  */
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav {
+    grid-row: 3 !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: 20 !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+    margin: 0 !important;
+    padding: 8px !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+
+    border-radius: 22px !important;
+    border: 1px solid rgba(255, 212, 90, .18) !important;
+    background:
+      radial-gradient(circle at top, rgba(255, 212, 90, .10), transparent 45%),
+      rgba(8, 22, 30, .96) !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.05) !important;
+    box-sizing: border-box !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 6px 4px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 255, 255, .10) !important;
+    background: rgba(255,255,255,.06) !important;
+    color: #fff7d8 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+
+    font-size: .76rem !important;
+    line-height: 1 !important;
+    font-weight: 950 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .04em !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button svg {
+    width: 22px !important;
+    height: 22px !important;
+    stroke-width: 2.4 !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button span {
+    display: block !important;
+    font-size: .72rem !important;
+    line-height: 1 !important;
+    font-weight: 1000 !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav .menu-mobile {
+    background: linear-gradient(180deg, rgba(255, 212, 90, .18), rgba(255,255,255,.06)) !important;
+    border-color: rgba(255, 212, 90, .26) !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav .logout-mobile {
+    background: rgba(255, 90, 90, .10) !important;
+    border-color: rgba(255, 130, 130, .20) !important;
+  }
+
+  /*
+    En Generando carrera, Carrera en curso y Resultados no mostramos estos botones.
+  */
+
+  body.hipiplay-race-mode .clean-player-shell:has(.player-screen.hipiplay-prep-screen) .mobile-bottom-nav,
+  body.hipiplay-race-mode .app-shell:has(.player-screen.hipiplay-prep-screen) .mobile-bottom-nav,
+  body.hipiplay-race-fullscreen-phase .mobile-bottom-nav,
+  body.hipiplay-server-race-phase .mobile-bottom-nav,
+  body.hipiplay-server-results-phase .mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
+@media (max-width: 390px), (max-height: 760px) {
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .clean-player-shell,
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .app-shell {
+    grid-template-rows: auto minmax(0, 1fr) 62px !important;
+    gap: 5px !important;
+    padding: 4px 7px 7px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav {
+    height: 62px !important;
+    min-height: 62px !important;
+    max-height: 62px !important;
+    padding: 6px !important;
+    gap: 6px !important;
+    border-radius: 20px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button {
+    border-radius: 16px !important;
+    gap: 3px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button span {
+    font-size: .66rem !important;
+  }
+}
+
+/* === END HIPIPLAY MOBILE BOTTOM BUTTONS V16 === */
+
+/* === HIPIPLAY BOTTOM HISTORY EXIT ONLY V17 === */
+
+@media (max-width: 820px) {
+
+  /*
+    Abajo solo quedan 2 botones:
+    Historial y Salir.
+    El botón Menú se queda solamente arriba en el header.
+  */
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    height: 66px !important;
+    min-height: 66px !important;
+    max-height: 66px !important;
+    padding: 8px !important;
+    gap: 10px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav .menu-mobile {
+    display: none !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button {
+    min-height: 50px !important;
+    border-radius: 18px !important;
+    font-size: .82rem !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button svg {
+    width: 23px !important;
+    height: 23px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button span {
+    font-size: .76rem !important;
+  }
+}
+
+@media (max-width: 390px), (max-height: 760px) {
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav {
+    height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+    padding: 6px !important;
+    gap: 8px !important;
+  }
+
+  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) .mobile-bottom-nav button {
+    min-height: 48px !important;
+  }
+}
+
+/* === END HIPIPLAY BOTTOM HISTORY EXIT ONLY V17 === */
+
+/* === HIPIPLAY VENTA P2P MENU V19 === */
+
+.wallet-action-sell-menu {
+  display: grid !important;
+  gap: 14px !important;
+  margin: 14px 0 !important;
+}
+
+.wallet-action-big-choice {
+  width: 100% !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 22px !important;
+  padding: 18px 16px !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  column-gap: 12px !important;
+  text-align: left !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.22) !important;
+}
+
+.wallet-action-big-choice svg {
+  grid-row: 1 / span 2 !important;
+}
+
+.wallet-action-big-choice strong {
+  font-size: 1.05rem !important;
+  font-weight: 1000 !important;
+  line-height: 1.1 !important;
+}
+
+.wallet-action-big-choice small {
+  opacity: .82 !important;
+  font-weight: 750 !important;
+  margin-top: 3px !important;
+}
+
+.wallet-action-new-sale {
+  background: linear-gradient(135deg, rgba(29,185,84,.92), rgba(132,216,0,.92)) !important;
+}
+
+.wallet-action-active-sales {
+  background: linear-gradient(135deg, rgba(14,45,64,.98), rgba(4,96,70,.96)) !important;
+}
+
+.wallet-action-active-sale-list {
+  display: grid !important;
+  gap: 12px !important;
+  max-height: 52svh !important;
+  overflow: auto !important;
+  padding-right: 2px !important;
+}
+
+.wallet-action-refresh-btn {
+  width: 100% !important;
+  min-height: 44px !important;
+}
+
+.wallet-action-empty-state {
+  border: 1px dashed rgba(255,255,255,.20) !important;
+  border-radius: 18px !important;
+  padding: 18px !important;
+  text-align: center !important;
+  color: rgba(255,255,255,.82) !important;
+  font-weight: 800 !important;
+}
+
+.wallet-action-sale-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+.wallet-action-sale-card small {
+  display: block !important;
+  margin-top: 3px !important;
+}
+
+.wallet-action-sale-note {
+  color: #ffe08a !important;
+  font-weight: 900 !important;
+}
+
+.wallet-action-modal-card .danger {
+  border-color: rgba(255,100,100,.45) !important;
+  color: #ffd4d4 !important;
+}
+
+.wallet-action-help-text {
+  display: block !important;
+  margin-top: 4px !important;
+  color: rgba(255,255,255,.72) !important;
+  font-weight: 700 !important;
+}
+
+@media (max-width: 820px) {
+  .wallet-action-big-choice {
+    min-height: 86px !important;
+  }
+
+  .wallet-action-active-sale-list {
+    max-height: 48svh !important;
+  }
+}
+
+/* === END HIPIPLAY VENTA P2P MENU V19 === */
+
+/* === HIPIPLAY PREP FULLSCREEN NO HEADER V24 === */
+
+@media (max-width: 820px) {
+
+  /*
+    Pantalla PREPARANDO CARRERA:
+    ocultar menú/header superior y usar pantalla completa.
+  */
+
+  body.hipiplay-race-mode .app-shell:has(.player-screen.hipiplay-prep-screen),
+  body.hipiplay-race-mode .clean-player-shell:has(.player-screen.hipiplay-prep-screen) {
+    width: 100% !important;
+    max-width: 430px !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: hidden !important;
+    background: #020611 !important;
+  }
+
+  body.hipiplay-race-mode .app-shell:has(.player-screen.hipiplay-prep-screen) .mobile-app-header,
+  body.hipiplay-race-mode .app-shell:has(.player-screen.hipiplay-prep-screen) .topbar,
+  body.hipiplay-race-mode .app-shell:has(.player-screen.hipiplay-prep-screen) .mobile-bottom-nav,
+  body.hipiplay-race-mode .clean-player-shell:has(.player-screen.hipiplay-prep-screen) .mobile-app-header,
+  body.hipiplay-race-mode .clean-player-shell:has(.player-screen.hipiplay-prep-screen) .topbar,
+  body.hipiplay-race-mode .clean-player-shell:has(.player-screen.hipiplay-prep-screen) .mobile-bottom-nav {
+    display: none !important;
+  }
+
+  body.hipiplay-race-mode .app-shell:has(.player-screen.hipiplay-prep-screen) .clean-main,
+  body.hipiplay-race-mode .clean-player-shell:has(.player-screen.hipiplay-prep-screen) .clean-main {
+    width: 100% !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #020611 !important;
+  }
+
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen {
+    width: 100% !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: hidden !important;
+    background: #020611 !important;
+  }
+
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen > section,
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen .betting-horses-preview,
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen .race-wait-fullscreen,
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen .race-generating-screen,
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen .generating-race-screen {
+    width: 100% !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    background: #020611 !important;
+  }
+
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen img,
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen video,
+  body.hipiplay-race-mode .player-screen.hipiplay-prep-screen canvas {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    border-radius: 0 !important;
+    display: block !important;
+  }
+}
+
+/* === END HIPIPLAY PREP FULLSCREEN NO HEADER V24 === */
+
+
+
+/* === HIPIPLAY HEADER BALANCE AFTER TEXT V26 === */
+
+@media (max-width: 820px) {
+  .mobile-app-header {
+    min-height: 72px !important;
+    padding: 7px 10px !important;
+  }
+
+  .mobile-brand-lockup-compact {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .mobile-brand-lockup-compact img {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    border-radius: 15px !important;
+  }
+
+  .mobile-brand-text-balance {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    min-width: 0 !important;
+  }
+
+  .mobile-brand-text {
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+  }
+
+  .mobile-brand-text strong {
+    font-size: 1.18rem !important;
+    line-height: 1.02 !important;
+    letter-spacing: -.04em !important;
+    white-space: nowrap !important;
+  }
+
+  .mobile-brand-text small {
+    font-size: .76rem !important;
+    line-height: 1.05 !important;
+    opacity: .82 !important;
+    white-space: nowrap !important;
+  }
+
+  .mobile-header-balance {
+    min-width: max-content !important;
+    padding: 6px 8px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 212, 90, .24) !important;
+    background: rgba(255, 212, 90, .10) !important;
+    color: #fff4c2 !important;
+    font-size: .78rem !important;
+    line-height: 1 !important;
+    font-weight: 1000 !important;
+    letter-spacing: -.02em !important;
+    white-space: nowrap !important;
+  }
+
+  .mobile-header-actions {
+    gap: 7px !important;
+    flex: 0 0 auto !important;
+  }
+
+  .mobile-icon-btn,
+  .mobile-install-btn.mobile-icon-btn,
+  .mobile-menu-btn {
+    width: 43px !important;
+    height: 43px !important;
+    min-width: 43px !important;
+    border-radius: 15px !important;
+  }
+
+  .mobile-icon-btn svg {
+    width: 23px !important;
+    height: 23px !important;
+  }
+}
+
+@media (max-width: 390px), (max-height: 760px) {
+  .mobile-app-header {
+    min-height: 66px !important;
+    padding: 6px 8px !important;
+  }
+
+  .mobile-brand-lockup-compact {
+    gap: 6px !important;
+  }
+
+  .mobile-brand-lockup-compact img {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    border-radius: 13px !important;
+  }
+
+  .mobile-brand-text-balance {
+    gap: 5px !important;
+  }
+
+  .mobile-brand-text strong {
+    font-size: 1.02rem !important;
+  }
+
+  .mobile-brand-text small {
+    font-size: .68rem !important;
+  }
+
+  .mobile-header-balance {
+    padding: 5px 7px !important;
+    font-size: .70rem !important;
+  }
+
+  .mobile-icon-btn,
+  .mobile-install-btn.mobile-icon-btn,
+  .mobile-menu-btn {
+    width: 39px !important;
+    height: 39px !important;
+    min-width: 39px !important;
+  }
+
+  .mobile-icon-btn svg {
+    width: 21px !important;
+    height: 21px !important;
+  }
+}
+
+/* === END HIPIPLAY HEADER BALANCE AFTER TEXT V26 === */
+
+.transfer-user-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transfer-user-check input {
+  flex: 1;
+}
+
+.transfer-user-check.valid input {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.45);
+}
+
+.transfer-user-check.invalid input {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.45);
+}
+
+.transfer-user-badge {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 15px;
+}
+
+.transfer-user-badge.valid {
+  background: rgba(34, 197, 94, 0.18);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.7);
+}
+
+.transfer-user-badge.invalid {
+  background: rgba(239, 68, 68, 0.18);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.7);
+}
+
+.transfer-user-badge.checking {
+  background: rgba(250, 204, 21, 0.18);
+  color: #facc15;
+  border: 1px solid rgba(250, 204, 21, 0.7);
+}
+
+.transfer-user-message {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.transfer-user-message.valid {
+  color: #22c55e;
+}
+
+.transfer-user-message.invalid {
+  color: #ef4444;
+}
+
+.transfer-user-message.checking {
+  color: #facc15;
+}
+
