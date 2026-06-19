@@ -40,3 +40,7 @@ fragmentos_*.txt
 .DS_Store
 Thumbs.db
 
+
+# Local env y backups de videos
+apps/api/.env
+apps/web/public/race-videos/backup_clean_*/
