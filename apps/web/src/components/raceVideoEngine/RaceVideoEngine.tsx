@@ -18,7 +18,7 @@ type RaceResult = {
   mapping: Record<string, number>;
 };
 
-const RACE_DURATION_MS = 20_000;
+const RACE_DURATION_MS = 10_000;
 const RACE_IMAGE_SRC = '/race-images/race-running.png';
 
 function clamp(value: number, min: number, max: number) {

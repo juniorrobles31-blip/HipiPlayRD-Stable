@@ -1,0 +1,22 @@
+[
+    {
+        "id":  "user-2a6295f3-4e9f-4184-b782-711d43c6d41d",
+        "localUserId":  "local-user-test-001",
+        "username":  "ruddytest",
+        "deviceId":  "device-test-001",
+        "coins":  10000,
+        "role":  "player",
+        "createdAt":  "2026-06-02T18:07:06.445Z",
+        "updatedAt":  "2026-06-02T18:07:06.445Z"
+    },
+    {
+        "id":  "user-9825954f-ab9f-40bd-a7b5-904caeff4e29",
+        "localUserId":  "local-user-test-002",
+        "username":  "ruddytest2",
+        "deviceId":  "device-test-002",
+        "coins":  10000,
+        "role":  "player",
+        "createdAt":  "2026-06-02T19:08:00.479Z",
+        "updatedAt":  "2026-06-02T19:08:00.479Z"
+    }
+]

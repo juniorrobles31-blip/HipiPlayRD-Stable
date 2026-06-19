@@ -1,4 +1,12 @@
-const API_BASE = '/api';
+const envApiBaseUrl = (
+  import.meta as unknown as {
+    env?: {
+      VITE_API_BASE_URL?: string;
+    };
+  }
+).env?.VITE_API_BASE_URL;
+
+const API_BASE = (envApiBaseUrl || '/app-api').replace(/\/$/, '');
 
 export type Wallet = {
   userId: string;
@@ -75,7 +83,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok || data.status === 'ERROR') throw new Error(data.message || 'Error de API');
+  if (!res.ok || data.status === 'ERROR' || data.ok === false) throw new Error(data.error || data.message || data.detail || 'Error de API');
   return data as T;
 }
 
@@ -83,7 +91,23 @@ export const api = {
   login: (username: string, password: string) => request<{status: string; token: string; user: any; wallet: Wallet}>('/auth/login', {
     method: 'POST', body: JSON.stringify({ username, password })
   }),
+  register: (username: string, password: string) => request<{status: string; token: string; user: any; wallet: Wallet}>('/auth/register', {
+    method: 'POST', body: JSON.stringify({ username, password })
+  }),
   me: () => request<{status: string; user: any; wallet: Wallet}>('/me'),
+
+  passkeyRegisterOptions: (payload: { username: string; termsAccepted: boolean }) => request<any>('/auth/passkey/register/options', {
+    method: 'POST', body: JSON.stringify(payload)
+  }),
+  passkeyRegisterVerify: (payload: { challengeId: string; credential: any }) => request<{status: string; token: string; user: any; wallet: Wallet}>('/auth/passkey/register/verify', {
+    method: 'POST', body: JSON.stringify(payload)
+  }),
+  passkeyLoginOptions: (payload?: { username?: string }) => request<any>('/auth/passkey/login/options', {
+    method: 'POST', body: JSON.stringify(payload || {})
+  }),
+  passkeyLoginVerify: (payload: { challengeId: string; credential: any; username?: string }) => request<{status: string; token: string; user: any; wallet: Wallet}>('/auth/passkey/login/verify', {
+    method: 'POST', body: JSON.stringify(payload)
+  }),
   history: () => request<{status: string; wallet: Wallet; bets: Bet[]}>('/games/history'),
   bet: (payload: any) => request<any>('/games/bet', { method: 'POST', body: JSON.stringify(payload) }),
   currentRace: () => request<{status: string; race: DerbyRace; previousRace: DerbyRace; myBet: DerbyBet | null; wallet: Wallet; serverTime: number}>('/races/current'),
@@ -99,3 +123,6 @@ export const api = {
   syncMovement: (movement: any) => request<any>('/local-first/sync-movement', { method: 'POST', body: JSON.stringify({ movement }) }),
   syncBatch: (movements: any[]) => request<any>('/local-first/sync-batch', { method: 'POST', body: JSON.stringify({ movements }) })
 };
+
+
+

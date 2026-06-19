@@ -1,0 +1,247 @@
+﻿const envServerUrl = (
+  import.meta as unknown as {
+    env?: {
+      VITE_HIPIPLAY_SERVER_URL?: string;
+    };
+  }
+).env?.VITE_HIPIPLAY_SERVER_URL;
+
+export const HIPIPLAY_SERVER_URL = (envServerUrl || '/hipiplay-server').replace(/\/$/, '');
+
+export type ServerPhase = 'BETTING' | 'RACE' | 'RESULTS';
+
+export type ServerHorse = {
+  id: number;
+  name: string;
+  color: string;
+};
+
+export type ServerTotal = {
+  horseId: number;
+  name: string;
+  color: string;
+  totalAmount: number;
+  totalBets: number;
+};
+
+export type ServerWinner = {
+  position: number;
+  horseId: number;
+  name: string;
+  color: string;
+  totalAmount?: number;
+  totalBets?: number;
+};
+
+export type ServerRaceState = {
+  ok: boolean;
+  serverTime: number;
+  roundId: number;
+  raceNumber?: number;
+  phase: ServerPhase;
+  secondsRemaining: number;
+  bettingSeconds: number;
+  raceSeconds: number;
+  resultsSeconds?: number;
+  payoutMultiplier?: number;
+  raceStartedAt: number | null;
+  resultsStartedAt?: number | null;
+  horses: ServerHorse[];
+  totals?: ServerTotal[];
+  totalBetsReceived: number;
+  winners: ServerWinner[];
+};
+
+export type ServerBetPayload = {
+  playerId: string;
+  horseId: number;
+  amount: number;
+  balanceApostado: number;
+  balanceTotal: number;
+  clientName?: string;
+};
+
+export type ServerBetResponse = {
+  ok: boolean;
+  message?: string;
+  error?: string;
+  bet?: {
+    id: string;
+    roundId?: number;
+    raceNumber?: number;
+    playerId: string;
+    clientName?: string;
+    horseId: number;
+    horseName?: string;
+    amount?: number;
+    balanceApostado?: number;
+    balanceTotal?: number;
+    balanceBeforeBet?: number;
+    balanceAfterBet?: number;
+    serverBalance?: number;
+    createdAt?: string;
+  };
+  state?: ServerRaceState;
+};
+
+export type ServerPublicRaceHistory = {
+  raceNumber: number;
+  winners: number[];
+};
+
+export type ServerHistoryResponse = {
+  ok: boolean;
+  history: ServerPublicRaceHistory[];
+};
+
+export type ServerPlayerBalance = {
+  ok: boolean;
+  playerId: string;
+  balance: number;
+  serverManaged: boolean;
+};
+
+export type ServerPlayerSettlement = {
+  betId: string;
+  horseId: number;
+  horseName?: string;
+  amount: number;
+  balanceBeforeBet?: number;
+  balanceAfterBet?: number;
+  won: boolean;
+  payout: number;
+  finalBalance?: number;
+  multiplier?: number;
+};
+
+export type ServerPlayerResult = {
+  ok: boolean;
+  available: boolean;
+  raceNumber?: number;
+  roundId?: number;
+  playerId: string;
+  won?: boolean;
+  totalBetAmount?: number;
+  totalPayout?: number;
+  multiplier?: number;
+  phase?: string;
+  message?: string;
+  balanceBeforeBet?: number | null;
+  balanceAfterBet?: number | null;
+  finalBalance?: number | null;
+  winners?: {
+    position: number;
+    horseId: number;
+    name?: string;
+    color?: string;
+  }[];
+  settlements?: ServerPlayerSettlement[];
+};
+
+async function readJsonResponse<T>(response: Response, fallbackMessage: string): Promise<T> {
+  let data: any = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok || data?.ok === false) {
+    throw new Error(data?.error || data?.message || `${fallbackMessage}. HTTP ${response.status}`);
+  }
+
+  return data as T;
+}
+
+export async function getServerRaceState(): Promise<ServerRaceState> {
+  const response = await fetch(`${HIPIPLAY_SERVER_URL}/api/state`, {
+    method: 'GET',
+    cache: 'no-store',
+    headers: {
+      Accept: 'application/json'
+    }
+  });
+
+  const data = await readJsonResponse<ServerRaceState>(response, 'No se pudo consultar el servidor');
+
+  if (!data?.ok) {
+    throw new Error('El servidor respondió un estado inválido.');
+  }
+
+  return data;
+}
+
+export async function sendServerBet(payload: ServerBetPayload): Promise<ServerBetResponse> {
+  const response = await fetch(`${HIPIPLAY_SERVER_URL}/api/bet`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  return readJsonResponse<ServerBetResponse>(response, 'No se pudo registrar la apuesta');
+}
+
+export async function getServerRaceHistory(): Promise<ServerPublicRaceHistory[]> {
+  const response = await fetch(`${HIPIPLAY_SERVER_URL}/api/history`, {
+    method: 'GET',
+    cache: 'no-store',
+    headers: {
+      Accept: 'application/json'
+    }
+  });
+
+  const data = await readJsonResponse<ServerHistoryResponse>(response, 'No se pudo consultar el historial del servidor');
+
+  if (!Array.isArray(data.history)) {
+    throw new Error('El servidor respondió un historial inválido.');
+  }
+
+  return data.history;
+}
+
+export async function getServerPlayerBalance(playerId: string): Promise<ServerPlayerBalance> {
+  const response = await fetch(`${HIPIPLAY_SERVER_URL}/api/player/balance/${encodeURIComponent(playerId)}`, {
+    method: 'GET',
+    cache: 'no-store',
+    headers: {
+      Accept: 'application/json'
+    }
+  });
+
+  const data = await readJsonResponse<ServerPlayerBalance>(response, 'No se pudo consultar el balance del jugador');
+
+  if (!Number.isFinite(Number(data.balance))) {
+    throw new Error('El servidor respondió un balance inválido.');
+  }
+
+  return {
+    ...data,
+    balance: Math.max(0, Math.floor(Number(data.balance)))
+  };
+}
+
+export async function getServerPlayerResult(playerId: string): Promise<ServerPlayerResult> {
+  const response = await fetch(`${HIPIPLAY_SERVER_URL}/api/player/result/${encodeURIComponent(playerId)}`, {
+    method: 'GET',
+    cache: 'no-store',
+    headers: {
+      Accept: 'application/json'
+    }
+  });
+
+  return readJsonResponse<ServerPlayerResult>(response, 'No se pudo consultar el resultado del jugador');
+}
+
+export function getServerTop3(state: ServerRaceState | null): number[] {
+  if (!state?.winners?.length) return [];
+
+  return [...state.winners]
+    .sort((a, b) => Number(a.position || 0) - Number(b.position || 0))
+    .map((winner) => Number(winner.horseId))
+    .filter((horseId) => Number.isFinite(horseId))
+    .slice(0, 3);
+}

@@ -1,4 +1,5 @@
-﻿import { enableGlobalScroll } from './enableGlobalScroll';
+﻿import './utils/webCryptoDigestFallback';
+import { enableGlobalScroll } from './enableGlobalScroll';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
@@ -22,6 +23,7 @@ initMobileDb()
   .then(() => console.log('HipiPlay IndexedDB lista.'))
   .catch((error) => console.error('Error inicializando IndexedDB:', error));
 enableAppScroll();
+
 
 
 

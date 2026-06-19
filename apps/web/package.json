@@ -8,15 +8,20 @@
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
+    "@scure/bip32": "^2.2.0",
+    "@simplewebauthn/browser": "^13.3.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.0",
+    "bip39": "^3.1.0",
+    "ethers": "^6.16.0",
+    "idb": "^8.0.3",
+    "lucide-react": "^0.468.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "lucide-react": "^0.468.0"
+    "vite": "^5.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.9.3"
   }
 }

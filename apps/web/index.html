@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -6,11 +6,11 @@
 
     <title>HipiPlay</title>
 
-    <meta name="description" content="HipiPlay - Carreras hípicas con monedas en tiempo real." />
+    <meta name="description" content="HipiPlay - Carreras hÃ­picas con monedas en tiempo real." />
     <meta name="theme-color" content="#0f2a1d" />
     <meta name="background-color" content="#06160f" />
 
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/pwa/manifest-hipiplay.webmanifest">
 
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
@@ -22,18 +22,26 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <meta property="og:title" content="HipiPlay" />
-    <meta property="og:description" content="Carreras hípicas con monedas en tiempo real." />
+    <meta property="og:description" content="Carreras hÃ­picas con monedas en tiempo real." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/icons/icon-512x512.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="HipiPlay" />
-    <meta name="twitter:description" content="Carreras hípicas con monedas en tiempo real." />
+    <meta name="twitter:description" content="Carreras hÃ­picas con monedas en tiempo real." />
     <meta name="twitter:image" content="/icons/icon-512x512.png" />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <script defer src="%BASE_URL%pwa-install.js"></script>
+</body>
 </html>
+
+
+
+
+
+
+

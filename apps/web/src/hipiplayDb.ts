@@ -1,4 +1,6 @@
-﻿export type SyncStatus = 'pending' | 'synced' | 'error';
+﻿import { safeRandomUUID } from './utils/safeRandomUUID';
+
+export type SyncStatus = 'pending' | 'synced' | 'error';
 
 export type MobileUser = {
   localUserId: string;
@@ -71,7 +73,7 @@ function now() {
 }
 
 export function createLocalId(prefix: string) {
-  return `${prefix}-${crypto.randomUUID()}`;
+  return `${prefix}-${safeRandomUUID()}`;
 }
 
 function createStore(
@@ -305,3 +307,4 @@ export async function migrateLegacyLocalUserToIndexedDb() {
     return null;
   }
 }
+

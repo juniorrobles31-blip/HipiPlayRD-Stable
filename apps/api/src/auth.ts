@@ -34,7 +34,15 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 export function login(username: string, password: string) {
   const db = loadDb();
   const user = db.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+
   if (!user) return null;
+
+  // Seguridad: el usuario admin interno no puede entrar a la PWA de jugadores.
+  if (user.username.toLowerCase() === 'admin' || user.id === 'usr_admin') {
+    return null;
+  }
+
   if (!bcrypt.compareSync(password, user.passwordHash)) return null;
+
   return { user, token: createToken(user.id) };
 }

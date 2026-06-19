@@ -1,0 +1,1124 @@
+﻿===== App.tsx: imports y header/menu/install =====
+
+  src\App.tsx:1:import { useEffect, useMemo, useRef, useState } from 'react';
+  src\App.tsx:2:import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
+> src\App.tsx:3:import { ArrowLeftRight, HandCoins, History, Landmark, LogOut, MoveRight, ShoppingCart, Sparkles, Trophy, Wallet as WalletIcon } from 
+'lucide-react';
+  src\App.tsx:4:import { syncLocalUserAfterLogin } from './localUserSync';
+  src\App.tsx:5:import { clearLocalUser, getLocalUser } from './localUserDb';
+  src\App.tsx:6:import { api, logout, setToken, Wallet } from './api';
+  src\App.tsx:7:
+  src\App.tsx:8:import hipiPlayLogo from './assets/hipiplay-logo.png';
+  src\App.tsx:9:
+  src\App.tsx:10:import {
+  src\App.tsx:11:  dbGetAll,
+  src\App.tsx:12:  LocalDerbyBet,
+  src\App.tsx:13:  LocalLedgerMovement,
+  src\App.tsx:335:    setMode('login');
+  src\App.tsx:336:  }
+  src\App.tsx:337:
+  src\App.tsx:338:  if (mode === 'quick' && savedUsername) {
+> src\App.tsx:339:return <div className="player-screen">
+  src\App.tsx:340:      <div className="login-card glass clean-login-card passkey-create-card">
+  src\App.tsx:341:        <div className="login-brand-lockup">
+  src\App.tsx:342:          <img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo login-logo" />
+  src\App.tsx:343:          <div>
+  src\App.tsx:344:            <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
+  src\App.tsx:345:            <h1>Bienvenido</h1>
+  src\App.tsx:346:            <p>Inicia sesión con la seguridad de tu móvil.</p>
+  src\App.tsx:347:          </div>
+  src\App.tsx:348:        </div>
+  src\App.tsx:349:
+  src\App.tsx:365:    </div>;
+  src\App.tsx:366:  }
+  src\App.tsx:367:
+  src\App.tsx:368:  if (mode === 'register') {
+> src\App.tsx:369:return <div className="player-screen">
+  src\App.tsx:370:      <div className="login-card glass clean-login-card passkey-create-card">
+  src\App.tsx:371:        <div className="login-brand-lockup">
+  src\App.tsx:372:          <img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo login-logo" />
+  src\App.tsx:373:          <div>
+  src\App.tsx:374:            <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
+  src\App.tsx:375:            <h1>Crear cuenta</h1>
+  src\App.tsx:376:            <p>Registra tu acceso usando la seguridad de tu móvil.</p>
+  src\App.tsx:377:          </div>
+  src\App.tsx:378:        </div>
+  src\App.tsx:379:
+  src\App.tsx:415:        </form>
+  src\App.tsx:416:      </div>
+  src\App.tsx:417:    </div>;
+  src\App.tsx:418:  }
+> src\App.tsx:419:return <div className="player-screen">
+  src\App.tsx:420:    <div className="login-card glass clean-login-card passkey-create-card">
+  src\App.tsx:421:      <div className="login-brand-lockup">
+  src\App.tsx:422:        <img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo login-logo" />
+  src\App.tsx:423:        <div>
+  src\App.tsx:424:          <div className="brand-badge"><Sparkles size={18} /> HipiPlay</div>
+  src\App.tsx:425:          <h1>Iniciar sesión</h1>
+  src\App.tsx:426:          <p>Escribe tu usuario y entra con huella, Face ID o PIN.</p>
+  src\App.tsx:427:        </div>
+  src\App.tsx:428:      </div>
+  src\App.tsx:429:
+  src\App.tsx:458:    </div>
+  src\App.tsx:459:  </div>;
+  src\App.tsx:460:}
+  src\App.tsx:461:
+> src\App.tsx:462:function WalletActionsPanel({ user, onAction }: { user: User; onAction: (action: WalletAction) => void }) {
+  src\App.tsx:463:  const player = user as any;
+  src\App.tsx:464:
+  src\App.tsx:465:  useEffect(() => {
+> src\App.tsx:466:    document.body.classList.add('hipiplay-home-mode');
+> src\App.tsx:467:    document.body.classList.remove('hipiplay-race-mode');
+  src\App.tsx:468:
+> src\App.tsx:469:    window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+  src\App.tsx:470:      detail: { view: 'home' }
+  src\App.tsx:471:    }));
+  src\App.tsx:472:  }, []);
+  src\App.tsx:473:
+  src\App.tsx:474:  function openAction(action: WalletAction) {
+  src\App.tsx:475:    if (action === 'bet') {
+> src\App.tsx:476:      document.body.classList.remove('hipiplay-home-mode');
+> src\App.tsx:477:      document.body.classList.add('hipiplay-race-mode');
+  src\App.tsx:478:
+> src\App.tsx:479:      window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+  src\App.tsx:480:        detail: { view: 'race' }
+  src\App.tsx:481:      }));
+  src\App.tsx:482:
+  src\App.tsx:483:      setTimeout(() => {
+  src\App.tsx:484:        const raceSection = document.querySelector('.horse-bet-panel, .race-panel, .race-card, .horse-grid, .horses-grid, .race-horses-grid, 
+.horse-select-grid');
+  src\App.tsx:485:        if (raceSection) {
+  src\App.tsx:486:          raceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  src\App.tsx:487:        } else {
+  src\App.tsx:488:          window.scrollTo({ top: 0, behavior: 'smooth' });
+  src\App.tsx:489:        }
+  src\App.tsx:1663:  } finally {
+  src\App.tsx:1664:    setLoading(false);
+  src\App.tsx:1665:  }
+  src\App.tsx:1666:  }
+> src\App.tsx:1667:  const [walletAction, setWalletAction] = useState<WalletAction | null>(null);
+  src\App.tsx:1668:
+> src\App.tsx:1669:return <div className="player-screen">
+  src\App.tsx:1670:    <PlayerSummary wallet={wallet} pendingCount={pendingCount} lastBet={lastBet} lastResult={lastResult} />
+> src\App.tsx:1671:    <WalletActionsPanel user={user} onAction={setWalletAction} />
+> src\App.tsx:1672:    {walletAction && <WalletActionModal action={walletAction} user={user} wallet={wallet} onClose={() => setWalletAction(null)} 
+onDone={async () => { await refreshLocal(); }} />}
+  src\App.tsx:1673:<div className="horse-bet-panel glass">
+  src\App.tsx:1674:      
+  src\App.tsx:1675:
+  src\App.tsx:1676:      <HorseBetGrid
+  src\App.tsx:1677:        selectedHorse={horse}
+  src\App.tsx:1678:        onSelect={(selected) => setHorse(selected)}
+  src\App.tsx:1679:      />
+  src\App.tsx:1680:
+  src\App.tsx:1681:      <label className="horse-bet-field-label">Cantidad de monedas</label>
+  src\App.tsx:1682:
+  src\App.tsx:1817:    </section>
+  src\App.tsx:1818:  );
+  src\App.tsx:1819:}
+  src\App.tsx:1820:
+> src\App.tsx:1821:type InstallPromptEvent = Event & {
+  src\App.tsx:1822:  prompt: () => Promise<void>;
+  src\App.tsx:1823:  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  src\App.tsx:1824:};
+  src\App.tsx:1825:
+> src\App.tsx:1826:function PwaInstallButton() {
+> src\App.tsx:1827:  const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
+> src\App.tsx:1828:  const [installed, setInstalled] = useState(false);
+  src\App.tsx:1829:
+  src\App.tsx:1830:  useEffect(() => {
+> src\App.tsx:1831:    const onBeforeInstallPrompt = (event: Event) => {
+  src\App.tsx:1832:      event.preventDefault();
+> src\App.tsx:1833:      setDeferredPrompt(event as InstallPromptEvent);
+  src\App.tsx:1834:    };
+  src\App.tsx:1835:
+> src\App.tsx:1836:    const onInstalled = () => {
+> src\App.tsx:1837:      setInstalled(true);
+  src\App.tsx:1838:      setDeferredPrompt(null);
+  src\App.tsx:1839:    };
+  src\App.tsx:1840:
+> src\App.tsx:1841:    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+> src\App.tsx:1842:    window.addEventListener('appinstalled', onInstalled);
+  src\App.tsx:1843:
+  src\App.tsx:1844:    return () => {
+> src\App.tsx:1845:      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+> src\App.tsx:1846:      window.removeEventListener('appinstalled', onInstalled);
+  src\App.tsx:1847:    };
+  src\App.tsx:1848:  }, []);
+  src\App.tsx:1849:
+> src\App.tsx:1850:  async function install() {
+  src\App.tsx:1851:    if (!deferredPrompt) return;
+  src\App.tsx:1852:    await deferredPrompt.prompt();
+  src\App.tsx:1853:    await deferredPrompt.userChoice;
+  src\App.tsx:1854:    setDeferredPrompt(null);
+  src\App.tsx:1855:  }
+  src\App.tsx:1856:
+> src\App.tsx:1857:  if (installed || !deferredPrompt) return null;
+> src\App.tsx:1858:  return <button className="mobile-install-btn" onClick={install}>Instalar</button>;
+  src\App.tsx:1859:}
+  src\App.tsx:1860:export function App() {
+  src\App.tsx:1861:  const [user, setUser] = useState<User | null>(null);
+  src\App.tsx:1862:  const [localWallet, setLocalWallet] = useState<LocalWalletState | null>(null);
+  src\App.tsx:1863:  const [tab, setTab] = useState<Tab>('games');
+  src\App.tsx:1864:const [loading, setLoading] = useState(true);
+  src\App.tsx:1865:async function refreshLocal(userId = user?.id) {
+  src\App.tsx:1866:    if (!userId) return;
+  src\App.tsx:1867:    const wallet = await getLocalWallet(userId);
+  src\App.tsx:1868:    setLocalWallet(wallet);
+  src\App.tsx:1926:  if (loading) return <div className="loading"><Sparkles className="spin" /> Cargando HipiPlay...</div>;
+  src\App.tsx:1927:  if (!user) return <Login onLogin={(u, w) => { bootstrap(u, w); }} />;
+  src\App.tsx:1928:
+  src\App.tsx:1929:  return <div className="app-shell clean-player-shell">
+> src\App.tsx:1930:    <header className="mobile-app-header">
+  src\App.tsx:1931:      <div className="mobile-brand-lockup">
+  src\App.tsx:1932:        <img src={hipiPlayLogo} alt="HipiPlay" />
+  src\App.tsx:1933:        <div>
+  src\App.tsx:1934:          <strong>HipiPlay</strong>
+  src\App.tsx:1935:          <small>Carreras Hí­picas</small>
+  src\App.tsx:1936:        </div>
+  src\App.tsx:1937:      </div>
+> src\App.tsx:1938:      <div className="mobile-header-actions">
+> src\App.tsx:1939:        <PwaInstallButton />
+  src\App.tsx:1940:        
+  src\App.tsx:1941:      </div>
+  src\App.tsx:1942:    </header>
+  src\App.tsx:1943:    <header className="topbar glass clean-topbar">
+  src\App.tsx:1944:      <div className="brand brand-hipiplay"><img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo topbar-logo" 
+/><div><strong>HipiPlay</strong><small>Carreras HÃpicas con monedas</small></div></div>
+  src\App.tsx:1945:      <nav>
+  src\App.tsx:1946:        <button className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}><History size={17}/> Historial</button>
+  src\App.tsx:1947:      </nav>
+  src\App.tsx:1948:      <button className="ghost" onClick={() => { clearLocalUser(); logout(); location.reload(); }}><LogOut size={18}/> Salir</button>
+  src\App.tsx:1949:    </header>
+
+
+
+===== styles.css: header móvil y botones existentes =====
+
+  src\styles.css:4818:  -webkit-tap-highlight-color: transparent;
+  src\styles.css:4819:}
+  src\styles.css:4820:
+> src\styles.css:4821:.mobile-app-header,
+  src\styles.css:4822:.mobile-bottom-nav,
+> src\styles.css:4823:.mobile-install-btn {
+  src\styles.css:4824:  display: none;
+  src\styles.css:4825:}
+  src\styles.css:4826:
+  src\styles.css:4827:@media (max-width: 768px) {
+  src\styles.css:4828:  html,
+  src\styles.css:4829:  body,
+  src\styles.css:4830:  #root {
+  src\styles.css:4831:    width: 100% !important;
+  src\styles.css:4832:    height: auto !important;
+  src\styles.css:4833:    min-height: 100dvh !important;
+  src\styles.css:4899:    overflow: visible !important;
+  src\styles.css:4900:  }
+  src\styles.css:4901:
+> src\styles.css:4902:  .mobile-app-header {
+  src\styles.css:4903:    position: fixed;
+  src\styles.css:4904:    top: 0;
+  src\styles.css:4905:    left: 50%;
+  src\styles.css:4906:    transform: translateX(-50%);
+  src\styles.css:4907:    z-index: 300;
+  src\styles.css:4908:    display: flex;
+  src\styles.css:4909:    align-items: center;
+  src\styles.css:4910:    justify-content: space-between;
+  src\styles.css:4911:    gap: 10px;
+  src\styles.css:4912:    width: min(100%, 480px);
+  src\styles.css:4919:    -webkit-backdrop-filter: blur(18px);
+  src\styles.css:4920:  }
+  src\styles.css:4921:
+> src\styles.css:4922:  .mobile-brand-lockup {
+  src\styles.css:4923:    display: flex;
+  src\styles.css:4924:    align-items: center;
+  src\styles.css:4925:    gap: 10px;
+  src\styles.css:4926:    min-width: 0;
+  src\styles.css:4927:  }
+  src\styles.css:4928:
+> src\styles.css:4929:  .mobile-brand-lockup img {
+  src\styles.css:4930:    width: 42px;
+  src\styles.css:4931:    height: 42px;
+  src\styles.css:4932:    object-fit: contain;
+  src\styles.css:4933:    border-radius: 13px;
+  src\styles.css:4934:    background: rgba(255, 255, 255, 0.08);
+  src\styles.css:4935:    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  src\styles.css:4936:  }
+  src\styles.css:4937:
+> src\styles.css:4938:  .mobile-brand-lockup strong,
+> src\styles.css:4939:  .mobile-brand-lockup small {
+  src\styles.css:4940:    display: block;
+  src\styles.css:4941:    line-height: 1.05;
+  src\styles.css:4942:  }
+  src\styles.css:4943:
+> src\styles.css:4944:  .mobile-brand-lockup strong {
+  src\styles.css:4945:    font-size: 16px;
+  src\styles.css:4946:    letter-spacing: 0.2px;
+  src\styles.css:4947:  }
+  src\styles.css:4948:
+> src\styles.css:4949:  .mobile-brand-lockup small {
+  src\styles.css:4950:    max-width: 140px;
+  src\styles.css:4951:    margin-top: 3px;
+  src\styles.css:4952:    color: rgba(255, 255, 255, 0.62);
+  src\styles.css:4953:    font-size: 11px;
+  src\styles.css:4954:    white-space: nowrap;
+  src\styles.css:4955:    overflow: hidden;
+  src\styles.css:4956:    text-overflow: ellipsis;
+  src\styles.css:4957:  }
+  src\styles.css:4958:
+> src\styles.css:4959:  .mobile-header-actions {
+  src\styles.css:4960:    display: flex;
+  src\styles.css:4961:    align-items: center;
+  src\styles.css:4962:    gap: 8px;
+  src\styles.css:4963:    flex-shrink: 0;
+  src\styles.css:4964:  }
+  src\styles.css:4965:
+  src\styles.css:4966:  .mobile-balance-pill {
+  src\styles.css:4967:    display: inline-flex;
+  src\styles.css:4968:    align-items: center;
+  src\styles.css:4969:    gap: 6px;
+  src\styles.css:4978:    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  src\styles.css:4979:  }
+  src\styles.css:4980:
+> src\styles.css:4981:  .mobile-install-btn {
+  src\styles.css:4982:    display: inline-flex;
+  src\styles.css:4983:    align-items: center;
+  src\styles.css:4984:    justify-content: center;
+  src\styles.css:4985:    min-height: 36px;
+  src\styles.css:4986:    padding: 0 10px;
+  src\styles.css:4987:    border-radius: 999px;
+  src\styles.css:4988:    border: 1px solid rgba(255, 255, 255, 0.18);
+  src\styles.css:4989:    background: rgba(255, 255, 255, 0.08);
+  src\styles.css:4990:    color: #fff;
+  src\styles.css:4991:    font-size: 11px;
+  src\styles.css:5445:}
+  src\styles.css:5446:
+  src\styles.css:5447:@media (max-width: 390px) {
+> src\styles.css:5448:  .mobile-brand-lockup small {
+  src\styles.css:5449:    max-width: 98px;
+  src\styles.css:5450:  }
+  src\styles.css:5451:
+  src\styles.css:5452:  .mobile-balance-pill {
+  src\styles.css:5453:    padding: 0 9px;
+  src\styles.css:5454:    font-size: 11px;
+  src\styles.css:5455:  }
+  src\styles.css:5456:
+> src\styles.css:5457:  .mobile-install-btn {
+  src\styles.css:5458:    padding: 0 8px;
+  src\styles.css:5459:    font-size: 10px;
+  src\styles.css:5460:  }
+  src\styles.css:5461:
+  src\styles.css:5462:  .hipica-broadcast-stage,
+  src\styles.css:5463:  .race-track,
+  src\styles.css:5464:  .track-shell {
+  src\styles.css:5465:    min-height: 238px !important;
+  src\styles.css:5466:    max-height: 320px !important;
+  src\styles.css:5467:  }
+  src\styles.css:5589:    padding-bottom: 18px !important;
+  src\styles.css:5590:  }
+  src\styles.css:5591:
+> src\styles.css:5592:  .mobile-app-header,
+  src\styles.css:5593:  .mobile-bottom-nav {
+  src\styles.css:5594:    flex: 0 0 auto !important;
+  src\styles.css:5595:  }
+  src\styles.css:5596:
+> src\styles.css:5597:  .mobile-app-header {
+  src\styles.css:5598:    position: fixed !important;
+  src\styles.css:5599:    top: 0 !important;
+  src\styles.css:5600:    left: 50% !important;
+  src\styles.css:5601:    transform: translateX(-50%) !important;
+  src\styles.css:5602:    z-index: 500 !important;
+  src\styles.css:5603:    width: min(100%, 480px) !important;
+  src\styles.css:5604:  }
+  src\styles.css:5605:
+  src\styles.css:5606:  .mobile-bottom-nav {
+  src\styles.css:5607:    position: fixed !important;
+  src\styles.css:5817:    touch-action: pan-y pinch-zoom !important;
+  src\styles.css:5818:  }
+  src\styles.css:5819:
+> src\styles.css:5820:  .mobile-app-header {
+  src\styles.css:5821:    position: sticky !important;
+  src\styles.css:5822:    top: 0 !important;
+  src\styles.css:5823:    z-index: 9998 !important;
+  src\styles.css:5824:    width: 100% !important;
+  src\styles.css:5825:    max-width: 480px !important;
+  src\styles.css:5826:    margin: 0 auto 14px auto !important;
+  src\styles.css:5827:    box-sizing: border-box !important;
+  src\styles.css:5828:  }
+  src\styles.css:5829:
+> src\styles.css:5830:  .mobile-app-header h1,
+> src\styles.css:5831:  .mobile-app-header strong,
+  src\styles.css:5832:  .mobile-brand-title,
+  src\styles.css:5833:  .brand-title {
+  src\styles.css:5834:    white-space: nowrap !important;
+  src\styles.css:5835:    word-break: keep-all !important;
+  src\styles.css:5836:    overflow: hidden !important;
+  src\styles.css:5837:    text-overflow: ellipsis !important;
+  src\styles.css:5838:    line-height: 1.05 !important;
+  src\styles.css:5839:  }
+  src\styles.css:5840:
+> src\styles.css:5841:  .mobile-app-header h1 {
+  src\styles.css:5842:    font-size: 22px !important;
+  src\styles.css:5843:  }
+  src\styles.css:5844:
+  src\styles.css:5845:  .mobile-bottom-nav,
+  src\styles.css:5846:  .bottom-nav,
+  src\styles.css:5847:  .mobile-nav {
+  src\styles.css:5848:    position: fixed !important;
+  src\styles.css:5849:    left: 12px !important;
+  src\styles.css:5850:    right: 12px !important;
+  src\styles.css:5851:    bottom: 12px !important;
+  src\styles.css:5927:/* BEGIN_FIX_SOLO_BARRAS_CENTRADAS */
+  src\styles.css:5928:
+  src\styles.css:5929:@media (max-width: 768px) {
+> src\styles.css:5930:  .mobile-app-header {
+  src\styles.css:5931:    position: sticky !important;
+  src\styles.css:5932:    top: 0 !important;
+  src\styles.css:5933:    left: 50% !important;
+  src\styles.css:5934:    right: auto !important;
+  src\styles.css:5935:    transform: translateX(-50%) !important;
+  src\styles.css:5936:    width: calc(100vw - 24px) !important;
+  src\styles.css:5937:    max-width: 480px !important;
+  src\styles.css:5938:    margin: 0 auto 14px auto !important;
+  src\styles.css:5939:    box-sizing: border-box !important;
+  src\styles.css:5940:    z-index: 9998 !important;
+  src\styles.css:5968:/* BEGIN_FIX_HEADER_SUPERIOR_DEFINITIVO */
+  src\styles.css:5969:
+  src\styles.css:5970:@media (max-width: 768px) {
+> src\styles.css:5971:  .mobile-app-header {
+  src\styles.css:5972:    position: sticky !important;
+  src\styles.css:5973:    top: 0 !important;
+  src\styles.css:5974:
+  src\styles.css:5975:    left: auto !important;
+  src\styles.css:5976:    right: auto !important;
+  src\styles.css:5977:    transform: none !important;
+  src\styles.css:5978:
+  src\styles.css:5979:    width: 100% !important;
+  src\styles.css:5980:    max-width: 100% !important;
+  src\styles.css:5981:    min-width: 0 !important;
+  src\styles.css:5988:    z-index: 9998 !important;
+  src\styles.css:5989:  }
+  src\styles.css:5990:
+> src\styles.css:5991:  .mobile-app-header > * {
+  src\styles.css:5992:    min-width: 0 !important;
+  src\styles.css:5993:  }
+  src\styles.css:5994:
+> src\styles.css:5995:  .mobile-app-header img {
+  src\styles.css:5996:    flex-shrink: 0 !important;
+  src\styles.css:5997:  }
+  src\styles.css:5998:
+> src\styles.css:5999:  .mobile-app-header h1,
+> src\styles.css:6000:  .mobile-app-header strong,
+  src\styles.css:6001:  .mobile-brand-title,
+  src\styles.css:6002:  .brand-title {
+  src\styles.css:6003:    display: block !important;
+  src\styles.css:6004:    white-space: nowrap !important;
+  src\styles.css:6005:    overflow: hidden !important;
+  src\styles.css:6006:    text-overflow: ellipsis !important;
+  src\styles.css:6007:    word-break: keep-all !important;
+  src\styles.css:6008:  }
+  src\styles.css:6009:}
+  src\styles.css:6010:
+  src\styles.css:8768:
+  src\styles.css:8769:@media (max-width: 820px) {
+  src\styles.css:8770:
+> src\styles.css:8771:  body.hipiplay-home-mode {
+  src\styles.css:8772:    background: #001b10 !important;
+  src\styles.css:8773:    overflow-x: hidden !important;
+  src\styles.css:8774:  }
+  src\styles.css:8775:
+> src\styles.css:8776:  body.hipiplay-home-mode .mobile-app-header,
+> src\styles.css:8777:  body.hipiplay-home-mode .topbar,
+> src\styles.css:8778:  body.hipiplay-home-mode .clean-topbar,
+> src\styles.css:8779:  body.hipiplay-home-mode .mobile-bottom-nav,
+> src\styles.css:8780:  body.hipiplay-home-mode .bottom-nav,
+> src\styles.css:8781:  body.hipiplay-home-mode .player-bottom-nav,
+> src\styles.css:8782:  body.hipiplay-home-mode .player-summary,
+> src\styles.css:8783:  body.hipiplay-home-mode .summary-card,
+> src\styles.css:8784:  body.hipiplay-home-mode .wallet-summary,
+> src\styles.css:8785:  body.hipiplay-home-mode .wallet-balance,
+> src\styles.css:8786:  body.hipiplay-home-mode .balance-card,
+> src\styles.css:8787:  body.hipiplay-home-mode .coin-dashboard,
+> src\styles.css:8788:  body.hipiplay-home-mode .game-hero,
+> src\styles.css:8789:  body.hipiplay-home-mode .cycle-steps,
+> src\styles.css:8790:  body.hipiplay-home-mode .horse-bet-panel,
+> src\styles.css:8791:  body.hipiplay-home-mode .race-tv,
+> src\styles.css:8792:  body.hipiplay-home-mode .broadcast-race-tv,
+> src\styles.css:8793:  body.hipiplay-home-mode .server-required-panel,
+> src\styles.css:8794:  body.hipiplay-home-mode .result-card {
+  src\styles.css:8795:    display: none !important;
+  src\styles.css:8796:  }
+  src\styles.css:8797:
+> src\styles.css:8798:  body.hipiplay-home-mode .clean-player-shell,
+> src\styles.css:8799:  body.hipiplay-home-mode .app-shell {
+  src\styles.css:8800:    width: 100% !important;
+  src\styles.css:8801:    max-width: none !important;
+  src\styles.css:8802:    min-height: 100dvh !important;
+  src\styles.css:8803:    padding: 0 !important;
+  src\styles.css:8804:    margin: 0 !important;
+  src\styles.css:8805:    background: #001b10 !important;
+  src\styles.css:8806:  }
+  src\styles.css:8807:
+> src\styles.css:8808:  body.hipiplay-home-mode .clean-main {
+  src\styles.css:8809:    width: 100% !important;
+  src\styles.css:8810:    min-height: 100dvh !important;
+  src\styles.css:8811:    padding: 0 !important;
+  src\styles.css:8812:    margin: 0 !important;
+  src\styles.css:8813:    background: #001b10 !important;
+  src\styles.css:8814:  }
+  src\styles.css:8815:
+> src\styles.css:8816:  body.hipiplay-home-mode .wallet-mobile-home-shell {
+  src\styles.css:8817:    position: fixed !important;
+  src\styles.css:8818:    inset: 0 !important;
+  src\styles.css:8819:    z-index: 2147483000 !important;
+  src\styles.css:8820:    width: 100vw !important;
+  src\styles.css:8821:    min-height: 100dvh !important;
+  src\styles.css:8822:    display: flex !important;
+  src\styles.css:8823:    align-items: center !important;
+  src\styles.css:8824:    justify-content: center !important;
+  src\styles.css:8825:    padding: 14px !important;
+  src\styles.css:8826:    box-sizing: border-box !important;
+  src\styles.css:8829:      linear-gradient(180deg, #071c13 0%, #001b10 100%) !important;
+  src\styles.css:8830:  }
+  src\styles.css:8831:
+> src\styles.css:8832:  body.hipiplay-home-mode .wallet-phone-menu {
+  src\styles.css:8833:    width: min(430px, calc(100vw - 24px)) !important;
+  src\styles.css:8834:    min-height: calc(100dvh - 28px) !important;
+  src\styles.css:8835:    padding: 24px 18px 30px !important;
+  src\styles.css:8836:    border-radius: 34px !important;
+  src\styles.css:8837:    border: 1px solid rgba(229, 184, 75, .34) !important;
+  src\styles.css:8838:    background:
+  src\styles.css:8839:      radial-gradient(circle at top, rgba(55, 175, 82, .16), transparent 48%),
+  src\styles.css:8840:      linear-gradient(180deg, rgba(6, 30, 20, .97), rgba(2, 14, 9, .99)) !important;
+  src\styles.css:8841:    box-shadow: 0 24px 65px rgba(0,0,0,.52), inset 0 0 0 1px rgba(255,255,255,.04) !important;
+  src\styles.css:8842:    display: grid !important;
+  src\styles.css:8845:    box-sizing: border-box !important;
+  src\styles.css:8846:  }
+  src\styles.css:8847:
+> src\styles.css:8848:  body.hipiplay-home-mode .wallet-phone-brand {
+  src\styles.css:8849:    text-align: center !important;
+  src\styles.css:8850:    display: grid !important;
+  src\styles.css:8851:    justify-items: center !important;
+  src\styles.css:8852:    gap: 8px !important;
+  src\styles.css:8853:  }
+  src\styles.css:8854:
+> src\styles.css:8855:  body.hipiplay-home-mode .wallet-phone-logo {
+  src\styles.css:8856:    width: 88px !important;
+  src\styles.css:8857:    height: 88px !important;
+  src\styles.css:8858:    object-fit: contain !important;
+  src\styles.css:8859:  }
+  src\styles.css:8860:
+> src\styles.css:8861:  body.hipiplay-home-mode .wallet-phone-brand h1 {
+  src\styles.css:8862:    margin: 0 !important;
+  src\styles.css:8863:    color: #fff7d8 !important;
+  src\styles.css:8864:    font-size: 2.7rem !important;
+  src\styles.css:8865:    line-height: .95 !important;
+  src\styles.css:8866:    font-weight: 1000 !important;
+  src\styles.css:8867:  }
+  src\styles.css:8868:
+> src\styles.css:8869:  body.hipiplay-home-mode .wallet-phone-brand p {
+  src\styles.css:8870:    margin: 0 !important;
+  src\styles.css:8871:    color: rgba(255,255,255,.82) !important;
+  src\styles.css:8872:    font-size: .98rem !important;
+  src\styles.css:8873:    font-weight: 800 !important;
+  src\styles.css:8874:  }
+  src\styles.css:8875:
+> src\styles.css:8876:  body.hipiplay-home-mode .wallet-phone-grid {
+  src\styles.css:8877:    display: grid !important;
+  src\styles.css:8878:    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  src\styles.css:8879:    gap: 16px !important;
+  src\styles.css:8880:    width: 100% !important;
+  src\styles.css:8881:  }
+  src\styles.css:8882:
+> src\styles.css:8883:  body.hipiplay-home-mode .wallet-action-card {
+  src\styles.css:8884:    width: 100% !important;
+  src\styles.css:8885:    min-height: 142px !important;
+  src\styles.css:8886:    padding: 14px 8px !important;
+  src\styles.css:8887:    border-radius: 22px !important;
+  src\styles.css:8888:    border: 1px solid rgba(255, 224, 137, .34) !important;
+  src\styles.css:8889:    background:
+  src\styles.css:8890:      linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)) !important;
+  src\styles.css:8891:    box-shadow: 0 14px 34px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  src\styles.css:8892:    display: flex !important;
+  src\styles.css:8893:    flex-direction: column !important;
+  src\styles.css:8898:    color: #fff !important;
+  src\styles.css:8899:  }
+  src\styles.css:8900:
+> src\styles.css:8901:  body.hipiplay-home-mode .wallet-action-icon {
+  src\styles.css:8902:    width: 82px !important;
+  src\styles.css:8903:    height: 82px !important;
+  src\styles.css:8904:    min-width: 82px !important;
+  src\styles.css:8905:    min-height: 82px !important;
+  src\styles.css:8906:    display: inline-flex !important;
+  src\styles.css:8907:    align-items: center !important;
+  src\styles.css:8908:    justify-content: center !important;
+  src\styles.css:8909:    border-radius: 22px !important;
+  src\styles.css:8910:    background: rgba(255,255,255,.045) !important;
+  src\styles.css:8911:    border: 1px solid rgba(229, 184, 75, .28) !important;
+  src\styles.css:8913:    color: #f4f4ee !important;
+  src\styles.css:8914:  }
+  src\styles.css:8915:
+> src\styles.css:8916:  body.hipiplay-home-mode .wallet-action-icon svg {
+  src\styles.css:8917:    width: 54px !important;
+  src\styles.css:8918:    height: 54px !important;
+  src\styles.css:8919:    stroke-width: 2.15 !important;
+  src\styles.css:8920:    color: #f4f4ee !important;
+  src\styles.css:8921:    stroke: currentColor !important;
+  src\styles.css:8922:    fill: none !important;
+  src\styles.css:8923:    filter: none !important;
+  src\styles.css:8924:  }
+  src\styles.css:8925:
+> src\styles.css:8926:  body.hipiplay-home-mode .wallet-action-card strong {
+  src\styles.css:8927:    display: block !important;
+  src\styles.css:8928:    color: #fff7d8 !important;
+  src\styles.css:8929:    font-size: .96rem !important;
+  src\styles.css:8930:    line-height: 1.05 !important;
+  src\styles.css:8931:    font-weight: 1000 !important;
+  src\styles.css:8932:    text-transform: uppercase !important;
+  src\styles.css:8933:    letter-spacing: .025em !important;
+  src\styles.css:8934:  }
+  src\styles.css:8935:
+> src\styles.css:8936:  body.hipiplay-home-mode .wallet-action-card small {
+  src\styles.css:8937:    display: block !important;
+  src\styles.css:8938:    color: rgba(255,255,255,.75) !important;
+  src\styles.css:8939:    font-size: .72rem !important;
+  src\styles.css:8940:    line-height: 1.05 !important;
+  src\styles.css:8941:    font-weight: 850 !important;
+  src\styles.css:8942:    text-transform: uppercase !important;
+  src\styles.css:8943:  }
+  src\styles.css:8944:
+> src\styles.css:8945:  body.hipiplay-race-mode .wallet-mobile-home-shell {
+  src\styles.css:8946:    display: none !important;
+  src\styles.css:8947:  }
+  src\styles.css:8948:
+> src\styles.css:8949:  body.hipiplay-race-fullscreen-phase .mobile-app-header,
+> src\styles.css:8950:  body.hipiplay-server-race-phase .mobile-app-header,
+> src\styles.css:8951:  body.hipiplay-server-results-phase .mobile-app-header,
+  src\styles.css:8952:  body.hipiplay-race-fullscreen-phase .mobile-bottom-nav,
+  src\styles.css:8953:  body.hipiplay-server-race-phase .mobile-bottom-nav,
+  src\styles.css:8954:  body.hipiplay-server-results-phase .mobile-bottom-nav,
+  src\styles.css:8955:  body.hipiplay-race-fullscreen-phase .bottom-nav,
+  src\styles.css:8956:  body.hipiplay-server-race-phase .bottom-nav,
+  src\styles.css:8957:  body.hipiplay-server-results-phase .bottom-nav,
+  src\styles.css:8958:  body.hipiplay-race-fullscreen-phase .player-bottom-nav,
+  src\styles.css:8959:  body.hipiplay-server-race-phase .player-bottom-nav,
+  src\styles.css:8960:  body.hipiplay-server-results-phase .player-bottom-nav,
+  src\styles.css:8961:  body.hipiplay-race-fullscreen-phase .horse-bet-panel,
+  src\styles.css:9080:
+  src\styles.css:9081:
+  src\styles.css:9082:
+> src\styles.css:9083:/* === HIPIPLAY MOBILE 6.1 APP BETTING LAYOUT V6 === */
+  src\styles.css:9084:
+  src\styles.css:9085:@media (max-width: 820px) {
+  src\styles.css:9086:
+> src\styles.css:9087:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) {
+  src\styles.css:9088:    background: #001b10 !important;
+  src\styles.css:9089:    overflow: hidden !important;
+  src\styles.css:9090:  }
+  src\styles.css:9091:
+  src\styles.css:9092:  /* Mantener header superior visible y dejar el contenido debajo */
+> src\styles.css:9093:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.clean-player-shell,
+> src\styles.css:9094:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.app-shell {
+  src\styles.css:9095:    width: 100% !important;
+  src\styles.css:9096:    max-width: 430px !important;
+  src\styles.css:9097:    height: 100svh !important;
+  src\styles.css:9098:    min-height: 100svh !important;
+  src\styles.css:9099:    max-height: 100svh !important;
+  src\styles.css:9100:    margin: 0 auto !important;
+  src\styles.css:9101:    padding-top: calc(72px + env(safe-area-inset-top)) !important;
+  src\styles.css:9102:    padding-left: 8px !important;
+  src\styles.css:9103:    padding-right: 8px !important;
+  src\styles.css:9104:    padding-bottom: 8px !important;
+  src\styles.css:9109:      linear-gradient(180deg, #071c13 0%, #001b10 100%) !important;
+  src\styles.css:9110:  }
+  src\styles.css:9111:
+> src\styles.css:9112:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.clean-main {
+  src\styles.css:9113:    width: 100% !important;
+  src\styles.css:9114:    height: 100% !important;
+  src\styles.css:9115:    min-height: 0 !important;
+  src\styles.css:9116:    max-height: 100% !important;
+  src\styles.css:9117:    padding: 0 !important;
+  src\styles.css:9118:    margin: 0 !important;
+  src\styles.css:9119:    overflow: hidden !important;
+  src\styles.css:9120:    box-sizing: border-box !important;
+  src\styles.css:9121:  }
+  src\styles.css:9122:
+  src\styles.css:9123:  /* Pantalla completa tipo app: arriba apuesta, abajo franja */
+> src\styles.css:9124:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.player-screen {
+  src\styles.css:9125:    width: 100% !important;
+  src\styles.css:9126:    height: 100% !important;
+  src\styles.css:9127:    min-height: 0 !important;
+  src\styles.css:9128:    max-height: 100% !important;
+  src\styles.css:9129:    display: grid !important;
+  src\styles.css:9130:    grid-template-rows: minmax(0, 1fr) 58px !important;
+  src\styles.css:9131:    gap: 6px !important;
+  src\styles.css:9132:    overflow: hidden !important;
+  src\styles.css:9133:    padding: 0 !important;
+  src\styles.css:9134:    margin: 0 !important;
+  src\styles.css:9135:    box-sizing: border-box !important;
+  src\styles.css:9136:  }
+  src\styles.css:9137:
+> src\styles.css:9138:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.player-summary,
+> src\styles.css:9139:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.wallet-mobile-home-shell,
+> src\styles.css:9140:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.mobile-bottom-nav,
+> src\styles.css:9141:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.bottom-nav,
+> src\styles.css:9142:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.player-bottom-nav {
+  src\styles.css:9143:    display: none !important;
+  src\styles.css:9144:  }
+  src\styles.css:9145:
+  src\styles.css:9146:  /* Recuadro superior de apuesta */
+> src\styles.css:9147:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel {
+  src\styles.css:9148:    grid-row: 1 !important;
+  src\styles.css:9149:    width: 100% !important;
+  src\styles.css:9150:    height: 100% !important;
+  src\styles.css:9151:    min-height: 0 !important;
+  src\styles.css:9152:    max-height: 100% !important;
+  src\styles.css:9153:    margin: 0 !important;
+  src\styles.css:9154:    padding: 14px 12px !important;
+  src\styles.css:9155:    border-radius: 24px !important;
+  src\styles.css:9156:    overflow: hidden !important;
+  src\styles.css:9157:    box-sizing: border-box !important;
+  src\styles.css:9162:  }
+  src\styles.css:9163:
+  src\styles.css:9164:  /* Grid de caballos más grande */
+> src\styles.css:9165:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel > div:first-child,
+> src\styles.css:9166:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-bet-grid,
+> src\styles.css:9167:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-grid,
+> src\styles.css:9168:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horses-grid,
+> src\styles.css:9169:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-select-grid,
+> src\styles.css:9170:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .race-horses-grid {
+  src\styles.css:9171:    display: grid !important;
+  src\styles.css:9172:    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  src\styles.css:9173:    gap: 12px !important;
+  src\styles.css:9174:    width: 100% !important;
+  src\styles.css:9175:    margin: 0 !important;
+  src\styles.css:9176:  }
+  src\styles.css:9177:
+> src\styles.css:9178:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel > div:first-child button,
+> src\styles.css:9179:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-bet-grid button,
+> src\styles.css:9180:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-grid button,
+> src\styles.css:9181:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horses-grid button,
+> src\styles.css:9182:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-select-grid button,
+> src\styles.css:9183:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .race-horses-grid button {
+  src\styles.css:9184:    min-height: clamp(92px, 13.5svh, 114px) !important;
+  src\styles.css:9185:    height: clamp(92px, 13.5svh, 114px) !important;
+  src\styles.css:9186:    max-height: 114px !important;
+  src\styles.css:9187:    padding: 8px !important;
+  src\styles.css:9188:    border-radius: 22px !important;
+  src\styles.css:9189:    overflow: hidden !important;
+  src\styles.css:9190:    box-sizing: border-box !important;
+  src\styles.css:9191:  }
+  src\styles.css:9192:
+> src\styles.css:9193:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel img {
+  src\styles.css:9194:    max-width: 100% !important;
+  src\styles.css:9195:    max-height: clamp(68px, 10svh, 86px) !important;
+  src\styles.css:9196:    width: auto !important;
+  src\styles.css:9197:    object-fit: contain !important;
+  src\styles.css:9198:  }
+  src\styles.css:9199:
+> src\styles.css:9200:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel strong,
+> src\styles.css:9201:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-number {
+  src\styles.css:9202:    font-size: clamp(1.05rem, 4.8vw, 1.32rem) !important;
+  src\styles.css:9203:    line-height: 1 !important;
+  src\styles.css:9204:  }
+  src\styles.css:9205:
+  src\styles.css:9206:  /* Texto cantidad */
+> src\styles.css:9207:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-field-label,
+> src\styles.css:9208:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel label {
+  src\styles.css:9209:    margin: 0 !important;
+  src\styles.css:9210:    font-size: .82rem !important;
+  src\styles.css:9211:    line-height: 1 !important;
+  src\styles.css:9212:    letter-spacing: .08em !important;
+  src\styles.css:9213:    text-transform: uppercase !important;
+  src\styles.css:9214:  }
+  src\styles.css:9215:
+  src\styles.css:9216:  /* Input */
+> src\styles.css:9217:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-amount-input,
+> src\styles.css:9218:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel input[type="number"] {
+  src\styles.css:9219:    width: 100% !important;
+  src\styles.css:9220:    min-height: 50px !important;
+  src\styles.css:9221:    height: 50px !important;
+  src\styles.css:9222:    max-height: 50px !important;
+  src\styles.css:9223:    padding: 8px 14px !important;
+  src\styles.css:9224:    border-radius: 18px !important;
+  src\styles.css:9225:    font-size: 1.05rem !important;
+  src\styles.css:9226:    line-height: 1 !important;
+  src\styles.css:9227:    box-sizing: border-box !important;
+  src\styles.css:9228:  }
+  src\styles.css:9229:
+  src\styles.css:9230:  /* Botón apostar */
+> src\styles.css:9231:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-submit-btn,
+> src\styles.css:9232:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .primary,
+> src\styles.css:9233:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .bet-button {
+  src\styles.css:9234:    width: 100% !important;
+  src\styles.css:9235:    min-height: 60px !important;
+  src\styles.css:9236:    height: 60px !important;
+  src\styles.css:9237:    max-height: 60px !important;
+  src\styles.css:9238:    border-radius: 22px !important;
+  src\styles.css:9239:    font-size: 1.08rem !important;
+  src\styles.css:9240:    line-height: 1 !important;
+  src\styles.css:9241:    letter-spacing: .04em !important;
+  src\styles.css:9242:    text-transform: uppercase !important;
+  src\styles.css:9243:    box-sizing: border-box !important;
+  src\styles.css:9244:  }
+  src\styles.css:9245:
+  src\styles.css:9246:  /* Franja inferior fija */
+> src\styles.css:9247:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel + section,
+> src\styles.css:9248:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.race-tv,
+> src\styles.css:9249:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.broadcast-race-tv {
+  src\styles.css:9250:    grid-row: 2 !important;
+  src\styles.css:9251:    position: relative !important;
+  src\styles.css:9252:    width: 100% !important;
+  src\styles.css:9253:    height: 58px !important;
+  src\styles.css:9254:    min-height: 58px !important;
+  src\styles.css:9255:    max-height: 58px !important;
+  src\styles.css:9256:    margin: 0 !important;
+  src\styles.css:9257:    padding: 0 14px !important;
+  src\styles.css:9258:    border-radius: 18px !important;
+  src\styles.css:9259:    overflow: hidden !important;
+  src\styles.css:9267:  }
+  src\styles.css:9268:
+  src\styles.css:9269:  /* Ocultar contenido interno del panel inferior y crear texto controlado */
+> src\styles.css:9270:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel + section > *,
+> src\styles.css:9271:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.race-tv > *,
+> src\styles.css:9272:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.broadcast-race-tv > * {
+  src\styles.css:9273:    display: none !important;
+  src\styles.css:9274:  }
+  src\styles.css:9275:
+> src\styles.css:9276:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel + section::before,
+> src\styles.css:9277:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.race-tv::before,
+> src\styles.css:9278:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.broadcast-race-tv::before {
+  src\styles.css:9279:    content: "APUESTAS ABIERTAS" !important;
+  src\styles.css:9280:    display: block !important;
+  src\styles.css:9281:    color: #ffd43b !important;
+  src\styles.css:9282:    font-size: .78rem !important;
+  src\styles.css:9283:    line-height: 1 !important;
+  src\styles.css:9284:    letter-spacing: .13em !important;
+  src\styles.css:9285:    font-weight: 1000 !important;
+  src\styles.css:9286:    text-transform: uppercase !important;
+  src\styles.css:9287:    margin-bottom: 5px !important;
+  src\styles.css:9288:  }
+  src\styles.css:9289:
+> src\styles.css:9290:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel + section::after,
+> src\styles.css:9291:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.race-tv::after,
+> src\styles.css:9292:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.broadcast-race-tv::after {
+  src\styles.css:9293:    content: "Apuesta y duplica tu inversión" !important;
+  src\styles.css:9294:    display: block !important;
+  src\styles.css:9295:    color: rgba(255,255,255,.72) !important;
+  src\styles.css:9296:    font-size: .72rem !important;
+  src\styles.css:9297:    line-height: 1 !important;
+  src\styles.css:9298:    font-weight: 800 !important;
+  src\styles.css:9299:  }
+  src\styles.css:9300:}
+  src\styles.css:9301:
+  src\styles.css:9302:/* Ajuste para móviles un poco más bajos */
+  src\styles.css:9303:@media (max-width: 390px), (max-height: 760px) {
+> src\styles.css:9304:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.clean-player-shell,
+> src\styles.css:9305:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.app-shell {
+  src\styles.css:9306:    padding-top: calc(68px + env(safe-area-inset-top)) !important;
+  src\styles.css:9307:  }
+  src\styles.css:9308:
+> src\styles.css:9309:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.player-screen {
+  src\styles.css:9310:    grid-template-rows: minmax(0, 1fr) 54px !important;
+  src\styles.css:9311:    gap: 5px !important;
+  src\styles.css:9312:  }
+  src\styles.css:9313:
+> src\styles.css:9314:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel {
+  src\styles.css:9315:    padding: 10px !important;
+  src\styles.css:9316:    gap: 8px !important;
+  src\styles.css:9317:  }
+  src\styles.css:9318:
+> src\styles.css:9319:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel > div:first-child button,
+> src\styles.css:9320:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-bet-grid button,
+> src\styles.css:9321:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-grid button,
+> src\styles.css:9322:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horses-grid button,
+> src\styles.css:9323:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-select-grid button,
+> src\styles.css:9324:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .race-horses-grid button {
+  src\styles.css:9325:    min-height: 86px !important;
+  src\styles.css:9326:    height: 86px !important;
+  src\styles.css:9327:    max-height: 86px !important;
+  src\styles.css:9328:  }
+  src\styles.css:9329:
+> src\styles.css:9330:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel img {
+  src\styles.css:9331:    max-height: 64px !important;
+  src\styles.css:9332:  }
+  src\styles.css:9333:
+> src\styles.css:9334:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-submit-btn,
+> src\styles.css:9335:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .primary,
+> src\styles.css:9336:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .bet-button {
+  src\styles.css:9337:    min-height: 54px !important;
+  src\styles.css:9338:    height: 54px !important;
+  src\styles.css:9339:    max-height: 54px !important;
+  src\styles.css:9340:  }
+  src\styles.css:9341:
+> src\styles.css:9342:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel + section,
+> src\styles.css:9343:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.race-tv,
+> src\styles.css:9344:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.broadcast-race-tv {
+  src\styles.css:9345:    height: 54px !important;
+  src\styles.css:9346:    min-height: 54px !important;
+  src\styles.css:9347:    max-height: 54px !important;
+  src\styles.css:9348:  }
+  src\styles.css:9349:}
+  src\styles.css:9350:
+> src\styles.css:9351:/* === END HIPIPLAY MOBILE 6.1 APP BETTING LAYOUT V6 === */
+  src\styles.css:9352:
+  src\styles.css:9353:/* === HIPIPLAY MOBILE TEXT SIZE V7 === */
+  src\styles.css:9354:
+  src\styles.css:9355:@media (max-width: 820px) {
+  src\styles.css:9356:
+  src\styles.css:9357:  /* Números de los caballos #1 #2 #3 */
+> src\styles.css:9358:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel strong,
+> src\styles.css:9359:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .horse-number {
+  src\styles.css:9360:    font-size: clamp(1.35rem, 6vw, 1.7rem) !important;
+  src\styles.css:9361:    line-height: 1 !important;
+  src\styles.css:9362:    font-weight: 1000 !important;
+  src\styles.css:9363:  }
+  src\styles.css:9364:
+  src\styles.css:9365:  /* Texto CANTIDAD DE MONEDAS */
+> src\styles.css:9366:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-field-label,
+> src\styles.css:9367:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel label {
+  src\styles.css:9368:    font-size: clamp(1rem, 4.6vw, 1.22rem) !important;
+  src\styles.css:9369:    line-height: 1.1 !important;
+  src\styles.css:9370:    font-weight: 1000 !important;
+  src\styles.css:9371:    letter-spacing: .07em !important;
+  src\styles.css:9372:  }
+  src\styles.css:9373:
+  src\styles.css:9374:  /* Número del monto: 100 */
+> src\styles.css:9375:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-amount-input,
+> src\styles.css:9376:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel input[type="number"] {
+  src\styles.css:9377:    font-size: clamp(1.45rem, 6.5vw, 1.9rem) !important;
+  src\styles.css:9378:    font-weight: 1000 !important;
+  src\styles.css:9379:    text-align: center !important;
+  src\styles.css:9380:  }
+  src\styles.css:9381:
+  src\styles.css:9382:  /* Botón APOSTAR */
+> src\styles.css:9383:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-submit-btn,
+> src\styles.css:9384:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .primary,
+> src\styles.css:9385:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel .bet-button {
+  src\styles.css:9386:    font-size: clamp(1.35rem, 5.8vw, 1.7rem) !important;
+  src\styles.css:9387:    font-weight: 1000 !important;
+  src\styles.css:9388:    letter-spacing: .05em !important;
+  src\styles.css:9389:  }
+  src\styles.css:9390:
+  src\styles.css:9391:  /* Franja inferior: APUESTAS ABIERTAS */
+> src\styles.css:9392:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel + section::before,
+> src\styles.css:9393:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.race-tv::before,
+> src\styles.css:9394:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.broadcast-race-tv::before {
+  src\styles.css:9395:    font-size: clamp(.95rem, 4.2vw, 1.12rem) !important;
+  src\styles.css:9396:    line-height: 1 !important;
+  src\styles.css:9397:    font-weight: 1000 !important;
+  src\styles.css:9398:    letter-spacing: .11em !important;
+  src\styles.css:9399:  }
+  src\styles.css:9400:
+  src\styles.css:9401:  /* Franja inferior: Apuesta y duplica tu inversión */
+> src\styles.css:9402:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.horse-bet-panel + section::after,
+> src\styles.css:9403:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.race-tv::after,
+> src\styles.css:9404:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.broadcast-race-tv::after {
+  src\styles.css:9405:    font-size: clamp(.82rem, 3.7vw, .98rem) !important;
+  src\styles.css:9406:    line-height: 1.05 !important;
+  src\styles.css:9407:    font-weight: 850 !important;
+  src\styles.css:9408:  }
+  src\styles.css:9409:}
+  src\styles.css:9410:
+  src\styles.css:9411:/* === END HIPIPLAY MOBILE TEXT SIZE V7 === */
+  src\styles.css:9412:
+> src\styles.css:9413:/* === HIPIPLAY MOBILE HEADER SIZE V8 === */
+  src\styles.css:9414:
+  src\styles.css:9415:@media (max-width: 820px) {
+  src\styles.css:9416:
+> src\styles.css:9417:  .mobile-app-header {
+  src\styles.css:9418:    min-height: 84px !important;
+  src\styles.css:9419:    padding: calc(10px + env(safe-area-inset-top)) 16px 10px !important;
+  src\styles.css:9420:  }
+  src\styles.css:9421:
+> src\styles.css:9422:  .mobile-brand-lockup {
+  src\styles.css:9423:    gap: 14px !important;
+  src\styles.css:9424:  }
+  src\styles.css:9425:
+> src\styles.css:9426:  .mobile-brand-lockup img {
+  src\styles.css:9427:    width: 62px !important;
+  src\styles.css:9428:    height: 62px !important;
+  src\styles.css:9429:    min-width: 62px !important;
+  src\styles.css:9430:    min-height: 62px !important;
+  src\styles.css:9431:    border-radius: 18px !important;
+  src\styles.css:9432:  }
+  src\styles.css:9433:
+> src\styles.css:9434:  .mobile-brand-lockup strong {
+  src\styles.css:9435:    font-size: 1.55rem !important;
+  src\styles.css:9436:    line-height: 1 !important;
+  src\styles.css:9437:    font-weight: 1000 !important;
+  src\styles.css:9438:    letter-spacing: -0.02em !important;
+  src\styles.css:9439:    color: #ffffff !important;
+  src\styles.css:9440:  }
+  src\styles.css:9441:
+> src\styles.css:9442:  .mobile-brand-lockup small {
+  src\styles.css:9443:    margin-top: 5px !important;
+  src\styles.css:9444:    font-size: 1rem !important;
+  src\styles.css:9445:    line-height: 1.05 !important;
+  src\styles.css:9446:    font-weight: 800 !important;
+  src\styles.css:9447:    color: rgba(255,255,255,.72) !important;
+  src\styles.css:9448:    max-width: 210px !important;
+  src\styles.css:9449:  }
+  src\styles.css:9450:
+  src\styles.css:9451:  /* Ajustar el espacio del contenido debajo del header nuevo */
+> src\styles.css:9452:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.clean-player-shell,
+> src\styles.css:9453:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.app-shell {
+  src\styles.css:9454:    padding-top: calc(96px + env(safe-area-inset-top)) !important;
+  src\styles.css:9455:  }
+  src\styles.css:9456:}
+  src\styles.css:9457:
+  src\styles.css:9458:@media (max-width: 390px), (max-height: 760px) {
+> src\styles.css:9459:  .mobile-app-header {
+  src\styles.css:9460:    min-height: 78px !important;
+  src\styles.css:9461:    padding: calc(9px + env(safe-area-inset-top)) 14px 9px !important;
+  src\styles.css:9462:  }
+  src\styles.css:9463:
+> src\styles.css:9464:  .mobile-brand-lockup img {
+  src\styles.css:9465:    width: 56px !important;
+  src\styles.css:9466:    height: 56px !important;
+  src\styles.css:9467:    min-width: 56px !important;
+  src\styles.css:9468:    min-height: 56px !important;
+  src\styles.css:9469:  }
+  src\styles.css:9470:
+> src\styles.css:9471:  .mobile-brand-lockup strong {
+  src\styles.css:9472:    font-size: 1.38rem !important;
+  src\styles.css:9473:  }
+  src\styles.css:9474:
+> src\styles.css:9475:  .mobile-brand-lockup small {
+  src\styles.css:9476:    font-size: .9rem !important;
+  src\styles.css:9477:  }
+  src\styles.css:9478:
+> src\styles.css:9479:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.clean-player-shell,
+> src\styles.css:9480:  body.hipiplay-race-mode:not(.hipiplay-race-fullscreen-phase):not(.hipiplay-server-race-phase):not(.hipiplay-server-results-phase) 
+.app-shell {
+  src\styles.css:9481:    padding-top: calc(88px + env(safe-area-inset-top)) !important;
+  src\styles.css:9482:  }
+  src\styles.css:9483:}
+  src\styles.css:9484:
+> src\styles.css:9485:/* === END HIPIPLAY MOBILE HEADER SIZE V8 === */
+
+
+
+===== pwa-install.js =====
+(function () {
+  // HipiPlay PWA helper reservado.
+  // No controla el menÃº principal.
+})();
+
+===== index.html manifest/install script =====
+
+  index.html:6:
+  index.html:7:    <title>HipiPlay</title>
+  index.html:8:
+> index.html:9:    <meta name="description" content="HipiPlay - Carreras hÃ­picas con monedas en tiempo real." />
+  index.html:10:    <meta name="theme-color" content="#0f2a1d" />
+  index.html:11:    <meta name="background-color" content="#06160f" />
+  index.html:12:
+> index.html:13:    <link rel="manifest" href="/pwa/manifest-hipiplay.webmanifest">
+  index.html:14:
+  index.html:15:    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+  index.html:16:    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
+  index.html:17:    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+  index.html:18:
+  index.html:22:    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  index.html:23:
+  index.html:24:    <meta property="og:title" content="HipiPlay" />
+> index.html:25:    <meta property="og:description" content="Carreras hÃ­picas con monedas en tiempo real." />
+  index.html:26:    <meta property="og:type" content="website" />
+  index.html:27:    <meta property="og:image" content="/icons/icon-512x512.png" />
+  index.html:28:
+  index.html:29:    <meta name="twitter:card" content="summary_large_image" />
+  index.html:30:    <meta name="twitter:title" content="HipiPlay" />
+> index.html:31:    <meta name="twitter:description" content="Carreras hÃ­picas con monedas en tiempo real." />
+  index.html:32:    <meta name="twitter:image" content="/icons/icon-512x512.png" />
+  index.html:33:  </head>
+  index.html:34:
+  index.html:35:  <body>
+  index.html:36:    <div id="root"></div>
+> index.html:37:    <script type="module" src="/src/main.tsx"></script>
+> index.html:38:    <script defer src="%BASE_URL%pwa-install.js"></script>
+  index.html:39:</body>
+  index.html:40:</html>
+  index.html:41:
+  index.html:42:
+  index.html:43:
+
+

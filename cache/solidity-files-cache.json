@@ -1,8 +1,44 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "C:\\xampp\\htdocs\\juega123_modern\\contracts\\HorseAuditRegistry.sol": {
-      "lastModificationDate": 1779923986447,
+    "C:\\hipiplay-app\\contracts\\HipiPlayRaces.sol": {
+      "lastModificationDate": 1781388467212,
+      "contentHash": "511981945c3e81df03590b154c7d2bd7",
+      "sourceName": "contracts/HipiPlayRaces.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "HipiPlayRaces"
+      ]
+    },
+    "C:\\hipiplay-app\\contracts\\HorseAuditRegistry.sol": {
+      "lastModificationDate": 1781150326420,
       "contentHash": "ac264ddf4bffe4a975c33aeb1727f4cf",
       "sourceName": "contracts/HorseAuditRegistry.sol",
       "solcConfig": {
@@ -37,8 +73,8 @@
         "HorseAuditRegistry"
       ]
     },
-    "C:\\xampp\\htdocs\\juega123_modern\\contracts\\LocalFirstWalletRegistry.sol": {
-      "lastModificationDate": 1780104137012,
+    "C:\\hipiplay-app\\contracts\\LocalFirstWalletRegistry.sol": {
+      "lastModificationDate": 1781150326660,
       "contentHash": "4096b05f203a9db86501c10477cbd8b8",
       "sourceName": "contracts/LocalFirstWalletRegistry.sol",
       "solcConfig": {
@@ -73,8 +109,8 @@
         "LocalFirstWalletRegistry"
       ]
     },
-    "C:\\xampp\\htdocs\\juega123_modern\\contracts\\WalletStateRegistry.sol": {
-      "lastModificationDate": 1780103393993,
+    "C:\\hipiplay-app\\contracts\\WalletStateRegistry.sol": {
+      "lastModificationDate": 1781150326879,
       "contentHash": "cfcc1e025019a22dcd86dfdf90c9e40e",
       "sourceName": "contracts/WalletStateRegistry.sol",
       "solcConfig": {

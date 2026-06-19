@@ -1,8 +1,11 @@
-﻿import 'dotenv/config';
+import 'dotenv/config';
 import express from 'express';
+import { passkeyAuthRouter } from './passkeyAuth.js';
+import bcrypt from 'bcryptjs';
+import crypto from 'node:crypto';
 import cors from 'cors';
 import { z } from 'zod';
-import { authMiddleware, login } from './auth.js';
+import { authMiddleware, createToken, login } from './auth.js';
 import { ensureDb, getWallet, loadDb, saveDb } from './db.js';
 import { gameHistory, placeBet } from './games.js';
 import { currentDerby, derbyHistory, ensureDerbyState, placeDerbyBet } from './derby.js';
@@ -19,6 +22,7 @@ const WEB_ORIGIN = process.env.WEB_ORIGIN || 'http://localhost:5173';
 
 app.use(cors({ origin: WEB_ORIGIN, credentials: true }));
 app.use(express.json());
+app.use('/api/auth/passkey', passkeyAuthRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK', app: 'juega123-modern-api', time: new Date().toISOString() });
@@ -35,6 +39,77 @@ app.post('/api/auth/login', (req, res) => {
   const wallet = getWallet(db, user.id);
   saveDb(db);
   res.json({ status: 'OK', token, user: { id: user.id, username: user.username }, wallet });
+});
+
+
+app.post('/api/auth/register', (req, res) => {
+  try {
+    const schema = z.object({
+      username: z.string().min(3),
+      password: z.string().min(6)
+    });
+
+    const parsed = schema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'El usuario debe tener al menos 3 caracteres y la clave al menos 6.'
+      });
+    }
+
+    const username = parsed.data.username.trim();
+
+    if (username.toLowerCase() === 'admin') {
+      return res.status(400).json({
+        status: 'ERROR',
+        message: 'Ese usuario no está disponible.'
+      });
+    }
+
+    const db = loadDb();
+
+    const exists = db.users.some(
+      user => user.username.toLowerCase() === username.toLowerCase()
+    );
+
+    if (exists) {
+      return res.status(409).json({
+        status: 'ERROR',
+        message: 'Ese usuario ya existe.'
+      });
+    }
+
+    const user = {
+      id: `usr_${crypto.randomUUID().replace(/-/g, '')}`,
+      username,
+      passwordHash: bcrypt.hashSync(parsed.data.password, 10),
+      createdAt: new Date().toISOString()
+    };
+
+    db.users.push(user);
+
+    const wallet = getWallet(db, user.id);
+
+    saveDb(db);
+
+    const token = createToken(user.id);
+
+    return res.json({
+      status: 'OK',
+      token,
+      user: {
+        id: user.id,
+        username: user.username
+      },
+      wallet
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: 'ERROR',
+      message: err instanceof Error ? err.message : 'No se pudo registrar el usuario.'
+    });
+  }
 });
 
 app.get('/api/me', authMiddleware, (req, res) => {

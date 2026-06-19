@@ -1,6 +1,14 @@
 ﻿import type { LocalUser } from './localUserDb';
 
-const API_BASE = '/api';
+const envApiBaseUrl = (
+  import.meta as unknown as {
+    env?: {
+      VITE_API_BASE_URL?: string;
+    };
+  }
+).env?.VITE_API_BASE_URL;
+
+const API_BASE = (envApiBaseUrl || '/app-api').replace(/\/$/, '');
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = {
@@ -57,3 +65,4 @@ export async function getBackendUser(serverUserId: string) {
     }
   });
 }
+

@@ -60,6 +60,15 @@ function defaultDb(): Database {
   };
 }
 
+
+function readDbJsonSafe(): Partial<Database> {
+  const raw = fs.readFileSync(DB_FILE, 'utf8')
+    .replace(/^\uFEFF/, '')
+    .replace(/^\u200B/, '')
+    .replace(/^\u0000/, '');
+
+  return JSON.parse(raw) as Partial<Database>;
+}
 function normalizeDb(raw: Partial<Database>): Database {
   const base = defaultDb();
   const wallets = (raw.wallets ?? base.wallets).map(w => normalizeWallet(w));
@@ -84,12 +93,12 @@ function normalizeDb(raw: Partial<Database>): Database {
 export function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(DB_FILE)) saveDb(defaultDb());
-  else saveDb(normalizeDb(JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) as Partial<Database>));
+  else saveDb(normalizeDb(readDbJsonSafe()));
 }
 
 export function loadDb(): Database {
   ensureDb();
-  return normalizeDb(JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) as Partial<Database>);
+  return normalizeDb(readDbJsonSafe());
 }
 
 export function saveDb(db: Database) {

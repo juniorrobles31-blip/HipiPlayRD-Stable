@@ -1,0 +1,19 @@
+[
+  {
+    "id": "aICC-T7jNDPLUtFuSrBgYg",
+    "credentialId": "aICC-T7jNDPLUtFuSrBgYg",
+    "userId": "usr_b1a7c032-b409-4695-9c13-df2b547a8e3f",
+    "username": "JRobles",
+    "webauthnUserID": "usr_b1a7c032-b409-4695-9c13-df2b547a8e3f",
+    "publicKey": "pQECAyYgASFYIP1Z5kdNwY1FDugMrw6ALiax2AkGqQfGxAY-EbYNcO2QIlggtJpTvBPaRhhh5NhgkL1zhFaHIoZp6WSzyLZpiOkreLs",
+    "counter": 0,
+    "transports": [
+      "hybrid",
+      "internal"
+    ],
+    "deviceType": "multiDevice",
+    "backedUp": true,
+    "createdAt": "2026-06-15T02:11:49.097Z",
+    "lastUsedAt": "2026-06-17T17:02:33.365Z"
+  }
+]

@@ -4,7 +4,7 @@
     "localUserId": "local-user-test-001",
     "username": "ruddytest",
     "deviceId": "device-test-001",
-    "coins": 1000,
+    "coins": 10000,
     "role": "player",
     "createdAt": "2026-06-02T18:07:06.445Z",
     "updatedAt": "2026-06-02T18:07:06.445Z"
@@ -14,19 +14,29 @@
     "localUserId": "local-user-test-002",
     "username": "ruddytest2",
     "deviceId": "device-test-002",
-    "coins": 1000,
+    "coins": 10000,
     "role": "player",
     "createdAt": "2026-06-02T19:08:00.479Z",
     "updatedAt": "2026-06-02T19:08:00.479Z"
   },
   {
-    "id": "user-cea7e868-0246-4929-a9e0-76ec63c1c841",
-    "localUserId": "local-user-094c2bb5-2cfd-4c15-8a59-9ef7d17fbf6c",
-    "username": "admin",
-    "deviceId": "device-61f8d741-4b5a-4527-845b-540ba2fa6f0b",
+    "id": "user-29af4220-5911-466f-aea7-d572adcbae2b",
+    "localUserId": "local-user-94be2f2d-d172-4c2e-926e-dbab7f58e72c",
+    "username": "JRobles",
+    "deviceId": "device-b5acf532-5d2e-41bf-8b7a-b0ce8663e667",
     "coins": 1000,
     "role": "player",
-    "createdAt": "2026-06-03T20:49:47.099Z",
-    "updatedAt": "2026-06-03T20:49:47.099Z"
+    "createdAt": "2026-06-15T02:11:49.180Z",
+    "updatedAt": "2026-06-15T02:11:49.180Z"
+  },
+  {
+    "id": "user-5eccdf3d-e62c-4155-ac29-8f58c79d26ab",
+    "localUserId": "local-user-7d2aa461-5733-47b6-9108-da27bd3f9482",
+    "username": "simulador01",
+    "deviceId": "device-32f902c9-16d3-40f0-b174-a4795ebefee8",
+    "coins": 1000,
+    "role": "player",
+    "createdAt": "2026-06-15T15:45:18.636Z",
+    "updatedAt": "2026-06-15T15:45:18.636Z"
   }
 ]

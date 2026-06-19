@@ -1,11 +1,18 @@
-{
-  "name": "Juega123 Modern",
-  "short_name": "Juega123",
-  "start_url": "/",
+﻿{
+  "id": "/pwa/",
+  "name": "HipiPlay",
+  "short_name": "HipiPlay",
+  "description": "HipiPlay PWA",
+  "start_url": "/pwa/",
+  "scope": "/pwa/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#111827",
   "icons": [
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+    {
+      "src": "/pwa/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
   ]
 }

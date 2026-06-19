@@ -1,0 +1,437 @@
+import express from 'express';
+import crypto from 'node:crypto';
+import bcrypt from 'bcryptjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+  generateAuthenticationOptions,
+  verifyAuthenticationResponse,
+} from '@simplewebauthn/server';
+
+import { createToken } from './auth.js';
+import { getWallet, loadDb, saveDb } from './db.js';
+
+const RP_NAME = process.env.WEBAUTHN_RP_NAME || 'HipiPlay';
+const RP_ID = process.env.WEBAUTHN_RP_ID || 'uribepro2.ddns.net';
+const ORIGIN = process.env.WEBAUTHN_ORIGIN || 'https://uribepro2.ddns.net';
+const TERMS_VERSION = process.env.HIPIPLAY_TERMS_VERSION || '2026-06-14';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_DIR = path.resolve(__dirname, '..', 'data');
+const PASSKEYS_FILE = path.join(DATA_DIR, 'passkeys.json');
+const CHALLENGES_FILE = path.join(DATA_DIR, 'passkey-challenges.json');
+
+export const passkeyAuthRouter = express.Router();
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function cleanUsername(value: unknown) {
+  return String(value || '').trim();
+}
+
+function toBase64Url(value: Uint8Array | Buffer | string) {
+  if (typeof value === 'string') return value;
+  return Buffer.from(value).toString('base64url');
+}
+
+function fromBase64Url(value: string) {
+  return Buffer.from(value, 'base64url');
+}
+
+function ensureDataFiles() {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+
+  if (!fs.existsSync(PASSKEYS_FILE)) {
+    fs.writeFileSync(PASSKEYS_FILE, '[]', 'utf8');
+  }
+
+  if (!fs.existsSync(CHALLENGES_FILE)) {
+    fs.writeFileSync(CHALLENGES_FILE, '[]', 'utf8');
+  }
+}
+
+function readJsonArray(filePath: string) {
+  ensureDataFiles();
+
+  const raw = fs.readFileSync(filePath, 'utf8')
+    .replace(/^\uFEFF/, '')
+    .trim();
+
+  if (!raw) return [];
+
+  const parsed = JSON.parse(raw);
+  return Array.isArray(parsed) ? parsed : [];
+}
+
+function writeJsonArray(filePath: string, data: any[]) {
+  ensureDataFiles();
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+}
+
+function loadPasskeys() {
+  return readJsonArray(PASSKEYS_FILE);
+}
+
+function savePasskeys(passkeys: any[]) {
+  writeJsonArray(PASSKEYS_FILE, passkeys);
+}
+
+function loadChallenges() {
+  const cutoff = Date.now() - (15 * 60 * 1000);
+
+  const challenges = readJsonArray(CHALLENGES_FILE).filter((c: any) => {
+    return new Date(c.createdAt || 0).getTime() > cutoff;
+  });
+
+  writeJsonArray(CHALLENGES_FILE, challenges);
+  return challenges;
+}
+
+function saveChallenges(challenges: any[]) {
+  writeJsonArray(CHALLENGES_FILE, challenges);
+}
+
+function findUserByUsername(db: any, username: string) {
+  return (db.users || []).find((u: any) => String(u.username || '').toLowerCase() === username.toLowerCase());
+}
+
+function getUserPasskeys(passkeys: any[], user: any) {
+  return passkeys.filter((p: any) => {
+    return p.userId === user.id || String(p.username || '').toLowerCase() === String(user.username || '').toLowerCase();
+  });
+}
+
+passkeyAuthRouter.post('/register/options', async (req, res) => {
+  try {
+    const username = cleanUsername(req.body?.username);
+    const termsAccepted = Boolean(req.body?.termsAccepted);
+
+    if (!username) {
+      return res.status(400).json({ ok: false, error: 'Escribe tu usuario.' });
+    }
+
+    if (username.toLowerCase() === 'admin') {
+      return res.status(400).json({ ok: false, error: 'Ese usuario no está disponible.' });
+    }
+
+    if (!termsAccepted) {
+      return res.status(400).json({ ok: false, error: 'Debes aceptar los términos y condiciones de HipiPlay.' });
+    }
+
+    const db: any = loadDb();
+    const passkeys = loadPasskeys();
+    const challenges = loadChallenges();
+
+    const existingUser = findUserByUsername(db, username);
+    const existingPasskeys = existingUser ? getUserPasskeys(passkeys, existingUser) : [];
+
+    if (existingUser && existingPasskeys.length > 0) {
+      return res.status(409).json({
+        ok: false,
+        error: 'Ese usuario ya existe. Usa iniciar sesión.'
+      });
+    }
+
+    const webauthnUserID = existingUser?.id || `usr_${crypto.randomUUID()}`;
+
+    const options: any = await generateRegistrationOptions({
+      rpName: RP_NAME,
+      rpID: RP_ID,
+      userID: Buffer.from(webauthnUserID),
+      userName: username,
+      userDisplayName: username,
+      attestationType: 'none',
+      supportedAlgorithmIDs: [-7, -257],
+      authenticatorSelection: {
+        residentKey: 'preferred',
+        userVerification: 'required'
+      },
+      excludeCredentials: existingPasskeys.map((p: any) => ({
+        id: p.id || p.credentialId,
+        transports: p.transports || []
+      }))
+    } as any);
+
+    const challengeId = crypto.randomUUID();
+
+    const newChallenges = challenges.filter((c: any) => {
+      return !(c.username?.toLowerCase() === username.toLowerCase() && c.type === 'registration');
+    });
+
+    newChallenges.push({
+      id: challengeId,
+      type: 'registration',
+      username,
+      webauthnUserID,
+      challenge: options.challenge,
+      termsAccepted: true,
+      termsVersion: TERMS_VERSION,
+      createdAt: nowIso()
+    });
+
+    saveChallenges(newChallenges);
+
+    return res.json({
+      status: 'OK',
+      challengeId,
+      options
+    });
+  } catch (error: any) {
+    console.error('[PASSKEY REGISTER OPTIONS ERROR]', error);
+
+    return res.status(500).json({
+      ok: false,
+      error: 'No se pudo iniciar el registro seguro.',
+      detail: error?.message || String(error)
+    });
+  }
+});
+
+passkeyAuthRouter.post('/register/verify', async (req, res) => {
+  try {
+    const { challengeId, credential } = req.body || {};
+
+    if (!challengeId || !credential) {
+      return res.status(400).json({ ok: false, error: 'Registro incompleto.' });
+    }
+
+    const challenges = loadChallenges();
+    const challenge = challenges.find((c: any) => c.id === challengeId && c.type === 'registration');
+
+    if (!challenge) {
+      return res.status(400).json({ ok: false, error: 'La sesión de registro expiró. Intenta de nuevo.' });
+    }
+
+    const verification: any = await verifyRegistrationResponse({
+      response: credential,
+      expectedChallenge: challenge.challenge,
+      expectedOrigin: ORIGIN,
+      expectedRPID: RP_ID,
+      requireUserVerification: true
+    } as any);
+
+    if (!verification.verified || !verification.registrationInfo?.credential) {
+      return res.status(400).json({ ok: false, error: 'No se pudo verificar la seguridad del dispositivo.' });
+    }
+
+    const db: any = loadDb();
+    const passkeys = loadPasskeys();
+
+    const registeredCredential = verification.registrationInfo.credential;
+    const credentialId = registeredCredential.id;
+
+    const existingUser = findUserByUsername(db, challenge.username);
+
+    const user = existingUser || {
+      id: challenge.webauthnUserID || `usr_${crypto.randomUUID()}`,
+      username: challenge.username,
+      passwordHash: bcrypt.hashSync(crypto.randomUUID(), 10),
+      termsAccepted: true,
+      termsVersion: challenge.termsVersion || TERMS_VERSION,
+      termsAcceptedAt: nowIso(),
+      createdAt: nowIso()
+    };
+
+    if (!existingUser) {
+      db.users.push(user);
+    } else {
+      existingUser.termsAccepted = true;
+      existingUser.termsVersion = challenge.termsVersion || TERMS_VERSION;
+      existingUser.termsAcceptedAt = existingUser.termsAcceptedAt || nowIso();
+    }
+
+    const alreadyRegistered = passkeys.some((p: any) => (p.id || p.credentialId) === credentialId);
+
+    if (!alreadyRegistered) {
+      passkeys.push({
+        id: credentialId,
+        credentialId,
+        userId: user.id,
+        username: user.username,
+        webauthnUserID: challenge.webauthnUserID,
+        publicKey: toBase64Url(registeredCredential.publicKey),
+        counter: registeredCredential.counter || 0,
+        transports: credential?.response?.transports || registeredCredential.transports || [],
+        deviceType: verification.registrationInfo.credentialDeviceType || null,
+        backedUp: Boolean(verification.registrationInfo.credentialBackedUp),
+        createdAt: nowIso(),
+        lastUsedAt: null
+      });
+    }
+
+    const wallet = getWallet(db, user.id);
+
+    saveDb(db);
+    savePasskeys(passkeys);
+    saveChallenges(challenges.filter((c: any) => c.id !== challengeId));
+
+    return res.json({
+      status: 'OK',
+      token: createToken(user.id),
+      user,
+      wallet
+    });
+  } catch (error: any) {
+    console.error('[PASSKEY REGISTER VERIFY ERROR]', error);
+
+    return res.status(500).json({
+      ok: false,
+      error: 'No se pudo completar el registro seguro.',
+      detail: error?.message || String(error)
+    });
+  }
+});
+
+passkeyAuthRouter.post('/login/options', async (req, res) => {
+  try {
+    const username = cleanUsername(req.body?.username);
+
+    if (!username) {
+      return res.status(400).json({ ok: false, error: 'Escribe tu usuario.' });
+    }
+
+    const db: any = loadDb();
+    const passkeys = loadPasskeys();
+    const challenges = loadChallenges();
+
+    const user = findUserByUsername(db, username);
+
+    if (!user) {
+      return res.status(404).json({ ok: false, error: 'Ese usuario no existe. Crea la cuenta primero.' });
+    }
+
+    const userPasskeys = getUserPasskeys(passkeys, user);
+
+    if (userPasskeys.length === 0) {
+      return res.status(409).json({
+        ok: false,
+        error: 'Este usuario no tiene huella registrada. Toca Crear cuenta para registrar este dispositivo.'
+      });
+    }
+
+    const options: any = await generateAuthenticationOptions({
+      rpID: RP_ID,
+      userVerification: 'required',
+      allowCredentials: userPasskeys.map((p: any) => ({
+        id: p.id || p.credentialId,
+        transports: p.transports || []
+      }))
+    } as any);
+
+    const challengeId = crypto.randomUUID();
+
+    const newChallenges = challenges.filter((c: any) => {
+      return !(c.userId === user.id && c.type === 'authentication');
+    });
+
+    newChallenges.push({
+      id: challengeId,
+      type: 'authentication',
+      username: user.username,
+      userId: user.id,
+      challenge: options.challenge,
+      createdAt: nowIso()
+    });
+
+    saveChallenges(newChallenges);
+
+    return res.json({
+      status: 'OK',
+      challengeId,
+      options
+    });
+  } catch (error: any) {
+    console.error('[PASSKEY LOGIN OPTIONS ERROR]', error);
+
+    return res.status(500).json({
+      ok: false,
+      error: 'No se pudo iniciar sesión segura.',
+      detail: error?.message || String(error)
+    });
+  }
+});
+
+passkeyAuthRouter.post('/login/verify', async (req, res) => {
+  try {
+    const { challengeId, credential, username } = req.body || {};
+
+    if (!challengeId || !credential) {
+      return res.status(400).json({ ok: false, error: 'Inicio de sesión incompleto.' });
+    }
+
+    const challenges = loadChallenges();
+    const challenge = challenges.find((c: any) => c.id === challengeId && c.type === 'authentication');
+
+    if (!challenge) {
+      return res.status(400).json({ ok: false, error: 'La sesión de acceso expiró. Intenta de nuevo.' });
+    }
+
+    if (username && String(username).toLowerCase() !== String(challenge.username).toLowerCase()) {
+      return res.status(403).json({ ok: false, error: 'La huella no corresponde a ese usuario.' });
+    }
+
+    const passkeys = loadPasskeys();
+    const credentialId = credential?.id;
+
+    const passkey = passkeys.find((p: any) => (p.id || p.credentialId) === credentialId);
+
+    if (!passkey) {
+      return res.status(404).json({ ok: false, error: 'Este dispositivo no está registrado con HipiPlay.' });
+    }
+
+    const db: any = loadDb();
+    const user = db.users.find((u: any) => u.id === passkey.userId);
+
+    if (!user) {
+      return res.status(404).json({ ok: false, error: 'Usuario no encontrado.' });
+    }
+
+    const verification: any = await verifyAuthenticationResponse({
+      response: credential,
+      expectedChallenge: challenge.challenge,
+      expectedOrigin: ORIGIN,
+      expectedRPID: RP_ID,
+      requireUserVerification: true,
+      credential: {
+        id: passkey.id || passkey.credentialId,
+        publicKey: fromBase64Url(passkey.publicKey),
+        counter: passkey.counter || 0,
+        transports: passkey.transports || []
+      }
+    } as any);
+
+    if (!verification.verified) {
+      return res.status(401).json({ ok: false, error: 'No se pudo verificar tu huella.' });
+    }
+
+    passkey.counter = verification.authenticationInfo?.newCounter || passkey.counter || 0;
+    passkey.lastUsedAt = nowIso();
+
+    const wallet = getWallet(db, user.id);
+
+    saveDb(db);
+    savePasskeys(passkeys);
+    saveChallenges(challenges.filter((c: any) => c.id !== challengeId));
+
+    return res.json({
+      status: 'OK',
+      token: createToken(user.id),
+      user,
+      wallet
+    });
+  } catch (error: any) {
+    console.error('[PASSKEY LOGIN VERIFY ERROR]', error);
+
+    return res.status(500).json({
+      ok: false,
+      error: 'No se pudo completar el inicio de sesión.',
+      detail: error?.message || String(error)
+    });
+  }
+});

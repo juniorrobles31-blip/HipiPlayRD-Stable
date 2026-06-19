@@ -1,4 +1,6 @@
-﻿export type LocalUser = {
+﻿import { safeRandomUUID } from './utils/safeRandomUUID';
+
+export type LocalUser = {
   localUserId: string;
   serverUserId?: string | null;
   username: string;
@@ -12,7 +14,7 @@
 const STORAGE_KEY = 'hipiplay_local_user';
 
 function createId(prefix: string) {
-  return `${prefix}-${crypto.randomUUID()}`;
+  return `${prefix}-${safeRandomUUID()}`;
 }
 
 export function createLocalUser(username: string): LocalUser {
@@ -69,3 +71,4 @@ export function attachServerUserId(serverUserId: string) {
     syncStatus: 'synced'
   });
 }
+

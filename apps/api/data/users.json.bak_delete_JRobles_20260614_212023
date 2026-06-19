@@ -1,0 +1,32 @@
+[
+  {
+    "id": "user-2a6295f3-4e9f-4184-b782-711d43c6d41d",
+    "localUserId": "local-user-test-001",
+    "username": "ruddytest",
+    "deviceId": "device-test-001",
+    "coins": 10000,
+    "role": "player",
+    "createdAt": "2026-06-02T18:07:06.445Z",
+    "updatedAt": "2026-06-02T18:07:06.445Z"
+  },
+  {
+    "id": "user-9825954f-ab9f-40bd-a7b5-904caeff4e29",
+    "localUserId": "local-user-test-002",
+    "username": "ruddytest2",
+    "deviceId": "device-test-002",
+    "coins": 10000,
+    "role": "player",
+    "createdAt": "2026-06-02T19:08:00.479Z",
+    "updatedAt": "2026-06-02T19:08:00.479Z"
+  },
+  {
+    "id": "user-dea76b58-137e-4908-8176-ccfd85c075a4",
+    "localUserId": "local-user-c6851a82-4830-4adc-b32c-93c87f04234f",
+    "username": "JRobles",
+    "deviceId": "device-fbfe0eb6-0e24-4d75-8b06-24dd3b02b261",
+    "coins": 1000,
+    "role": "player",
+    "createdAt": "2026-06-15T00:56:48.177Z",
+    "updatedAt": "2026-06-15T00:56:48.177Z"
+  }
+]

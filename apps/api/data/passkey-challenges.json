@@ -1,0 +1,12 @@
+[
+  {
+    "id": "9dd8800e-22be-4a33-982e-276f19a8c622",
+    "type": "registration",
+    "username": "Simulador01",
+    "webauthnUserID": "usr_fbbb8702837d44cfbc5ff20df6974c1b",
+    "challenge": "nIJaObBghdyAeV81gaGDIyj2DNWQZXCbrnQfa-_4HMM",
+    "termsAccepted": true,
+    "termsVersion": "2026-06-14",
+    "createdAt": "2026-06-18T23:34:53.722Z"
+  }
+]

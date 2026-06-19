@@ -1,0 +1,1013 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #e5e7eb;
+  background: #050816;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background:
+  radial-gradient(circle at top left, rgba(34, 197, 94, .25), transparent 35%),
+  radial-gradient(circle at top right, rgba(250, 204, 21, .20), transparent 34%),
+  linear-gradient(135deg, #020617 0%, #111827 48%, #052e16 100%); }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+.glass { background: rgba(15, 23, 42, .72); border: 1px solid rgba(255,255,255,.10); box-shadow: 0 24px 80px rgba(0,0,0,.35); backdrop-filter: blur(14px); }
+.login-shell { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.login-card { max-width: 520px; width: 100%; border-radius: 28px; padding: 34px; }
+.brand-badge { display: inline-flex; gap: 8px; align-items: center; padding: 10px 14px; border-radius: 999px; color: #facc15; background: rgba(250,204,21,.10); }
+h1 { font-size: clamp(34px, 6vw, 64px); line-height: .95; margin: 22px 0 14px; letter-spacing: -0.06em; }
+h2 { margin: 0; display: flex; align-items: center; gap: 10px; }
+h3 { margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+p { color: #a3a3a3; line-height: 1.65; }
+.form-grid { display: grid; gap: 14px; margin-top: 22px; }
+.form-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+label { display: grid; gap: 8px; color: #cbd5e1; font-weight: 700; }
+input, select { width: 100%; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 13px 14px; background: rgba(2,6,23,.65); color: #f8fafc; outline: none; }
+input:focus, select:focus { border-color: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.16); }
+.primary, .secondary, .danger, .ghost { border: 0; border-radius: 16px; padding: 12px 16px; color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; transition: .2s; }
+.primary { background: linear-gradient(135deg, #16a34a, #84cc16); box-shadow: 0 12px 35px rgba(34,197,94,.25); }
+.secondary { background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.12); }
+.danger { background: linear-gradient(135deg, #dc2626, #f97316); }
+.ghost { background: rgba(255,255,255,.06); }
+.primary:hover, .secondary:hover, .danger:hover, .ghost:hover, .game-chip:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.wide { width: 100%; margin-top: 18px; }
+.error-box { border: 1px solid #ef4444; background: rgba(239,68,68,.12); color: #fecaca; border-radius: 14px; padding: 12px; }
+.loading { min-height: 100vh; display: grid; place-items: center; gap: 12px; color: #facc15; font-weight: 800; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.app-shell { max-width: 1440px; margin: 0 auto; padding: 20px; }
+.topbar { position: sticky; top: 14px; z-index: 10; border-radius: 26px; display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: center; padding: 14px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand > span { font-size: 34px; filter: drop-shadow(0 8px 16px rgba(250,204,21,.25)); }
+.brand small { display: block; color: #9ca3af; }
+nav { display: flex; gap: 8px; flex-wrap: wrap; }
+nav button { border: 0; border-radius: 14px; padding: 10px 12px; color: #cbd5e1; background: rgba(255,255,255,.06); display: inline-flex; align-items: center; gap: 7px; }
+nav button.active { background: #22c55e; color: #052e16; font-weight: 900; }
+main { padding: 22px 0 40px; }
+.ref-banner { border-radius: 18px; padding: 12px 16px; margin-top: 18px; color: #fde68a; }
+.wallet-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.metric-card { background: linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.10); border-radius: 24px; padding: 20px; min-height: 130px; display: grid; gap: 8px; }
+.metric-card svg { color: #facc15; }
+.metric-card span { color: #9ca3af; }
+.metric-card strong { font-size: 24px; letter-spacing: -0.04em; }
+.game-layout { display: grid; grid-template-columns: 360px 1fr; gap: 16px; }
+.game-list { border-radius: 28px; padding: 14px; display: grid; gap: 10px; align-self: start; }
+.game-chip { border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.05); color: #e5e7eb; border-radius: 20px; padding: 14px; display: flex; gap: 14px; text-align: left; align-items: center; }
+.game-chip.active { border-color: #22c55e; background: rgba(34,197,94,.16); }
+.game-chip span { font-size: 32px; }
+.game-chip small { display: block; color: #9ca3af; margin-top: 4px; }
+.play-card { border-radius: 30px; padding: 22px; min-height: 520px; }
+.play-hero { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+.big-icon { width: 86px; height: 86px; display: grid; place-items: center; font-size: 48px; border-radius: 26px; background: radial-gradient(circle, rgba(250,204,21,.24), rgba(34,197,94,.12)); }
+.mode-toggle { display: grid; grid-template-columns: 1fr 1fr; padding: 6px; background: rgba(255,255,255,.07); border-radius: 18px; margin-bottom: 16px; }
+.mode-toggle button { border: 0; color: #cbd5e1; background: transparent; border-radius: 14px; padding: 12px; font-weight: 900; }
+.mode-toggle button.active { color: #052e16; background: #facc15; }
+.race-track { margin: 20px 0; display: grid; gap: 9px; }
+.lane { height: 38px; border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border: 1px dashed rgba(255,255,255,.10); position: relative; overflow: hidden; display: flex; align-items: center; }
+.lane span { width: 46px; padding-left: 14px; color: #fde68a; font-size: 13px; }
+.horse { transition: margin-left .8s cubic-bezier(.2,.8,.2,1); font-size: 24px; }
+.result-card { margin-top: 16px; border-radius: 20px; padding: 16px; display: grid; gap: 5px; }
+.result-card.win { background: rgba(34,197,94,.14); border: 1px solid rgba(34,197,94,.28); }
+.result-card.lose { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.22); }
+.muted { display: block; margin-top: 12px; color: #9ca3af; }
+.pool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.pool-card { border-radius: 28px; padding: 22px; }
+.pool-money { font-size: 52px; font-weight: 950; letter-spacing: -0.06em; color: #facc15; margin: 10px 0; }
+.action-row { display: flex; gap: 10px; margin-top: 14px; }
+.leaderboard { grid-row: span 2; }
+.leader-row { display: grid; grid-template-columns: 50px 1fr auto; gap: 10px; border-bottom: 1px solid rgba(255,255,255,.08); padding: 12px 0; align-items: center; }
+.leader-row span { color: #facc15; font-weight: 900; }
+.leader-row em { color: #22c55e; font-style: normal; }
+.history-card { border-radius: 28px; padding: 22px; }
+.history-row { display: grid; grid-template-columns: 1.2fr .7fr .8fr .8fr 1.4fr; gap: 10px; border-bottom: 1px solid rgba(255,255,255,.08); padding: 13px 0; align-items: center; }
+.pos { color: #22c55e; font-weight: 900; }
+.neg { color: #f87171; font-weight: 900; }
+.audit-row { display: grid; grid-template-columns: 200px 1fr 100px; gap: 12px; border-bottom: 1px solid rgba(255,255,255,.08); padding: 13px 0; }
+code { color: #fde68a; word-break: break-all; }
+
+@media (max-width: 980px) {
+  .topbar { grid-template-columns: 1fr; }
+  .wallet-grid, .game-layout, .pool-grid { grid-template-columns: 1fr; }
+  .form-grid.two { grid-template-columns: 1fr; }
+  .history-row, .audit-row { grid-template-columns: 1fr; }
+}
+
+/* Derby Minute global race */
+.derby-card { position: relative; overflow: hidden; }
+.derby-card::before { content: ''; position: absolute; inset: -80px -120px auto auto; width: 360px; height: 360px; background: radial-gradient(circle, rgba(250,204,21,.18), transparent 62%); pointer-events: none; }
+.derby-hero { align-items: flex-start; justify-content: space-between; }
+.derby-status { margin-left: auto; min-width: 220px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 14px; border-radius: 999px; background: rgba(2,6,23,.58); border: 1px solid rgba(255,255,255,.10); color: #fde68a; font-weight: 900; }
+.live-dot, .lock-dot { width: 10px; height: 10px; display: inline-block; border-radius: 999px; }
+.live-dot { background: #22c55e; box-shadow: 0 0 0 6px rgba(34,197,94,.14); }
+.lock-dot { background: #f97316; box-shadow: 0 0 0 6px rgba(249,115,22,.14); }
+.derby-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+.derby-info { border: 1px solid rgba(255,255,255,.10); border-radius: 18px; padding: 12px; display: grid; gap: 6px; background: rgba(255,255,255,.045); min-height: 92px; }
+.derby-info svg { color: #facc15; }
+.derby-info span { color: #94a3b8; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.derby-info strong { color: #f8fafc; font-size: 15px; }
+.derby-info code { font-size: 12px; }
+.derby-track .lane { height: 44px; background: linear-gradient(90deg, rgba(34,197,94,.08), rgba(250,204,21,.05)); }
+.derby-track .lane.selected { border-color: rgba(250,204,21,.55); background: linear-gradient(90deg, rgba(250,204,21,.16), rgba(34,197,94,.08)); }
+.derby-track .lane em { position: absolute; right: 13px; font-style: normal; font-weight: 950; color: #94a3b8; }
+.derby-track .lane em.top3 { color: #facc15; }
+.result-card.neutral { background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.25); }
+.derby-result { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.derby-result span { border-radius: 999px; padding: 8px 10px; background: rgba(255,255,255,.07); color: #cbd5e1; font-weight: 800; }
+.derby-result .podium { background: rgba(250,204,21,.18); color: #fde68a; border: 1px solid rgba(250,204,21,.20); }
+
+@media (max-width: 980px) {
+  .derby-hero { display: grid; }
+  .derby-status { margin-left: 0; width: 100%; }
+  .derby-grid { grid-template-columns: 1fr; }
+}
+
+/* Cinematic Derby Minute experience */
+.derby-countdown-board {
+  display: grid;
+  grid-template-columns: 1fr 54px 1fr 54px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin: 18px 0 12px;
+}
+.board-item {
+  min-height: 72px;
+  border-radius: 18px;
+  padding: 12px;
+  display: grid;
+  gap: 2px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  color: #94a3b8;
+}
+.board-item span {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(148,163,184,.14);
+  color: #cbd5e1;
+  font-weight: 950;
+  font-size: 12px;
+}
+.board-item strong { color: #e5e7eb; }
+.board-item small { color: #94a3b8; }
+.board-item.active {
+  border-color: rgba(250,204,21,.36);
+  background: linear-gradient(145deg, rgba(250,204,21,.14), rgba(34,197,94,.08));
+  color: #fde68a;
+  box-shadow: 0 16px 50px rgba(250,204,21,.08);
+}
+.board-item.active span { background: #facc15; color: #111827; }
+.board-line { height: 3px; border-radius: 999px; background: linear-gradient(90deg, rgba(250,204,21,.35), rgba(34,197,94,.2)); }
+
+.derby-stadium {
+  position: relative;
+  margin: 22px 0 8px;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(250,204,21,.20), transparent 24%),
+    radial-gradient(circle at 88% 0%, rgba(34,197,94,.16), transparent 28%),
+    linear-gradient(180deg, rgba(15,23,42,.88), rgba(2,6,23,.92));
+}
+.derby-stadium::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 42px 100%;
+  opacity: .25;
+  pointer-events: none;
+}
+.stadium-lights {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 3;
+  display: flex;
+  gap: 7px;
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(2,6,23,.68);
+  border: 1px solid rgba(255,255,255,.12);
+}
+.light { width: 12px; height: 12px; border-radius: 999px; background: rgba(148,163,184,.35); }
+.light.green.on { background: #22c55e; box-shadow: 0 0 20px rgba(34,197,94,.8); }
+.light.amber.on { background: #f97316; box-shadow: 0 0 20px rgba(249,115,22,.75); animation: blink .7s ease-in-out infinite alternate; }
+.light.gold.on { background: #facc15; box-shadow: 0 0 24px rgba(250,204,21,.9); }
+@keyframes blink { from { opacity: .5; transform: scale(.9); } to { opacity: 1; transform: scale(1.08); } }
+
+.race-progress-panel {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 18px 12px;
+}
+.race-progress-panel strong { display: block; font-size: 17px; color: #f8fafc; }
+.race-progress-panel small { display: block; color: #94a3b8; margin-top: 4px; }
+.race-progress-ring {
+  --p: 0%;
+  width: 74px;
+  height: 74px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(#facc15 var(--p), rgba(255,255,255,.10) 0);
+  box-shadow: inset 0 0 0 8px rgba(2,6,23,.7), 0 12px 30px rgba(0,0,0,.26);
+}
+.race-progress-ring span {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #020617;
+  color: #fde68a;
+  font-weight: 950;
+  letter-spacing: -.04em;
+}
+
+.race-scene { position: relative; padding: 0 16px 18px; }
+.grandstand {
+  height: 44px;
+  border-radius: 18px 18px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: linear-gradient(180deg, rgba(30,41,59,.88), rgba(15,23,42,.72));
+  border: 1px solid rgba(255,255,255,.10);
+  border-bottom: 0;
+  font-size: 22px;
+  opacity: .9;
+}
+.finish-line, .starting-gate {
+  position: absolute;
+  z-index: 4;
+  top: 44px;
+  bottom: 18px;
+  width: 4px;
+  pointer-events: none;
+}
+.finish-line {
+  right: 42px;
+  background: repeating-linear-gradient(180deg, #f8fafc 0 10px, #111827 10px 20px);
+  box-shadow: 0 0 25px rgba(250,204,21,.28);
+}
+.starting-gate {
+  left: 84px;
+  background: rgba(148,163,184,.32);
+}
+.finish-line span, .starting-gate span {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-90deg);
+  font-size: 10px;
+  letter-spacing: .14em;
+  font-weight: 950;
+  color: #facc15;
+  background: rgba(2,6,23,.72);
+  border-radius: 999px;
+  padding: 4px 7px;
+}
+.starting-gate span { color: #cbd5e1; }
+
+.derby-track.cinematic {
+  position: relative;
+  margin: 0;
+  gap: 0;
+  padding: 10px 0;
+  border-radius: 0 0 22px 22px;
+  background:
+    linear-gradient(90deg, rgba(22,101,52,.38), rgba(132,204,22,.16)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.10) 0 1px, transparent 1px 45px);
+  border: 1px solid rgba(255,255,255,.10);
+  overflow: hidden;
+}
+.derby-track.cinematic::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+  transform: translateX(-100%);
+  animation: stadiumSweep 4.5s linear infinite;
+  pointer-events: none;
+}
+@keyframes stadiumSweep { to { transform: translateX(100%); } }
+.derby-track.cinematic .lane {
+  position: relative;
+  height: 52px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px dashed rgba(255,255,255,.12);
+  overflow: visible;
+}
+.derby-track.cinematic .lane:last-child { border-bottom: 0; }
+.lane-number {
+  position: relative;
+  z-index: 5;
+  width: 52px !important;
+  display: inline-grid;
+  place-items: center;
+  height: 32px;
+  margin-left: 8px;
+  padding: 0 !important;
+  border-radius: 999px;
+  background: rgba(2,6,23,.72);
+  color: #fde68a !important;
+  border: 1px solid rgba(250,204,21,.18);
+  font-weight: 950;
+}
+.lane-dirt {
+  position: absolute;
+  left: 72px;
+  right: 38px;
+  height: 16px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(120,53,15,.34), rgba(217,119,6,.12));
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.25);
+}
+.horse-runner {
+  position: absolute;
+  z-index: 4;
+  left: var(--x);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 1.25s cubic-bezier(.18,.8,.2,1);
+  transition-delay: var(--delay);
+  display: grid;
+  place-items: center;
+}
+.horse-sprite {
+  font-size: 30px;
+  display: block;
+  filter: drop-shadow(0 10px 10px rgba(0,0,0,.35));
+  animation: gallop .38s ease-in-out infinite alternate;
+}
+.jockey {
+  position: absolute;
+  top: -11px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #facc15;
+  color: #111827;
+  font-size: 10px;
+  font-weight: 950;
+  border: 2px solid rgba(2,6,23,.75);
+}
+.horse-shadow {
+  position: absolute;
+  width: 35px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.28);
+  bottom: -1px;
+  filter: blur(2px);
+}
+.phase-locked .horse-sprite { animation-duration: .22s; }
+.phase-countdown .horse-sprite { animation-duration: .24s; }
+.phase-revealed .horse-sprite { animation-duration: .16s; }
+@keyframes gallop {
+  from { transform: translateY(1px) rotate(-2deg) scaleX(1); }
+  to { transform: translateY(-4px) rotate(2deg) scaleX(1.04); }
+}
+.derby-track.cinematic .lane.selected .lane-number,
+.derby-track.cinematic .lane.selected .jockey {
+  background: #22c55e;
+  color: #052e16;
+}
+.derby-track.cinematic .lane.selected {
+  background: linear-gradient(90deg, rgba(34,197,94,.18), transparent 65%);
+}
+.derby-track.cinematic .lane.winner-lane {
+  background: linear-gradient(90deg, rgba(250,204,21,.18), transparent 68%);
+}
+.derby-track.cinematic .lane em {
+  position: absolute;
+  z-index: 6;
+  right: 8px;
+  width: 42px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(2,6,23,.78);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #94a3b8;
+  font-style: normal;
+  font-weight: 950;
+}
+.derby-track.cinematic .lane em.top3 {
+  color: #111827;
+  background: #facc15;
+  box-shadow: 0 0 24px rgba(250,204,21,.28);
+}
+.phase-countdown .derby-track.cinematic { box-shadow: inset 0 0 0 1px rgba(249,115,22,.18), 0 0 36px rgba(249,115,22,.10); }
+.phase-revealed .finish-line { animation: finishFlash .45s ease-in-out 4; }
+@keyframes finishFlash { 50% { filter: brightness(2.4); transform: scaleX(1.6); } }
+
+@media (max-width: 980px) {
+  .derby-countdown-board { grid-template-columns: 1fr; }
+  .board-line { display: none; }
+  .race-progress-panel { align-items: flex-start; }
+  .race-progress-ring { width: 62px; height: 62px; }
+  .race-progress-ring span { width: 44px; height: 44px; }
+  .finish-line { right: 28px; }
+  .starting-gate { left: 70px; }
+  .horse-sprite { font-size: 26px; }
+}
+
+/* Local-first wallet layer */
+.local-first-shell .topbar { border-color: rgba(34, 197, 94, .25); }
+.local-first-banner {
+  display: flex; align-items: center; gap: 10px; margin: 18px auto 0; max-width: 1180px;
+  padding: 12px 16px; color: #dfffea; border: 1px solid rgba(34,197,94,.25);
+  background: linear-gradient(135deg, rgba(34,197,94,.13), rgba(15,23,42,.58));
+}
+.local-wallet-grid { grid-template-columns: repeat(6, minmax(150px, 1fr)); }
+.local-first-card { border: 1px solid rgba(34,197,94,.2); }
+.local-first-race .horse-runner { transition: transform .36s linear; }
+.local-first-race.phase-locked .horse-runner { animation-duration: .38s; }
+.local-first-race.phase-revealed .finish-line { box-shadow: 0 0 50px rgba(250,204,21,.4); }
+.danger-zone {
+  max-width: 1180px; margin: 20px auto 40px; padding: 14px 16px; display: flex;
+  justify-content: space-between; align-items: center; gap: 12px;
+}
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.action-row button { width: auto; }
+.metric-card code, .derby-info code { word-break: break-all; }
+@media (max-width: 1100px) { .local-wallet-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); } }
+@media (max-width: 680px) { .local-wallet-grid { grid-template-columns: 1fr; } .danger-zone { flex-direction: column; align-items: stretch; } }
+
+
+
+/* === Derby visual simulation patch === */
+.race-countdown-big {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(80px, 16vw, 180px);
+  font-weight: 1000;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 12px 40px rgba(0,0,0,.55), 0 0 22px rgba(255, 214, 102, .55);
+  pointer-events: none;
+  animation: derbyPulseCount 1s ease-in-out infinite;
+}
+
+@keyframes derbyPulseCount {
+  0% { transform: scale(.86); opacity: .55; }
+  45% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(.92); opacity: .75; }
+}
+
+.stadium-lights .light.red {
+  background: #ff3b3b;
+  box-shadow: 0 0 0 rgba(255,59,59,0);
+}
+
+.stadium-lights .light.red.on {
+  box-shadow: 0 0 22px rgba(255,59,59,.85);
+}
+
+.realistic-race.phase-countdown .starting-gate {
+  filter: drop-shadow(0 0 18px rgba(255,255,255,.35));
+}
+
+.realistic-race.phase-locked .horse-runner {
+  animation: horseGallop .22s ease-in-out infinite alternate;
+}
+
+@keyframes horseGallop {
+  from { transform: translateX(var(--x)) translateY(-1px) scale(1); }
+  to { transform: translateX(var(--x)) translateY(2px) scale(1.025); }
+}
+
+.derby-result b.pos,
+.history-row .pos {
+  color: #69f0ae;
+}
+
+.derby-result b.neg,
+.history-row .neg {
+  color: #ff8a80;
+}
+
+
+/* === Derby Market Calculator Patch === */
+.market-calculator-panel {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(17, 24, 39, .92), rgba(31, 41, 55, .86));
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 18px 45px rgba(0,0,0,.25);
+}
+
+.market-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.market-header strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.market-header small {
+  display: block;
+  opacity: .72;
+  margin-top: 4px;
+}
+
+.market-badge {
+  white-space: nowrap;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+.market-badge.open {
+  color: #032b16;
+  background: linear-gradient(135deg, #7bf1a8, #22c55e);
+}
+
+.market-badge.closed {
+  color: #3a1300;
+  background: linear-gradient(135deg, #fdba74, #f97316);
+}
+
+.market-limits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.market-limits span {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.06);
+  font-size: .82rem;
+}
+
+.horse-exposure-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.horse-exposure {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.07);
+  text-align: center;
+}
+
+.horse-exposure span {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.horse-exposure strong {
+  display: block;
+  margin: 6px 0 2px;
+  font-size: .82rem;
+}
+
+.horse-exposure small {
+  opacity: .7;
+}
+
+.horse-exposure.least {
+  background: linear-gradient(135deg, rgba(250, 204, 21, .24), rgba(34, 197, 94, .16));
+  border-color: rgba(250, 204, 21, .55);
+  box-shadow: 0 0 0 1px rgba(250,204,21,.25), 0 10px 30px rgba(250,204,21,.12);
+}
+
+.market-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(59, 130, 246, .13);
+  border: 1px solid rgba(96, 165, 250, .25);
+  font-size: .86rem;
+}
+
+@media (max-width: 900px) {
+  .market-limits {
+    grid-template-columns: 1fr;
+  }
+  .horse-exposure-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .market-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+/* JUEGA123_REAL_RACE_60S_PATCH */
+.derby-stadium.visual-race-active {
+  border: 1px solid rgba(245, 197, 91, 0.35);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38), inset 0 0 48px rgba(255, 197, 91, 0.08);
+}
+
+.broadcast-panel strong::before {
+  content: "EN VIVO  ";
+  display: inline-block;
+  margin-right: 8px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  background: rgba(255, 54, 54, 0.16);
+  border: 1px solid rgba(255, 54, 54, 0.45);
+  color: #ffb3b3;
+}
+
+.realistic-race-scene {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255,255,255,0.12), transparent 18%),
+    linear-gradient(180deg, rgba(9, 43, 33, 0.92), rgba(5, 20, 16, 0.98));
+}
+
+.visual-race-active .realistic-race-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.055), transparent);
+  animation: cameraSweep 5.5s linear infinite;
+}
+
+.crowd-line {
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.4));
+  animation: crowdPulse 1.6s ease-in-out infinite;
+}
+
+.realistic-track {
+  position: relative;
+  background:
+    repeating-linear-gradient(180deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 58px),
+    linear-gradient(180deg, #8a562f 0%, #6f3f21 100%);
+  box-shadow: inset 0 18px 35px rgba(0,0,0,0.2), inset 0 -16px 30px rgba(0,0,0,0.25);
+}
+
+.realistic-lane {
+  position: relative;
+  overflow: hidden;
+  min-height: 58px;
+}
+
+.realistic-lane::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 5px;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  opacity: 0.45;
+}
+
+.realistic-horse {
+  position: absolute;
+  left: var(--x);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 960ms linear;
+  z-index: 5;
+  will-change: left, transform;
+}
+
+.visual-race-active .realistic-horse {
+  animation: horseBodyMotion 0.34s ease-in-out infinite;
+}
+
+.realistic-horse .horse-sprite {
+  display: inline-block;
+  font-size: 34px;
+  filter: drop-shadow(0 9px 8px rgba(0,0,0,0.38));
+  animation: gallopFrame 0.28s steps(2, end) infinite;
+}
+
+.realistic-horse .horse-shadow {
+  position: absolute;
+  left: 8px;
+  bottom: -6px;
+  width: 46px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.33);
+  filter: blur(3px);
+}
+
+.visual-race-active .lane-dirt::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--x) - 7%);
+  top: 50%;
+  width: 70px;
+  height: 18px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(210, 139, 74, 0.35), transparent 68%);
+  filter: blur(4px);
+  opacity: 0.85;
+}
+
+.visual-race-active .finish-line {
+  box-shadow: 0 0 26px rgba(255, 255, 255, 0.18);
+}
+
+.visual-race-active.phase-revealed .winner-lane {
+  background: linear-gradient(90deg, rgba(255, 214, 92, 0.18), transparent 75%);
+}
+
+@keyframes horseBodyMotion {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-1deg); }
+  50% { transform: translate(-50%, calc(-50% - 3px)) rotate(1deg); }
+}
+
+@keyframes gallopFrame {
+  0% { transform: scaleX(1) translateY(0); }
+  50% { transform: scaleX(1.04) translateY(-2px); }
+  100% { transform: scaleX(1) translateY(0); }
+}
+
+@keyframes cameraSweep {
+  0% { transform: translateX(-100%); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes crowdPulse {
+  0%, 100% { transform: translateY(0); opacity: 0.92; }
+  50% { transform: translateY(-2px); opacity: 1; }
+}
+
+/* ===== CABALLOS REALISTAS SIN EMOJIS ===== */
+
+.clean-grandstand {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  color: rgba(255,255,255,0.72);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+}
+
+.realistic-horse {
+  width: 96px;
+  height: 48px;
+  position: absolute;
+  left: var(--x);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.85s linear;
+  z-index: 5;
+}
+
+.realistic-horse.is-running {
+  animation: horseBodyBounce 0.34s infinite ease-in-out;
+  animation-delay: var(--delay);
+}
+
+.horse-shadow {
+  position: absolute;
+  left: 8px;
+  bottom: -8px;
+  width: 82px;
+  height: 13px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.42);
+  filter: blur(3px);
+}
+
+.horse-model {
+  --horse-main: #7a421f;
+  --horse-dark: #2a1208;
+  --jockey-color: #ffd84d;
+  position: relative;
+  width: 92px;
+  height: 46px;
+}
+
+.horse-color-1 { --horse-main: #7b3f1d; --horse-dark: #2b1409; --jockey-color: #ffd84d; }
+.horse-color-2 { --horse-main: #9a6b3f; --horse-dark: #3b2412; --jockey-color: #4dd7ff; }
+.horse-color-3 { --horse-main: #3f2a1d; --horse-dark: #120b07; --jockey-color: #ff5b5b; }
+.horse-color-4 { --horse-main: #b47a45; --horse-dark: #4a2811; --jockey-color: #67ff8a; }
+.horse-color-5 { --horse-main: #5d3926; --horse-dark: #1d0f09; --jockey-color: #c77dff; }
+.horse-color-6 { --horse-main: #8f8a78; --horse-dark: #3a382e; --jockey-color: #ffffff; }
+
+.horse-body {
+  position: absolute;
+  left: 22px;
+  top: 16px;
+  width: 50px;
+  height: 21px;
+  border-radius: 60% 45% 50% 55%;
+  background: linear-gradient(135deg, var(--horse-main), var(--horse-dark));
+  box-shadow: inset -8px -5px 0 rgba(0,0,0,0.22);
+}
+
+.horse-neck {
+  position: absolute;
+  left: 60px;
+  top: 9px;
+  width: 16px;
+  height: 25px;
+  border-radius: 12px 12px 5px 5px;
+  background: linear-gradient(135deg, var(--horse-main), var(--horse-dark));
+  transform: rotate(-28deg);
+}
+
+.horse-head {
+  position: absolute;
+  left: 71px;
+  top: 6px;
+  width: 23px;
+  height: 16px;
+  border-radius: 55% 45% 45% 55%;
+  background: linear-gradient(135deg, var(--horse-main), var(--horse-dark));
+  transform: rotate(-8deg);
+}
+
+.horse-ear {
+  position: absolute;
+  left: 77px;
+  top: 1px;
+  width: 7px;
+  height: 10px;
+  background: var(--horse-dark);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.horse-mane {
+  position: absolute;
+  left: 60px;
+  top: 7px;
+  width: 8px;
+  height: 23px;
+  border-radius: 999px;
+  background: #160b05;
+  transform: rotate(-25deg);
+}
+
+.horse-tail {
+  position: absolute;
+  left: 7px;
+  top: 17px;
+  width: 26px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #160b05, var(--horse-dark));
+  transform-origin: right center;
+  animation: horseTailMove 0.45s infinite ease-in-out;
+}
+
+.horse-leg {
+  position: absolute;
+  top: 31px;
+  width: 7px;
+  height: 19px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--horse-main), var(--horse-dark));
+  transform-origin: top center;
+}
+
+.leg-front-a { left: 58px; }
+.leg-front-b { left: 68px; }
+.leg-back-a { left: 30px; }
+.leg-back-b { left: 41px; }
+
+.is-running .leg-front-a,
+.is-running .leg-back-b {
+  animation: legRunA 0.32s infinite ease-in-out;
+}
+
+.is-running .leg-front-b,
+.is-running .leg-back-a {
+  animation: legRunB 0.32s infinite ease-in-out;
+}
+
+.jockey-rider {
+  position: absolute;
+  left: 43px;
+  top: 1px;
+  width: 19px;
+  height: 22px;
+  border-radius: 10px 10px 6px 6px;
+  background: linear-gradient(180deg, var(--jockey-color), #d98d00);
+  border: 2px solid rgba(0,0,0,0.28);
+  display: grid;
+  place-items: center;
+  color: #0c1710;
+  font-size: 10px;
+  font-weight: 900;
+  transform: rotate(-8deg);
+  z-index: 8;
+}
+
+.jockey-rider::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  width: 14px;
+  height: 8px;
+  border-radius: 8px 8px 3px 3px;
+  background: #111827;
+}
+
+.race-dust {
+  position: absolute;
+  left: 10px;
+  bottom: 3px;
+  width: 10px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(215, 188, 117, 0.5);
+  filter: blur(2px);
+  animation: dustTrail 0.5s infinite ease-out;
+}
+
+.dust-two {
+  left: 0;
+  animation-delay: 0.18s;
+}
+
+@keyframes horseBodyBounce {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px);
+  }
+}
+
+@keyframes horseTailMove {
+  0%, 100% {
+    transform: rotate(-18deg);
+  }
+  50% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes legRunA {
+  0%, 100% {
+    transform: rotate(25deg);
+  }
+  50% {
+    transform: rotate(-30deg);
+  }
+}
+
+@keyframes legRunB {
+  0%, 100% {
+    transform: rotate(-28deg);
+  }
+  50% {
+    transform: rotate(30deg);
+  }
+}
+
+@keyframes dustTrail {
+  0% {
+    opacity: 0.7;
+    transform: translateX(0) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-28px) scale(1.9);
+  }
+}

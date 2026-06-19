@@ -1,0 +1,83 @@
+﻿(function () {
+  let deferredPrompt = null;
+
+  function isIos() {
+    return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  }
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function isPwaPath() {
+    return window.location.pathname.startsWith('/pwa/');
+  }
+
+  function createInstallButton() {
+    if (document.getElementById('hipiplay-install-btn')) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'hipiplay-install-btn';
+    btn.innerHTML = '⬇ Instalar App';
+
+    btn.style.position = 'fixed';
+    btn.style.right = '16px';
+    btn.style.top = '16px';
+    btn.style.zIndex = '999999';
+    btn.style.border = 'none';
+    btn.style.borderRadius = '999px';
+    btn.style.padding = '11px 16px';
+    btn.style.fontSize = '13px';
+    btn.style.fontWeight = '800';
+    btn.style.cursor = 'pointer';
+    btn.style.color = '#06111f';
+    btn.style.background = 'linear-gradient(135deg, #f8d35c, #ffffff)';
+    btn.style.boxShadow = '0 10px 30px rgba(0,0,0,.35)';
+    btn.style.letterSpacing = '.3px';
+
+    btn.addEventListener('click', async function () {
+      if (!isPwaPath()) {
+        window.location.href = '/pwa/';
+        return;
+      }
+
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        btn.style.display = 'none';
+        return;
+      }
+
+      if (isIos()) {
+        alert('Para instalar en iPhone: toca Compartir y luego "Agregar a pantalla de inicio".');
+        return;
+      }
+
+      alert('Para instalar HipiPlay: abre el menú del navegador y selecciona "Instalar app" o "Agregar a pantalla de inicio".');
+    });
+
+    document.body.appendChild(btn);
+
+    if (isStandalone()) {
+      btn.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('beforeinstallprompt', function (event) {
+    if (!isPwaPath()) return;
+    event.preventDefault();
+    deferredPrompt = event;
+    createInstallButton();
+  });
+
+  window.addEventListener('appinstalled', function () {
+    const btn = document.getElementById('hipiplay-install-btn');
+    if (btn) btn.style.display = 'none';
+  });
+
+  window.addEventListener('load', function () {
+    if (!isPwaPath()) return;
+    setTimeout(createInstallButton, 1200);
+  });
+})();

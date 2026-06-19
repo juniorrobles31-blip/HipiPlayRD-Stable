@@ -1,0 +1,288 @@
+(function () {
+  const INSTALL_FLAG = 'hipiplay_pwa_installed_v1';
+  const BUTTON_ID = 'hipiplay-pwa-install-button';
+
+  let deferredPrompt = null;
+
+  function isStandaloneMode() {
+    const standaloneByMedia = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    const fullscreenByMedia = window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches;
+    const minimalUiByMedia = window.matchMedia && window.matchMedia('(display-mode: minimal-ui)').matches;
+    const iosStandalone = window.navigator && window.navigator.standalone === true;
+    const androidAppReferrer = document.referrer && document.referrer.startsWith('android-app://');
+
+    return Boolean(standaloneByMedia || fullscreenByMedia || minimalUiByMedia || iosStandalone || androidAppReferrer);
+  }
+
+  function wasInstalledBefore() {
+    return localStorage.getItem(INSTALL_FLAG) === '1';
+  }
+
+  function markInstalled() {
+    localStorage.setItem(INSTALL_FLAG, '1');
+    document.documentElement.classList.add('pwa-installed');
+    if (document.body) document.body.classList.add('pwa-installed');
+  }
+
+  function shouldHideInstallButton() {
+    return isStandaloneMode() || wasInstalledBefore();
+  }
+
+  function hasActiveRaceOrBet() {
+    const text = (document.body && document.body.innerText ? document.body.innerText : '').toLowerCase();
+
+    const activeTexts = [
+      'carrera en curso',
+      'preparación',
+      'preparacion',
+      'apuesta confirmada',
+      'apuesta realizada',
+      'boleto generado',
+      'ticket de apuesta',
+      'esperando cierre',
+      'resultado oficial'
+    ];
+
+    const hasActiveText = activeTexts.some(function (item) {
+      return text.includes(item);
+    });
+
+    const hasRaceElement = Boolean(
+      document.querySelector('[class*="race-video"], [class*="RaceVideo"], [class*="preparation"], [class*="countdown"], video')
+    );
+
+    return hasActiveText || hasRaceElement || document.body.classList.contains('hipi-hide-header-menu');
+  }
+
+  function findHeaderTarget() {
+    const candidates = Array.from(
+      document.querySelectorAll('header, .topbar, .app-header, .brand, [class*="header"], [class*="brand"], [class*="top"]')
+    );
+
+    const exact = candidates.find(function (el) {
+      const text = (el.textContent || '').toLowerCase();
+      return text.includes('hipiplay') && text.includes('carreras');
+    });
+
+    if (exact) {
+      return exact.closest('header') || exact;
+    }
+
+    const logo = Array.from(document.querySelectorAll('img, div, section')).find(function (el) {
+      const text = (el.textContent || '').toLowerCase();
+      return text.includes('hipiplay');
+    });
+
+    return logo ? (logo.closest('header') || logo.parentElement || logo) : null;
+  }
+
+  function removeOldFloatingInstallButtons() {
+    const selectors = [
+      '#installPWA',
+      '#install-pwa',
+      '#pwa-install',
+      '#pwa-install-button',
+      '.install-pwa',
+      '.pwa-install',
+      '.pwa-install-button',
+      '[data-pwa-install]:not(#' + BUTTON_ID + ')'
+    ];
+
+    selectors.forEach(function (selector) {
+      document.querySelectorAll(selector).forEach(function (el) {
+        el.style.display = 'none';
+        el.setAttribute('aria-hidden', 'true');
+      });
+    });
+  }
+
+  function hideInstallButton() {
+    removeOldFloatingInstallButtons();
+
+    const button = document.getElementById(BUTTON_ID);
+    if (button) {
+      button.style.display = 'none';
+      button.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function showInstallButton() {
+    const button = document.getElementById(BUTTON_ID);
+    if (!button) return;
+
+    button.style.display = 'inline-flex';
+    button.setAttribute('aria-hidden', 'false');
+  }
+
+  function ensureGlobalStyle() {
+    if (document.getElementById('hipiplay-pwa-install-style')) return;
+
+    const style = document.createElement('style');
+    style.id = 'hipiplay-pwa-install-style';
+    style.textContent = `
+      html.pwa-installed #${BUTTON_ID},
+      body.pwa-installed #${BUTTON_ID},
+      body.hipi-wallet-home-open #${BUTTON_ID},
+      body.hipi-hide-header-menu #${BUTTON_ID} {
+        display: none !important;
+      }
+
+      #${BUTTON_ID} {
+        position: static !important;
+        transform: none !important;
+        z-index: auto !important;
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  function createInstallButton() {
+    if (shouldHideInstallButton()) {
+      markInstalled();
+      hideInstallButton();
+      return;
+    }
+
+    if (!deferredPrompt) {
+      hideInstallButton();
+      return;
+    }
+
+    ensureGlobalStyle();
+
+    const target = findHeaderTarget();
+
+    if (!target) {
+      hideInstallButton();
+      return;
+    }
+
+    target.classList.add('hipiplay-header-menu-target');
+
+    let button = document.getElementById(BUTTON_ID);
+
+    if (!button) {
+      button = document.createElement('button');
+      button.id = BUTTON_ID;
+      button.type = 'button';
+      button.className = 'wallet-header-install-button';
+      button.innerHTML = '<span class="wallet-header-install-icon">⬇</span><span>Instalar</span>';
+      button.setAttribute('data-pwa-install', 'true');
+
+      button.addEventListener('click', async function () {
+        if (!deferredPrompt) {
+          hideInstallButton();
+          return;
+        }
+
+        button.disabled = true;
+
+        deferredPrompt.prompt();
+
+        const choice = await deferredPrompt.userChoice.catch(function () {
+          return { outcome: 'dismissed' };
+        });
+
+        deferredPrompt = null;
+
+        if (choice && choice.outcome === 'accepted') {
+          markInstalled();
+          hideInstallButton();
+        } else {
+          button.disabled = false;
+          validateInstallVisibility();
+        }
+      });
+    }
+
+    const menuButton = document.getElementById('hipiplay-header-wallet-menu-button');
+
+    if (menuButton && menuButton.parentElement === target) {
+      target.insertBefore(button, menuButton);
+    } else if (button.parentElement !== target) {
+      target.appendChild(button);
+    }
+
+    validateInstallVisibility();
+  }
+
+  function validateInstallVisibility() {
+    if (shouldHideInstallButton()) {
+      markInstalled();
+      hideInstallButton();
+      return;
+    }
+
+    if (!deferredPrompt) {
+      hideInstallButton();
+      return;
+    }
+
+    if (hasActiveRaceOrBet()) {
+      hideInstallButton();
+      return;
+    }
+
+    createInstallButton();
+
+    if (hasActiveRaceOrBet()) {
+      hideInstallButton();
+    } else {
+      showInstallButton();
+    }
+  }
+
+  window.addEventListener('beforeinstallprompt', function (event) {
+    event.preventDefault();
+    deferredPrompt = event;
+    validateInstallVisibility();
+  });
+
+  window.addEventListener('appinstalled', function () {
+    deferredPrompt = null;
+    markInstalled();
+    hideInstallButton();
+  });
+
+  document.addEventListener('click', function (event) {
+    const target = event.target;
+    const button = target && target.closest ? target.closest('button') : null;
+
+    if (!button) return;
+    if (button.closest('.wallet-action-hub')) return;
+
+    const text = (button.textContent || '').trim().toLowerCase();
+
+    if (text === 'apostar' || text.includes('confirmar apuesta') || text.includes('realizar apuesta')) {
+      document.body.classList.add('hipi-hide-header-menu');
+      hideInstallButton();
+
+      window.setTimeout(function () {
+        document.body.classList.remove('hipi-hide-header-menu');
+        validateInstallVisibility();
+      }, 130000);
+    }
+  }, true);
+
+  const observer = new MutationObserver(function () {
+    validateInstallVisibility();
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    validateInstallVisibility();
+
+    if (document.body) {
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+    }
+  });
+
+  window.addEventListener('load', validateInstallVisibility);
+  window.addEventListener('focus', validateInstallVisibility);
+
+  setInterval(validateInstallVisibility, 2000);
+})();

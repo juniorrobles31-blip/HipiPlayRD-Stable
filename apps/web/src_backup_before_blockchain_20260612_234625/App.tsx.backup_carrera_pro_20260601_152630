@@ -1,0 +1,572 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Coins, Gift, History, LogOut, Sparkles, Ticket, Trophy } from 'lucide-react';
+import { api, logout, setToken, Wallet } from './api';
+import { dbGetAll, LocalDerbyBet, LocalLedgerMovement, LocalWalletState } from './localDb';
+import { getLocalWallet, initLocalWallet } from './localWallet';
+import { localDerbyHistory, placeLocalDerbyBet, resolvePendingLocalBets } from './localLedger';
+import { syncPendingQueue } from './syncQueue';
+import {
+  addBetToExposure,
+  buildResultOrderFromExposure,
+  createEmptyExposure,
+  DerbyMarketExposure,
+  getMarketStatus,
+  MARKET_CONFIG,
+} from './marketEngine';
+
+type User = { id: string; username: string };
+type Tab = 'games' | 'history';
+type CyclePhase = 'betting' | 'running';
+
+type CycleInfo = {
+  cycleIndex: number;
+  raceId: string;
+  raceCode: string;
+  seed: string;
+  phase: CyclePhase;
+  phaseElapsed: number;
+  phaseRemaining: number;
+  bettingProgress: number;
+  raceProgress: number;
+};
+
+type UserRaceBet = {
+  raceId: string;
+  raceCode: string;
+  betId: string;
+  selectedHorse: number;
+  amount: number;
+};
+
+type RaceResult = {
+  raceId: string;
+  raceCode: string;
+  resultOrder: number[];
+  exposure: DerbyMarketExposure;
+  selectedHorse?: number;
+  amount?: number;
+  won?: boolean;
+  resolvedAt: number;
+};
+
+const BETTING_WINDOW_MS = 60_000;
+const RACE_WINDOW_MS = 60_000;
+const CYCLE_WINDOW_MS = BETTING_WINDOW_MS + RACE_WINDOW_MS;
+const HORSES = [1, 2, 3, 4, 5, 6];
+const GAME_EPOCH_MS = Date.UTC(2026, 0, 1, 0, 0, 0);
+
+const coins = (n: number) => new Intl.NumberFormat('es-DO', { maximumFractionDigits: 0 }).format(Math.max(0, Math.floor(Number(n || 0))));
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+function hashString(value: string) {
+  let h = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    h ^= value.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function getCycleInfo(now: number, forcedIndex?: number): CycleInfo {
+  const elapsed = Math.max(0, now - GAME_EPOCH_MS);
+  const cycleIndex = forcedIndex ?? Math.floor(elapsed / CYCLE_WINDOW_MS);
+  const cycleStart = GAME_EPOCH_MS + cycleIndex * CYCLE_WINDOW_MS;
+  const insideCycle = forcedIndex === undefined ? elapsed % CYCLE_WINDOW_MS : RACE_WINDOW_MS + BETTING_WINDOW_MS - 1;
+  const phase: CyclePhase = insideCycle < BETTING_WINDOW_MS ? 'betting' : 'running';
+  const phaseElapsed = phase === 'betting' ? insideCycle : insideCycle - BETTING_WINDOW_MS;
+  const phaseLimit = phase === 'betting' ? BETTING_WINDOW_MS : RACE_WINDOW_MS;
+  const phaseRemaining = Math.max(0, phaseLimit - phaseElapsed);
+  const raceCode = `DERBY-${String(cycleIndex).padStart(7, '0')}`;
+  const raceId = `race-${cycleIndex}`;
+  const seed = `${raceId}:${cycleStart}:juega123-derby`;
+
+  return {
+    cycleIndex,
+    raceId,
+    raceCode,
+    seed,
+    phase,
+    phaseElapsed,
+    phaseRemaining,
+    bettingProgress: phase === 'betting' ? clamp(phaseElapsed / BETTING_WINDOW_MS, 0, 1) : 1,
+    raceProgress: phase === 'running' ? clamp(phaseElapsed / RACE_WINDOW_MS, 0, 1) : 0,
+  };
+}
+
+function buildPublicMarket(race: CycleInfo, progress = race.bettingProgress) {
+  let exposure = createEmptyExposure(race.raceId);
+  const maxPublicBets = 42;
+  const visiblePublicBets = Math.floor(maxPublicBets * clamp(progress, 0, 1));
+
+  for (let i = 0; i < visiblePublicBets; i++) {
+    const h = hashString(`${race.seed}:public:${i}`);
+    const horse = (h % 6) + 1;
+    const amount = 10 + ((h >>> 5) % 20) * 10;
+    exposure = addBetToExposure(exposure, horse, amount, `public-${i}`, 'public');
+  }
+
+  return exposure;
+}
+
+function addUserBetToExposure(exposure: DerbyMarketExposure, bet: UserRaceBet | null, userId: string) {
+  if (!bet) return exposure;
+  return addBetToExposure(exposure, bet.selectedHorse, bet.amount, userId, 'local');
+}
+
+function normalizeError(err: unknown) {
+  const raw = err instanceof Error ? err.message : 'No se pudo generar el boleto.';
+  return raw
+    .replace('Saldo local insuficiente en la wallet del teléfono.', 'Monedas insuficientes.')
+    .replace('Saldo local insuficiente en la wallet del dispositivo.', 'Monedas insuficientes.')
+    .replace('Monto inválido.', 'Cantidad inválida.')
+    .replace('Apuestas cerradas para esta carrera. Espera la próxima.', 'Las apuestas están cerradas. Espera la próxima ventana.')
+    .replace('Ya tienes un boleto pendiente en esta carrera. Espera el resultado o la próxima carrera.', 'Ya tienes un boleto activo en esta carrera.');
+}
+
+function Login({ onLogin }: { onLogin: (user: User, wallet: Wallet) => void }) {
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('admin123');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.login(username, password);
+      setToken(res.token);
+      onLogin(res.user, res.wallet);
+    } catch (err) {
+      setError(normalizeError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return <div className="login-shell">
+    <div className="login-card glass clean-login-card">
+      <div className="brand-badge"><Sparkles size={22} /> Juega123 Derby</div>
+      <h1>Derby Minute con monedas</h1>
+      <p>Apuesta con monedas, espera el cierre de la ronda y mira una carrera en vivo de 60 segundos.</p>
+      <form onSubmit={submit} className="form-grid">
+        <label>Usuario<input value={username} onChange={e => setUsername(e.target.value)} /></label>
+        <label>Clave<input type="password" value={password} onChange={e => setPassword(e.target.value)} /></label>
+        {error && <div className="error-box">{error}</div>}
+        <button className="primary" disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
+      </form>
+      <small>Prueba local: admin / admin123</small>
+    </div>
+  </div>;
+}
+
+function PlayerSummary({ wallet, pendingCount, lastBet, lastResult }: { wallet: LocalWalletState | null; pendingCount: number; lastBet?: LocalDerbyBet; lastResult?: RaceResult | null }) {
+  return <section className="coin-dashboard">
+    <div className="coin-card featured">
+      <Coins />
+      <span>Monedas disponibles</span>
+      <strong>{coins(wallet?.demoBalance || 0)}</strong>
+    </div>
+    <div className="coin-card">
+      <Gift />
+      <span>Bonos</span>
+      <strong>{coins(wallet?.giftBalance || 0)}</strong>
+    </div>
+    <div className="coin-card">
+      <Ticket />
+      <span>Boletos activos</span>
+      <strong>{pendingCount}</strong>
+    </div>
+    <div className="coin-card">
+      <History />
+      <span>Último resultado</span>
+      <strong>{lastResult ? lastResult.resultOrder.slice(0, 3).map(h => `#${h}`).join(' - ') : '-'}</strong>
+      <small>{lastBet ? `${lastBet.status === 'won' ? 'Ganó' : lastBet.status === 'lost' ? 'Perdió' : 'Pendiente'} - ${coins(Math.abs(lastBet.profitLoss || 0))} monedas` : 'Sin boletos'}</small>
+    </div>
+  </section>;
+}
+
+function RaceHorse({ horse, x, running, selected, winnerLane, rank }: { horse: number; x: number; running: boolean; selected: boolean; winnerLane: boolean; rank?: number }) {
+  return <div className={`lane realistic-lane ${selected ? 'selected' : ''} ${winnerLane ? 'winner-lane' : ''}`}>
+    <span className="lane-number">#{horse}</span>
+    <div className="lane-dirt"></div>
+    <div
+      className={`horse-runner realistic-horse horse-color-${horse} ${running ? 'is-running' : ''}`}
+      style={{ ['--x' as string]: `${x}%`, ['--delay' as string]: `${horse * 70}ms` }}
+    >
+      <span className="horse-shadow"></span>
+      <div className="horse-model">
+        <div className="horse-tail"></div>
+        <div className="horse-body"></div>
+        <div className="horse-neck"></div>
+        <div className="horse-head"></div>
+        <div className="horse-ear"></div>
+        <div className="horse-mane"></div>
+        <div className="horse-leg leg-front-a"></div>
+        <div className="horse-leg leg-front-b"></div>
+        <div className="horse-leg leg-back-a"></div>
+        <div className="horse-leg leg-back-b"></div>
+        <div className="jockey-rider"><span>{horse}</span></div>
+      </div>
+      {running && <span className="race-dust dust-one"></span>}
+      {running && <span className="race-dust dust-two"></span>}
+    </div>
+    {rank && <em className={rank <= 3 ? 'top3' : ''}>{rank}o</em>}
+  </div>;
+}
+
+function RaceTrack({ cycle, resultOrder, selectedHorse, lastResult }: { cycle: CycleInfo; resultOrder: number[]; selectedHorse?: number; lastResult?: RaceResult | null }) {
+  const running = cycle.phase === 'running';
+  const progress = running ? cycle.raceProgress : 0;
+  const secondsLeft = Math.ceil(cycle.phaseRemaining / 1000);
+  const top3 = resultOrder.slice(0, 3);
+  const leadHorse = resultOrder[0];
+  const ease = progress < 1 ? 1 - Math.pow(1 - progress, 2.2) : 1;
+
+  return <section className={`race-tv glass ${running ? 'race-running' : 'race-betting'}`}>
+    <div className="race-tv-header">
+      <div>
+        <span className={running ? 'live-badge' : 'betting-badge'}>{running ? 'EN VIVO' : 'APUESTAS'}</span>
+        <strong>{running ? 'Carrera en vivo - 60 segundos' : 'Ventana de apuestas - 60 segundos'}</strong>
+        <small>{running ? `Tiempo restante de carrera: ${secondsLeft}s` : `Cierre de apuestas en: ${secondsLeft}s`}</small>
+      </div>
+      <div className="race-clock">
+        <span>{secondsLeft}</span>
+      </div>
+    </div>
+
+    <div className="race-scene realistic-scene">
+      <div className="grandstand clean-grandstand">
+        <span>GRADAS</span>
+        <span>PÚBLICO</span>
+        <span>TRANSMISIÓN</span>
+        <span>META</span>
+      </div>
+      <div className="starting-gate realistic-gate"><span>PARTIDA</span></div>
+      <div className="finish-line realistic-finish"><span>META</span></div>
+
+      <div className="race-track derby-track cinematic realistic-track">
+        {HORSES.map(horse => {
+          const rankIndex = resultOrder.indexOf(horse);
+          const rank = rankIndex >= 0 ? rankIndex + 1 : horse;
+          const startX = 6;
+          const finalX = 93 - ((rank - 1) * 4.6);
+          const laneStagger = (horse - 3) * 0.22;
+          const gallopSurge = running ? Math.sin(Date.now() / (175 + horse * 9) + horse) * (1.35 + (rank <= 3 ? 0.35 : 0)) : 0;
+          const midRaceDrama = running && progress > 0.22 && progress < 0.88 ? Math.sin(Date.now() / 760 + rank) * 2.15 : 0;
+          const x = running
+            ? Math.min(94, Math.max(5, startX + (finalX - startX) * ease + gallopSurge + midRaceDrama + laneStagger))
+            : startX + horse * 0.72;
+
+          return <RaceHorse
+            key={horse}
+            horse={horse}
+            x={x}
+            running={running}
+            selected={selectedHorse === horse}
+            winnerLane={false}
+          />;
+        })}
+      </div>
+    </div>
+
+    {running && <div className="race-commentary">
+      <strong>Corriendo ahora:</strong> {leadHorse ? `Caballo #${leadHorse} marcando el paso.` : 'Los caballos están saliendo del partidor.'}
+    </div>}
+
+    {!running && lastResult && <div className={`race-final-board ${lastResult.won ? 'win' : lastResult.won === false ? 'lose' : 'neutral'}`}>
+      <div>
+        <span className="result-pill">ÚLTIMO RESULTADO</span>
+        <strong>{lastResult.raceCode}</strong>
+        <small>{lastResult.won === undefined ? 'Resultado de la carrera anterior.' : lastResult.won ? 'Tu boleto quedó dentro del Top 3.' : 'Tu boleto quedó fuera del Top 3.'}</small>
+      </div>
+      <div className="top3-board">
+        <span>Top 3 ganador</span>
+        <strong>{lastResult.resultOrder.slice(0, 3).map(h => `#${h}`).join('  -  ')}</strong>
+      </div>
+    </div>}
+  </section>;
+}
+
+function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWalletState | null; refreshLocal: () => Promise<void> }) {
+  const [now, setNow] = useState(Date.now());
+  const [amount, setAmount] = useState(100);
+  const [horse, setHorse] = useState(1);
+  const [bets, setBets] = useState<LocalDerbyBet[]>([]);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [userBetsByRace, setUserBetsByRace] = useState<Record<string, UserRaceBet>>({});
+  const [lastResult, setLastResult] = useState<RaceResult | null>(null);
+  const resolvedRacesRef = useRef<Set<string>>(new Set());
+
+  const cycle = useMemo(() => getCycleInfo(now), [now]);
+
+  async function loadLocalBets() {
+    const all = await localDerbyHistory(user.id);
+    setBets(all);
+  }
+
+  async function syncNowQuietly() {
+    try {
+      await syncPendingQueue(20);
+    } catch {
+      // La sincronización no debe interrumpir la carrera.
+    } finally {
+      await refreshLocal();
+    }
+  }
+
+  useEffect(() => {
+    loadLocalBets().catch(() => null);
+    const interval = setInterval(() => setNow(Date.now()), 250);
+    const historyInterval = setInterval(() => loadLocalBets().catch(() => null), 3000);
+    return () => {
+      clearInterval(interval);
+      clearInterval(historyInterval);
+    };
+  }, [user.id]);
+
+  function userBetForRace(raceId: string, raceCode: string): UserRaceBet | null {
+    if (userBetsByRace[raceId]) return userBetsByRace[raceId];
+    const pending = bets.find(b => b.raceId === raceId && b.status === 'pending');
+    if (!pending) return null;
+    return {
+      raceId,
+      raceCode,
+      betId: pending.id,
+      selectedHorse: pending.selectedHorse,
+      amount: pending.amount,
+    };
+  }
+
+  function exposureForRace(race: CycleInfo, userBet: UserRaceBet | null, progressOverride?: number) {
+    const publicExposure = buildPublicMarket(race, progressOverride ?? race.bettingProgress);
+    return addUserBetToExposure(publicExposure, userBet, user.id);
+  }
+
+  const currentUserBet = userBetForRace(cycle.raceId, cycle.raceCode);
+  const currentExposure = exposureForRace(cycle, currentUserBet, cycle.phase === 'running' ? 1 : cycle.bettingProgress);
+  // Resultado interno: se calcula con la exposición del mercado, pero el jugador solo ve el resultado final.
+  const resultOrder = buildResultOrderFromExposure(currentExposure, cycle.seed);
+  const pendingCount = bets.filter(b => b.status === 'pending').length;
+  const lastBet = bets[0];
+  const bettingOpen = cycle.phase === 'betting' && !currentUserBet && getMarketStatus(currentExposure).canAcceptBet;
+
+  useEffect(() => {
+    if (cycle.phase !== 'betting') return;
+    const previousIndex = cycle.cycleIndex - 1;
+    if (previousIndex < 0) return;
+
+    const previousRace = getCycleInfo(now, previousIndex);
+    if (resolvedRacesRef.current.has(previousRace.raceId)) return;
+
+    const previousUserBet = userBetForRace(previousRace.raceId, previousRace.raceCode);
+    const previousExposure = exposureForRace(previousRace, previousUserBet, 1);
+    const previousOrder = buildResultOrderFromExposure(previousExposure, previousRace.seed);
+    const top3 = previousOrder.slice(0, 3);
+    const won = previousUserBet ? top3.includes(previousUserBet.selectedHorse) : undefined;
+
+    resolvedRacesRef.current.add(previousRace.raceId);
+    setLastResult({
+      raceId: previousRace.raceId,
+      raceCode: previousRace.raceCode,
+      resultOrder: previousOrder,
+      exposure: previousExposure,
+      selectedHorse: previousUserBet?.selectedHorse,
+      amount: previousUserBet?.amount,
+      won,
+      resolvedAt: Date.now(),
+    });
+
+    if (previousUserBet) {
+      resolvePendingLocalBets(user.id, previousRace.raceId, previousRace.raceCode, previousOrder)
+        .then(async () => {
+          setMessage(won
+            ? `GANASTE. Top 3 ganador: ${top3.map(h => `#${h}`).join(', ')}.`
+            : `PERDISTE. Top 3 ganador: ${top3.map(h => `#${h}`).join(', ')}.`
+          );
+          await refreshLocal();
+          await loadLocalBets();
+          await syncNowQuietly();
+        })
+        .catch(err => setMessage(normalizeError(err)));
+    }
+  }, [cycle.cycleIndex, cycle.phase]);
+
+  async function bet() {
+    if (!bettingOpen) {
+      setMessage(cycle.phase === 'running'
+        ? 'La carrera está corriendo. Las apuestas abren en la próxima ronda.'
+        : 'Ya tienes un boleto en esta carrera o el mercado está cerrado.'
+      );
+      return;
+    }
+
+    const safeAmount = Math.floor(Number(amount || 0));
+    if (!Number.isFinite(safeAmount) || safeAmount <= 0) {
+      setMessage('Ingresa una cantidad válida de monedas.');
+      return;
+    }
+
+    if ((wallet?.demoBalance || 0) < safeAmount) {
+      setMessage('Monedas insuficientes para realizar esta apuesta.');
+      return;
+    }
+
+    setLoading(true);
+    setMessage('');
+    try {
+      const res = await placeLocalDerbyBet({
+        userId: user.id,
+        raceId: cycle.raceId,
+        raceCode: cycle.raceCode,
+        mode: 'demo',
+        horse,
+        amount: safeAmount,
+      });
+
+      const placedBet = {
+        raceId: cycle.raceId,
+        raceCode: cycle.raceCode,
+        betId: res.bet.id,
+        selectedHorse: horse,
+        amount: safeAmount,
+      };
+
+      setUserBetsByRace(prev => ({ ...prev, [cycle.raceId]: placedBet }));
+      setMessage(`Boleto generado: ${res.bet.id}. Espera el cierre de apuestas; la carrera correrá 60 segundos.`);
+      await refreshLocal();
+      await loadLocalBets();
+      syncNowQuietly();
+    } catch (err) {
+      setMessage(normalizeError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return <div className="player-screen">
+    <PlayerSummary wallet={wallet} pendingCount={pendingCount} lastBet={lastBet} lastResult={lastResult} />
+
+    <section className="game-hero glass cycle-hero">
+      <div className="game-title-block">
+        <div className="big-icon text-icon">DERBY</div>
+        <div>
+          <h2>Derby Minute</h2>
+          <p>60 segundos para apostar, 60 segundos de carrera. El resultado oficial se revela al finalizar cada carrera.</p>
+        </div>
+      </div>
+      <div className="cycle-status">
+        <span className={cycle.phase === 'running' ? 'live-dot racing' : 'live-dot'}></span>
+        <strong>{cycle.phase === 'betting' ? 'Apuestas abiertas' : 'Carrera en vivo'}</strong>
+        <small>{cycle.raceCode}</small>
+      </div>
+    </section>
+
+    <div className="cycle-steps glass">
+      <div className={cycle.phase === 'betting' ? 'step active' : 'step done'}><span>01</span><strong>Apuestas</strong><small>60 segundos</small></div>
+      <div className="step-line"></div>
+      <div className={cycle.phase === 'running' ? 'step active' : 'step'}><span>02</span><strong>Carrera</strong><small>60 segundos</small></div>
+      <div className="step-line"></div>
+      <div className={lastResult ? 'step done' : 'step'}><span>03</span><strong>Resultado</strong><small>Top 3</small></div>
+    </div>
+
+    <div className="bet-panel glass">
+      <div className="bet-field">
+        <label>Cantidad de monedas</label>
+        <input type="number" min={1} value={amount} onChange={e => setAmount(Number(e.target.value))} disabled={!bettingOpen || loading} />
+      </div>
+      <div className="bet-field">
+        <label>Caballo</label>
+        <select value={horse} onChange={e => setHorse(Number(e.target.value))} disabled={!bettingOpen || loading}>
+          {HORSES.map(n => <option key={n} value={n}>Caballo #{n}</option>)}
+        </select>
+      </div>
+      <button className="primary bet-button" onClick={bet} disabled={!bettingOpen || loading}>
+        {loading ? 'Generando boleto...' : currentUserBet ? 'Boleto generado' : cycle.phase === 'running' ? 'Apuestas cerradas' : `Apostar ${coins(amount)} monedas al #${horse}`}
+      </button>
+    </div>
+
+    <RaceTrack cycle={cycle} resultOrder={resultOrder} selectedHorse={currentUserBet?.selectedHorse || horse} lastResult={lastResult} />
+    {currentUserBet && cycle.phase === 'betting' && <div className="result-card neutral"><strong>Boleto activo:</strong> Caballo #{currentUserBet.selectedHorse} - {coins(currentUserBet.amount)} monedas. La carrera inicia cuando cierre el contador.</div>}
+
+    {message && <div className={`result-card ${message.startsWith('GANASTE') ? 'win' : message.startsWith('PERDISTE') ? 'lose' : 'neutral'}`}>
+      <strong>{message}</strong>
+    </div>}
+  </div>;
+}
+
+function HistoryPanel({ userId }: { userId: string }) {
+  const [bets, setBets] = useState<LocalDerbyBet[]>([]);
+  const [movements, setMovements] = useState<LocalLedgerMovement[]>([]);
+
+  async function load() {
+    setBets(await localDerbyHistory(userId));
+    const all = await dbGetAll<LocalLedgerMovement>('ledger_movements');
+    setMovements(all.filter(m => m.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+  }
+
+  useEffect(() => {
+    load();
+    const t = setInterval(load, 3000);
+    return () => clearInterval(t);
+  }, [userId]);
+
+  return <section className="glass history-card clean-history">
+    <h2><History /> Historial de jugadas</h2>
+    {bets.length === 0 ? <p>No hay boletos registrados.</p> : bets.map(b => <div className="history-row" key={b.id}>
+      <strong>{b.raceCode}</strong>
+      <span>Caballo #{b.selectedHorse}</span>
+      <span>{coins(b.amount)} monedas</span>
+      <span className={b.status === 'won' ? 'pos' : b.status === 'lost' ? 'neg' : ''}>{b.status === 'won' ? 'Ganó' : b.status === 'lost' ? 'Perdió' : 'Pendiente'}</span>
+      <small>{new Date(b.createdAt).toLocaleString()}</small>
+    </div>)}
+    {movements.length > 0 && <small className="muted">Jugadas registradas: {movements.length}</small>}
+  </section>;
+}
+
+export function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [localWallet, setLocalWallet] = useState<LocalWalletState | null>(null);
+  const [tab, setTab] = useState<Tab>('games');
+  const [loading, setLoading] = useState(true);
+
+  async function refreshLocal(userId = user?.id) {
+    if (!userId) return;
+    const wallet = await getLocalWallet(userId);
+    setLocalWallet(wallet);
+  }
+
+  async function bootstrap(u: User, w: Wallet) {
+    setUser(u);
+    const local = await initLocalWallet(u.id, {
+      demoBalance: w.demoBalance,
+      realBalance: w.realBalance,
+      giftLocked: w.giftLocked,
+    });
+    setLocalWallet(local);
+  }
+
+  useEffect(() => {
+    api.me().then(res => bootstrap(res.user, res.wallet)).catch(() => null).finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="loading"><Sparkles className="spin" /> Cargando juego...</div>;
+  if (!user) return <Login onLogin={(u, w) => { bootstrap(u, w); }} />;
+
+  return <div className="app-shell clean-player-shell">
+    <header className="topbar glass clean-topbar">
+      <div className="brand"><span className="brand-derby">DERBY</span><div><strong>Juega123 Derby</strong><small>Monedas + carreras automáticas</small></div></div>
+      <nav>
+        <button className={tab === 'games' ? 'active' : ''} onClick={() => setTab('games')}><Trophy size={17}/> Derby</button>
+        <button className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}><History size={17}/> Historial</button>
+      </nav>
+      <button className="ghost" onClick={() => { logout(); location.reload(); }}><LogOut size={18}/> Salir</button>
+    </header>
+
+    <main className="clean-main">
+      {tab === 'games' && <DerbyGame user={user} wallet={localWallet} refreshLocal={() => refreshLocal(user.id)} />}
+      {tab === 'history' && <HistoryPanel userId={user.id} />}
+    </main>
+  </div>;
+}

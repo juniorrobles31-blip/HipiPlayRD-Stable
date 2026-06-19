@@ -1,0 +1,79 @@
+import resultTop3Bg from '../../assets/results-top3-bg.png';
+
+type ServerWinner =
+  | number
+  | string
+  | {
+      id?: number | string;
+      horseId?: number | string;
+      horse?: number | string;
+      number?: number | string;
+      selectedHorse?: number | string;
+    };
+
+type ServerRaceResultPanelProps = {
+  winners: ServerWinner[];
+  selectedHorse?: number;
+  betAmount?: number;
+  secondsLeft?: number;
+  serverPlayerResult?: any;
+};
+
+function normalizeWinner(winner: ServerWinner): number | null {
+  if (typeof winner === 'number') return winner;
+
+  if (typeof winner === 'string') {
+    const parsed = Number(winner);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  if (winner && typeof winner === 'object') {
+    const value =
+      winner.id ??
+      winner.horseId ??
+      winner.horse ??
+      winner.number ??
+      winner.selectedHorse;
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+}
+
+export function ServerRaceResultPanel({
+  winners
+}: ServerRaceResultPanelProps) {
+  const officialWinners = (Array.isArray(winners) ? winners : [])
+    .map(normalizeWinner)
+    .filter((winner): winner is number => winner !== null && Number.isFinite(winner) && winner >= 1 && winner <= 99)
+    .slice(0, 3);
+
+  const podium = [
+    { place: '1.º', horse: officialWinners[0] ?? null, className: 'result-marker result-marker-top' },
+    { place: '2.º', horse: officialWinners[1] ?? null, className: 'result-marker result-marker-middle' },
+    { place: '3.º', horse: officialWinners[2] ?? null, className: 'result-marker result-marker-bottom' }
+  ];
+
+  return (
+    <section className="server-results-fullscreen-image">
+      <div className="server-results-stage-image">
+        <img
+          src={resultTop3Bg}
+          alt="Resultado oficial Top 3"
+          className="server-results-bg-image"
+        />
+
+        <div className="server-results-image-overlay">
+          {podium.map((item) => (
+            <div key={item.place} className={item.className}>
+              <span>{item.place}</span>
+              <strong>{item.horse ? `#${item.horse}` : '-'}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
