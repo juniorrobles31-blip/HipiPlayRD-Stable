@@ -1,4 +1,0 @@
-.exit
-console.log(ethers.formatEther(await ethers.provider.getBalance(deployer.address)));
-console.log(await deployer.getAddress());
-const [deployer] = await ethers.getSigners();

@@ -1,3 +1,0 @@
-(function () {
-  console.log("HipiPlay pwa-install.js desactivado temporalmente.");
-})();

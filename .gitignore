@@ -1,9 +1,42 @@
-﻿node_modules/
+﻿
+# Dependencias y builds
+node_modules/
 dist/
 build/
-.vite/
-.env
-.env.local
+.cache/
+cache/
+
+# Hardhat / blockchain build
+artifacts/
+typechain-types/
+coverage/
+coverage.json
+
+# Backups generados por parches
+*.bak
+*.bak_*
+*.backup
+*.backup_*
+*.backup_*
+*.old
+*_backup_*
+src_backup_before_*/
+apps/web/src_backup_before_*/
+apps/web/backups/
+
+# Datos locales / sensibles / runtime
+apps/api/data/
+*.secret
+*.key
+*.pem
+*.env.local
+*.env.development.local
+*.env.production.local
+
+# Logs y temporales
+*.log
+diagnostico_*.txt
+fragmentos_*.txt
 .DS_Store
 Thumbs.db
-*.log
+
