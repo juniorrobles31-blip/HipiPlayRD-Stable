@@ -11,6 +11,14 @@ type ServerWinner =
       selectedHorse?: number | string;
     };
 
+const horseColorMap: Record<number, string> = {
+  1: '#ff3b3b',   // rojo
+  2: '#3b82ff',   // azul
+  3: '#22c55e',   // verde
+  4: '#ffd83d',   // amarillo más brillante
+  5: '#8b5cf6',   // morado/negro visual
+  6: '#ff7a1a'    // naranja/blanco visual
+};
 type ServerRaceResultPanelProps = {
   winners: ServerWinner[];
   selectedHorse?: number;

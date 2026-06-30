@@ -44,3 +44,27 @@ Thumbs.db
 # Local env y backups de videos
 apps/api/.env
 apps/web/public/race-videos/backup_clean_*/
+
+# HipiPlay sensitive/runtime files
+**/data/
+**/backups/
+**/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
+**/*.db
+**/*.log
+**/*.pid
+**/*.env
+**/.env
+**/custody-master-key.hex
+**/custody-wallets-bsc.json
+**/payment-console.config.json
+**/payment-console-domain-access-*.txt
+**/main-admin-token.txt
+**/credited-paid-intents.json
+**/custody-real-deposits-detected.json
+**/custody-balance-audit.json
+**/custody-unpaid-cleanup-audit.json
+**/custody-tron-deposit-detector-audit.json
+**/custody-withdrawal-requests.json
+**/custody-withdrawal-requests-audit.json

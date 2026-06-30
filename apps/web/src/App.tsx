@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
-import { ArrowLeftRight, Download, HandCoins, History, Landmark, LogOut, Menu, MoveRight, ShoppingCart, Sparkles, Trophy, Wallet as WalletIcon } from 'lucide-react';
+import { ArrowLeftRight, Download, HandCoins, History, Landmark, LogOut, Menu, MoveRight, ShoppingCart, Sparkles, Trophy, UserRound, Wallet as WalletIcon } from 'lucide-react';
 import { syncLocalUserAfterLogin } from './localUserSync';
 import { clearLocalUser, getLocalUser } from './localUserDb';
 import { api, logout, setToken, Wallet } from './api';
@@ -25,6 +25,7 @@ import { syncPendingQueue } from './syncQueue';
 
 import { ServerRaceResultPanel } from './components/raceVideoEngine/ServerRaceResultPanel';
 import { HorseBetGrid } from './components/HorseBetGrid';
+import { DemoProfileModal } from './components/DemoProfileModal';
 
 
 import {
@@ -46,6 +47,155 @@ import {
   getMarketStatus,
   MARKET_CONFIG,
 } from './marketEngine';
+
+
+
+
+
+
+function hipiInstallCopyAddressHandler(): void {
+  try {
+    if (typeof document === "undefined") return;
+
+    const g = globalThis as any;
+
+    if (g.__hipiCopyAddressHandlerInstalled) return;
+
+    g.__hipiCopyAddressHandlerInstalled = true;
+
+    document.addEventListener(
+      "click",
+      function (event) {
+        const target = event.target as HTMLElement | null;
+
+        if (!target) return;
+
+        const box = target.closest(".hipi-payment-summary, pre, div") as HTMLElement | null;
+
+        if (!box) return;
+
+        const content = String(box.textContent || "");
+
+        if (
+          content.includes("Copiar dirección de pago") ||
+          content.includes("Dirección de pago")
+        ) {
+          hipiCopyPaymentAddress("");
+        }
+      },
+      true
+    );
+  } catch {}
+}
+
+hipiInstallCopyAddressHandler();
+
+function hipiMaskWallet(value: unknown, visible = 8): string {
+  const raw = String(value || "").trim();
+
+  if (!raw) return "pendiente";
+  if (raw.length <= visible) return raw;
+
+  return "••••" + raw.slice(-visible);
+}
+
+
+
+function hipiShortRef(value: unknown): string {
+  const raw = String(value || "").trim();
+
+  if (!raw) return "pendiente";
+
+  return "REF-" + raw.slice(-8);
+}
+
+
+
+function hipiPaymentStatus(value: unknown): string {
+  const raw = String(value || "").trim().toUpperCase();
+
+  if (raw === "PAID" || raw === "CONFIRMED") return "Pago confirmado";
+  if (raw === "Pendiente de pago" || raw === "PENDING") return "Pendiente de pago";
+  if (raw === "EXPIRED") return "Expirada";
+  if (raw === "CANCELLED" || raw === "CANCELED") return "Cancelada";
+
+  return raw || "Pendiente de pago";
+}
+
+
+
+function hipiDepositAddressFromIntent(intent: any): string {
+  return String(
+    intent?.depositAddress ||
+    intent?.vaultAddress ||
+    intent?.vault_address ||
+    intent?.deposit_address ||
+    intent?.address ||
+    ""
+  ).trim();
+}
+
+
+
+function hipiCleanDepositText(value: unknown): string {
+  let msg = String(value || "").trim();
+
+  if (!msg) return "";
+
+  const foundAddresses: string[] = [];
+
+  msg = msg.replace(/0x[a-fA-F0-9]{40}/g, function (addr) {
+    foundAddresses.push(addr);
+    return hipiMaskWallet(addr, 8);
+  });
+
+  if (foundAddresses.length > 0) {
+    try {
+      (globalThis as any).__hipiLastPaymentAddress =
+        foundAddresses[foundAddresses.length - 1];
+    } catch {}
+  }
+
+  msg = msg.replace(/Pendiente de pago/g, "Pendiente de pago");
+  msg = msg.replace(/PAID/g, "Pago confirmado");
+
+  msg = msg.replace(/Intent:\s*(PAY-[A-Z0-9-]+)/gi, function (_m, id) {
+    return "Referencia: " + hipiShortRef(id);
+  });
+
+  msg = msg.replace(/Wallet\s+origen:\s*/gi, "");
+  msg = msg.replace(/Tu\s+wallet:\s*/gi, "");
+  msg = msg.replace(/Enviar\s+USDT\s+a\s+esta\s+wallet\s+destino:\s*/gi, "Dirección de pago: ");
+  msg = msg.replace(/Cuando el pago sea detectado,[\s\S]*?fichas compradas\./gi, "Al confirmarse el pago, tus fichas compradas se acreditarán automáticamente.");
+
+  const fullAddress = String((globalThis as any).__hipiLastPaymentAddress || "").trim();
+
+  if (fullAddress && !msg.includes("Copiar dirección de pago")) {
+    msg =
+      msg.trim() +
+      "\n\nCopiar dirección de pago • " +
+      hipiMaskWallet(fullAddress, 8);
+  }
+
+  return msg;
+}
+
+
+
+function hipiCopyPaymentAddress(address: unknown): void {
+  const raw =
+    String(address || "").trim() ||
+    String((globalThis as any).__hipiLastPaymentAddress || "").trim();
+
+  if (!raw) return;
+
+  try {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(raw);
+    }
+  } catch {}
+}
+
 
 type User = { id: string; username: string };
 type Tab = 'games' | 'history';
@@ -169,11 +319,11 @@ function addUserBetToExposure(exposure: DerbyMarketExposure, bet: UserRaceBet | 
 function normalizeError(err: unknown) {
   const raw = err instanceof Error ? err.message : 'No se pudo generar el boleto.';
   return raw
-    .replace('Saldo local insuficiente en la wallet del telÃƒÆ’Ã‚Â©fono.', 'Monedas insuficientes.')
+    .replace('Saldo local insuficiente en la wallet del teléfono.', 'Monedas insuficientes.')
     .replace('Saldo local insuficiente en la wallet del dispositivo.', 'Monedas insuficientes.')
-    .replace('Monto invÃƒÆ’Â¡lido.', 'Cantidad invÃƒÆ’Â¡lida.')
-    .replace('Apuestas cerradas para esta carrera. Espera la prÃƒÆ’Ã‚Â³xima.', 'Las apuestas estÃƒÆ’Â¡n cerradas. Espera la prÃƒÆ’Ã‚Â³xima ventana.')
-    .replace('Ya tienes un boleto pendiente en esta carrera. Espera el resultado o la prÃƒÆ’Ã‚Â³xima carrera.', 'Ya tienes un boleto activo en esta carrera.');
+    .replace('Monto invÃƒÆ’Ã†’Ã‚¡lido.', 'Cantidad invÃƒÆ’Ã†’Ã‚¡lida.')
+    .replace('Apuestas cerradas para esta carrera. Espera la próxima.', 'Las apuestas estÃƒÆ’Ã†’Ã‚¡n cerradas. Espera la próxima ventana.')
+    .replace('Ya tienes un boleto pendiente en esta carrera. Espera el resultado o la próxima carrera.', 'Ya tienes un boleto activo en esta carrera.');
 }
 
 
@@ -573,6 +723,21 @@ function WalletActionsPanel({ user, onAction }: { user: User; onAction: (action:
   const player = user as any;
 
   useEffect(() => {
+    const shouldOpenRaceDirectly =
+      localStorage.getItem('hipiplay_demo_entry_target') === 'race' ||
+      document.body.classList.contains('hipiplay-race-mode');
+
+    if (shouldOpenRaceDirectly) {
+      document.body.classList.remove('hipiplay-home-mode');
+      document.body.classList.add('hipiplay-race-mode');
+
+      window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+        detail: { view: 'race' }
+      }));
+
+      return;
+    }
+
     document.body.classList.add('hipiplay-home-mode');
     document.body.classList.remove('hipiplay-race-mode');
 
@@ -581,16 +746,21 @@ function WalletActionsPanel({ user, onAction }: { user: User; onAction: (action:
     }));
   }, []);
 
-  function openAction(action: WalletAction | 'history-home' | 'logout-home') {
+  function openAction(action: WalletAction | 'profile-home' | 'history-home' | 'logout-home') {
     if (action === 'history-home') {
       window.dispatchEvent(new CustomEvent('hipiplay-request-history'));
       return;
     }
 
+    if (action === 'profile-home') {
+      window.dispatchEvent(
+        new CustomEvent('hipiplay-request-profile')
+      );
+      return;
+    }
+
     if (action === 'logout-home') {
-      clearLocalUser();
-      logout();
-      location.reload();
+      window.dispatchEvent(new CustomEvent('hipiplay-request-logout'));
       return;
     }
 
@@ -602,65 +772,92 @@ function WalletActionsPanel({ user, onAction }: { user: User; onAction: (action:
         detail: { view: 'race' }
       }));
 
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         const raceSection = document.querySelector('.horse-bet-panel, .race-panel, .race-card, .horse-grid, .horses-grid, .race-horses-grid, .horse-select-grid');
+
         if (raceSection) {
-          raceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          raceSection.scrollIntoView({ behavior: 'auto', block: 'start' });
         } else {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: 'auto' });
         }
-      }, 120);
+      });
 
       return;
     }
 
     onAction(action);
 
-    window.dispatchEvent(new CustomEvent('hipiplay-wallet-action', {
+    window.dispatchEvent(new CustomEvent('hipiplay-action-open', {
       detail: {
         action,
-        userId: player?.id,
+        playerId: player?.id,
         username: player?.username
       }
     }));
   }
 
-  const actions: Array<{ action: WalletAction | 'history-home' | 'logout-home'; label: string; caption: string; icon: JSX.Element }> = [
-    { action: 'transfer', label: 'TRANSFERENCIA', caption: 'ENTRE USUARIOS', icon: <ArrowLeftRight size={54} /> },
-    { action: 'bet', label: 'APUESTA', caption: 'CARRERAS', icon: <Trophy size={54} /> },
-    { action: 'withdraw', label: 'RETIRO USDT', caption: 'BSC/BEP20', icon: <Landmark size={54} /> },
-    { action: 'deposit', label: 'RECARGA USDT', caption: 'COMPRAR COIN', icon: <WalletIcon size={54} /> },
-    { action: 'sell-p2p', label: 'VENTA P2P', caption: 'PUBLICAR OFERTA', icon: <HandCoins size={54} /> },
-    { action: 'buy-p2p', label: 'COMPRA P2P', caption: 'VER OFERTAS', icon: <ShoppingCart size={54} /> },
-    { action: 'history-home', label: 'HISTORIAL', caption: 'CARRERAS', icon: <History size={54} /> },
-    { action: 'logout-home', label: 'SALIR', caption: 'CERRAR SESI?N', icon: <LogOut size={54} /> }
+  const actions: Array<{ action: WalletAction | 'profile-home' | 'history-home' | 'logout-home'; label: string; caption: string; icon: JSX.Element; featured?: boolean }> = [
+    { action: 'bet', label: 'Apuesta', caption: 'En 1 minuto', icon: <Trophy size={38} />, featured: true },
+    { action: 'deposit', label: 'Recarga', caption: 'Comprar coin', icon: <WalletIcon size={38} />, featured: true },
+    { action: 'transfer', label: 'Transferir', caption: 'Entre usuarios', icon: <ArrowLeftRight size={34} /> },
+    { action: 'withdraw', label: 'Retiro USDT', caption: 'Wallet personal', icon: <Landmark size={34} /> },
+    { action: 'sell-p2p', label: 'Venta P2P', caption: 'Publicar oferta', icon: <HandCoins size={34} /> },
+    { action: 'buy-p2p', label: 'Compra P2P', caption: 'Ver ofertas', icon: <ShoppingCart size={34} /> },
+    { action: 'profile-home', label: 'Perfil', caption: 'Mi cuenta', icon: <UserRound size={34} /> },
+    { action: 'history-home', label: 'Historial', caption: 'Jugadas', icon: <History size={34} /> },
+    { action: 'logout-home', label: 'Salir', caption: 'Cerrar sesión', icon: <LogOut size={34} /> }
   ];
 
   return (
-    <section className="wallet-mobile-home-shell" aria-label="Menú principal HipiPlay">
-      <div className="wallet-phone-menu">
-        <div className="wallet-phone-brand">
-          <img src={hipiPlayLogo} alt="HipiPlay" className="wallet-phone-logo" />
+    <section className="hipiplay-main-menu-v2">
+      <div className="hipiplay-main-menu-brand">
+        <img src={hipiPlayLogo} alt="HipiPlay" />
+        <div>
           <h1>HipiPlay</h1>
-          <p>Centro de monedas</p>
-        </div>
-
-        <div className="wallet-phone-grid">
-          {actions.map(item => (
-            <button
-              key={item.action}
-              type="button"
-              className="wallet-action-card"
-              onClick={() => openAction(item.action)}
-            >
-              <span className="wallet-action-icon">{item.icon}</span>
-              <strong>{item.label}</strong>
-              <small>{item.caption}</small>
-            </button>
-          ))}
         </div>
       </div>
-</section>
+
+      <div className="hipiplay-main-menu-user-id">
+        <span>Tu ID</span>
+        <strong>{String(user.username || '').toUpperCase()}</strong>
+        <small>Úsalo para recibir monedas</small>
+      </div>
+
+
+      <div className="hipiplay-main-menu-feature-row">
+        {actions.filter(action => action.featured).map((item) => (
+          <button
+            key={item.action}
+            type="button"
+            className="hipiplay-main-menu-feature-card"
+            onClick={() => openAction(item.action)}
+          >
+            <span className="hipiplay-main-menu-feature-icon">{item.icon}</span>
+            <span className="hipiplay-main-menu-feature-text">
+              <strong>{item.label}</strong>
+              <small>{item.caption}</small>
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <div className="hipiplay-main-menu-grid-v2">
+        {actions.filter(action => !action.featured).map((item) => (
+          <button
+            key={item.action}
+            type="button"
+            className="hipiplay-main-menu-card-v2"
+            onClick={() => openAction(item.action)}
+          >
+            <span className="hipiplay-main-menu-icon-v2">{item.icon}</span>
+            <span className="hipiplay-main-menu-text-v2">
+              <strong>{item.label}</strong>
+              <small>{item.caption}</small>
+            </span>
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -683,6 +880,12 @@ function WalletActionModal({
   const [price, setPrice] = useState('1');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
+  const [depositIntent, setDepositIntent] = useState<any | null>(null);
+  const [depositDetectMessage, setDepositDetectMessage] = useState('');
+  const [depositDetectStatus, setDepositDetectStatus] = useState<'idle' | 'valid' | 'warning' | 'invalid'>('idle');
+  const [depositDetectedLabel, setDepositDetectedLabel] = useState('');
+  const [depositDetectedNetwork, setDepositDetectedNetwork] = useState('');
+  const [depositSourceWallet, setDepositSourceWallet] = useState('');
   const [offers, setOffers] = useState<any[]>([]);
   const [mySales, setMySales] = useState<any[]>([]);
   const [sellView, setSellView] = useState<'menu' | 'new' | 'active'>('menu');
@@ -703,10 +906,10 @@ function WalletActionModal({
   };
 
   const subtitles: Record<WalletAction, string> = {
-    transfer: 'Envía monedas internas a otro usuario.',
+    transfer: 'Envía monedas usando el ID de 5 números del destinatario.',
     bet: 'Entrar a la pantalla de apuestas.',
-    withdraw: 'Solicita retiro USDT por red BSC/BEP20.',
-    deposit: 'Genera una orden de recarga USDT.',
+    withdraw: 'Solicita retiro USDT hacia tu wallet personal.',
+    deposit: 'Ingresa tu wallet y el monto. Generaremos una dirección segura para completar tu recarga.',
     'sell-p2p': 'Elige si quieres publicar una nueva venta o revisar tus ventas activas.',
     'buy-p2p': 'Consulta ofertas P2P disponibles.'
   };
@@ -740,6 +943,70 @@ function WalletActionModal({
 
     const value = Number(raw);
     return Number.isFinite(value) ? value.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '0';
+  }
+
+  function detectDepositNetworkFromWallet(rawWallet: string) {
+    const value = String(rawWallet || '').trim();
+
+    if (!value) {
+      return {
+        network: '',
+        networkCode: '',
+        label: '',
+        status: 'idle' as const,
+        message: 'Escribe tu wallet para detectar la carretera.'
+      };
+    }
+
+    if (/^0x[a-fA-F0-9]{40}$/.test(value)) {
+      return {
+        network: 'BSC',
+        networkCode: 'BSC_BEP20',
+        label: 'BSC / BEP20',
+        status: 'valid' as const,
+        message: 'Carretera disponible.'
+      };
+    }
+
+    if (/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(value)) {
+      return {
+        network: 'TRON',
+        networkCode: 'TRON_TRC20',
+        label: 'TRON / TRC20',
+        status: 'valid' as const,
+        message: 'Carretera disponible.'
+      };
+    }
+
+    if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value)) {
+      return {
+        network: 'SOLANA',
+        networkCode: '',
+        label: 'Solana',
+        status: 'warning' as const,
+        message: 'Solana no está disponible en este momento.'
+      };
+    }
+
+    return {
+      network: '',
+      networkCode: '',
+      label: '',
+      status: 'invalid' as const,
+      message: 'No pudimos identificar la carretera de esa wallet.'
+    };
+  }
+
+  function updateDepositWalletDetection(nextWallet: string) {
+    const detected = detectDepositNetworkFromWallet(nextWallet);
+
+    setDepositSourceWallet(nextWallet);
+    setDepositDetectedNetwork(detected.network);
+    setDepositDetectedLabel(detected.label);
+    setDepositDetectStatus(detected.status);
+    setDepositDetectMessage(detected.message);
+    setDepositIntent(null);
+    setStatus('');
   }
 
   async function postJson(url: string, payload: any) {
@@ -830,15 +1097,32 @@ function WalletActionModal({
   
   
   async function validateTargetUser() {
-    const query = targetUser.trim();
+    const rawQuery = targetUser
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, '');
 
     setResolvedTargetUser(null);
 
-    if (!query) {
+    if (!rawQuery) {
       setTargetUserStatus('idle');
       setTargetUserMessage('');
       return null;
     }
+
+    const numericId = rawQuery.replace(/^ID/, '');
+
+    if (!/^\d{5}$/.test(numericId)) {
+      setTargetUserStatus('invalid');
+      setTargetUserMessage(
+        'El ID debe contener exactamente 5 números. Ejemplo: 12261.'
+      );
+      return null;
+    }
+
+    const query = numericId;
+
+    setTargetUser(`ID${numericId}`);
 
     setTargetUserStatus('checking');
     setTargetUserMessage('Validando usuario...');
@@ -856,8 +1140,13 @@ function WalletActionModal({
       }
 
       setResolvedTargetUser(data.user);
+      setTargetUser(
+        String(data.user.username || `ID${numericId}`).toUpperCase()
+      );
       setTargetUserStatus('valid');
-      setTargetUserMessage(`Usuario validado: ${data.user.username}`);
+      setTargetUserMessage(
+        `ID validado correctamente: ${data.user.username}`
+      );
 
       return data.user;
     } catch (error) {
@@ -868,31 +1157,45 @@ function WalletActionModal({
     }
   }
   async function requestTransferPasskeyProof(
-    purpose: 'COIN_TRANSFER_CREATE' | 'COIN_TRANSFER_CONFIRM',
+    purpose: 'COIN_TRANSFER_COMPLETE',
     payload: Record<string, any>
   ) {
-    const optionsResponse = await postJson('/api/auth/passkey/transfer/options', {
-      username: user.username,
-      purpose,
-      ...payload
-    });
+    const optionsResponse = await postJson(
+      '/api/demo/passkey/auth/options',
+      {
+        existingPlayerId: user.id
+      }
+    );
 
     const credential = await startAuthentication({
       optionsJSON: optionsResponse.options
     } as any);
 
-    const verifyResponse = await postJson('/api/auth/passkey/transfer/verify', {
-      challengeId: optionsResponse.challengeId,
-      credential,
-      username: user.username
-    });
+    const verifyResponse = await postJson(
+      '/api/demo/passkey/auth/verify',
+      {
+        ceremonyId:
+          optionsResponse.ceremonyId,
+
+        response:
+          credential,
+
+        transferIntent: {
+          purpose,
+          ...payload
+        }
+      }
+    );
 
     if (!verifyResponse?.passkeyProof) {
-      throw new Error('No se pudo validar la huella para esta transferencia.');
+      throw new Error(
+        'No se pudo validar la huella para completar la transferencia.'
+      );
     }
 
     return verifyResponse.passkeyProof;
   }
+
   async function submit() {
     const safeAmount = Math.floor(Number(amount || 0));
 
@@ -914,7 +1217,7 @@ function WalletActionModal({
         }
 
         if (!targetUser.trim()) {
-          setStatus('Escribe el usuario o ID destino.');
+          setStatus('Escribe los 5 números del ID destino.');
           setLoading(false);
           return;
         }
@@ -922,75 +1225,104 @@ function WalletActionModal({
         const finalTargetUser = resolvedTargetUser || await validateTargetUser();
 
         if (!finalTargetUser?.playerId) {
-          setStatus('Debes validar un usuario destino registrado antes de transferir.');
+          setStatus('Debes validar correctamente el ID destino antes de transferir.');
           setLoading(false);
           return;
         }
-
         if (transferStep === 'form') {
-          setStatus('Valida tu huella para crear la transferencia.');
+          setPendingTransfer({
+            fromPlayerId:
+              user.id,
 
-          const passkeyProof = await requestTransferPasskeyProof('COIN_TRANSFER_CREATE', {
-            toPlayerId: finalTargetUser.playerId,
-            amount: safeAmount
+            fromName:
+              user.username,
+
+            toPlayerId:
+              finalTargetUser.playerId,
+
+            toName:
+              finalTargetUser.username,
+
+            amount:
+              safeAmount,
+
+            status:
+              'AWAITING_PAYMENT'
           });
 
-          data = await postJson('/api/transfers/coins/create', {
-            fromPlayerId: user.id,
-            toPlayerId: finalTargetUser.playerId,
-            amount: safeAmount,
-            note: 'Transferencia entre usuarios',
-            passkeyProof
-          });
-
-          setPendingTransfer(data.transfer);
           setTransferPasskeyProof('');
           setTransferStep('pending');
-          setStatus('Transferencia pendiente. Cuando recibas el pago, presiona "Pago recibido".');
 
-          await onDone();
+          setStatus(
+            'Transferencia preparada. Cuando recibas el dinero, presiona "Pago recibido".'
+          );
+
           return;
         }
 
         if (transferStep === 'pending') {
-          if (!pendingTransfer?.transferId) {
-            setStatus('No hay una transferencia pendiente para confirmar.');
+          if (
+            !pendingTransfer?.toPlayerId
+          ) {
+            setStatus(
+              'No hay una transferencia preparada.'
+            );
+
             setLoading(false);
             return;
           }
 
-          setStatus('Valida tu huella para confirmar que recibiste el pago.');
+          setStatus(
+            'Confirma con tu huella, rostro o PIN que recibiste el dinero.'
+          );
 
-          const passkeyProof = await requestTransferPasskeyProof('COIN_TRANSFER_CONFIRM', {
-            transferId: pendingTransfer.transferId,
-            toPlayerId: pendingTransfer.toPlayerId || finalTargetUser.playerId,
-            amount: Number(pendingTransfer.amount || safeAmount)
-          });
+          const passkeyProof =
+            await requestTransferPasskeyProof(
+              'COIN_TRANSFER_COMPLETE',
+              {
+                toPlayerId:
+                  pendingTransfer.toPlayerId,
 
-          setTransferPasskeyProof(passkeyProof);
-          setTransferStep('ready');
-          setStatus('Huella validada. Presiona "Â¿Estás seguro?" para completar la transferencia.');
-          return;
-        }
+                amount:
+                  Number(
+                    pendingTransfer.amount ||
+                    safeAmount
+                  )
+              }
+            );
 
-        if (transferStep === 'ready') {
-          if (!pendingTransfer?.transferId || !transferPasskeyProof) {
-            setStatus('Primero debes validar la huella.');
-            setLoading(false);
-            return;
-          }
+          data = await postJson(
+            '/api/transfers/coins/complete',
+            {
+              fromPlayerId:
+                user.id,
 
-          data = await postJson(`/api/transfers/coins/${pendingTransfer.transferId}/confirm`, {
-            confirmingPlayerId: user.id,
-            paymentReceived: true,
-            confirmationText: 'PAGO_RECIBIDO',
-            passkeyProof: transferPasskeyProof
-          });
+              toPlayerId:
+                pendingTransfer.toPlayerId,
 
-          setPendingTransfer(data.transfer);
+              amount:
+                Number(
+                  pendingTransfer.amount ||
+                  safeAmount
+                ),
+
+              note:
+                'Transferencia confirmada después de recibir el dinero',
+
+              passkeyProof
+            }
+          );
+
+          setPendingTransfer(
+            data.transfer
+          );
+
           setTransferPasskeyProof('');
           setTransferStep('confirmed');
-          setStatus('Transferencia confirmada correctamente.');
+
+          setStatus(
+            'Transferencia confirmada correctamente.'
+          );
 
           await onDone();
           return;
@@ -1018,21 +1350,100 @@ function WalletActionModal({
       }
 
       if (action === 'deposit') {
-        data = await postJson('/api/player/deposit/request', {
+        const sourceWallet = depositSourceWallet.trim();
+        const detected = detectDepositNetworkFromWallet(sourceWallet);
+
+        if (depositIntent) {
+          const existingAddress =
+            depositIntent.depositAddress ||
+            depositIntent.address ||
+            depositIntent.walletAddress ||
+            depositIntent.toAddress ||
+            '';
+
+          const existingIntentId =
+            depositIntent.intentId ||
+            depositIntent.orderId ||
+            depositIntent.id ||
+            '';
+
+          setStatus(
+            `Recarga en espera de pago.\n\nCarretera: ${depositIntent.networkLabel || depositIntent.network || depositDetectedLabel}\nWallet origen: ${depositIntent.sourceWallet || sourceWallet}\nIntent: ${existingIntentId || 'PENDIENTE'}\nMonto: ${depositIntent.expectedAmount || depositIntent.amount || safeAmount} USDT\nEstado: ${depositIntent.status || 'Pendiente de pago'}\n\nWallet destino:\n${existingAddress}\n\nNo se generara otra wallet para esta misma recarga.`
+          );
+
+          return;
+        }
+
+        if (!sourceWallet) {
+          setStatus('Escribe tu wallet origen para detectar la carretera.');
+          setLoading(false);
+          return;
+        }
+
+        if (detected.status !== 'valid' || !detected.network) {
+          setDepositDetectedNetwork(detected.network);
+          setDepositDetectedLabel(detected.label);
+          setDepositDetectStatus(detected.status);
+          setDepositDetectMessage(detected.message);
+
+          setStatus(detected.message);
+          setLoading(false);
+          return;
+        }
+
+        data = await postJson('/blockchain-pay/api/public/intents', {
           playerId: user.id,
           userId: user.id,
+          visibleId: user.username,
           amount: safeAmount,
-          network: 'BSC',
-          token: 'USDT'
+          network: detected.network,
+          networkCode: detected.networkCode,
+          networkLabel: detected.label,
+          token: 'USDT',
+          tokenSymbol: 'USDT',
+          sourceWallet,
+          customerWallet: sourceWallet,
+          fromAddress: sourceWallet,
+          pwa: 'HipiPlay'
         });
 
-        const order = data.order || data.deposit || data;
-        const payAddress = order.address || order.depositAddress || order.walletAddress || order.toAddress || '';
-        const orderId = order.orderId || order.id || data.orderId || '';
+        const order = data.intent || data.order || data.deposit || data;
+
+        const payAddress =
+          order.address ||
+          order.depositAddress ||
+          order.walletAddress ||
+          order.toAddress ||
+          '';
+
+        const intentId =
+          order.intentId ||
+          order.orderId ||
+          order.id ||
+          data.intentId ||
+          data.orderId ||
+          '';
+
+        const normalizedOrder = {
+          ...order,
+          intentId,
+          depositAddress: payAddress,
+          sourceWallet,
+          network: detected.network,
+          networkCode: detected.networkCode,
+          networkLabel: detected.label,
+          token: 'USDT',
+          expectedAmount: order.expectedAmount || order.amount || safeAmount,
+          status: order.status || 'Pendiente de pago'
+        };
+
+        setDepositIntent(normalizedOrder);
 
         setStatus(
-          `Orden de recarga creada.${orderId ? `\nOrden: ${orderId}` : ''}${payAddress ? `\nDirección: ${payAddress}` : ''}`
+          `Recarga creada.\n\nCarretera: ${detected.label}\nWallet origen: ${sourceWallet}\nIntent: ${intentId || 'PENDIENTE'}\nMonto: ${normalizedOrder.expectedAmount} USDT\nEstado: ${normalizedOrder.status}\n\nDirección de pago:\n${payAddress}\n\nAl confirmarse el pago, tus fichas compradas se acreditarán automáticamente.`
         );
+
+        return;
       }
 
       if (action === 'sell-p2p') {
@@ -1173,30 +1584,61 @@ function WalletActionModal({
 
         {action === 'transfer' && (
           <>
+            <div className="transfer-current-user-id">
+              <span>Tu ID para recibir monedas</span>
+              <strong>{String(user.username || '').toUpperCase()}</strong>
+            </div>
+
             <label>
-              Usuario destino
+              ID destino
+
               <div className={`transfer-user-check ${targetUserStatus}`}>
                 <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={7}
                   value={targetUser}
+                  disabled={transferStep !== 'form' || loading}
                   onChange={e => {
-                    setTargetUser(e.target.value);
+                    const nextValue = e.target.value
+                      .toUpperCase()
+                      .replace(/\s+/g, '')
+                      .slice(0, 7);
+
+                    setTargetUser(nextValue);
                     setTargetUserStatus('idle');
                     setTargetUserMessage('');
                     setResolvedTargetUser(null);
                   }}
                   onBlur={validateTargetUser}
-                  placeholder="usuario123"
+                  placeholder="12261 o ID12261"
                 />
-                {targetUserStatus === 'checking' && <span className="transfer-user-badge checking">...</span>}
-                {targetUserStatus === 'valid' && <span className="transfer-user-badge valid">âœ“</span>}
-                {targetUserStatus === 'invalid' && <span className="transfer-user-badge invalid">!</span>}
+
+                {targetUserStatus === 'checking' && (
+                  <span className="transfer-user-badge checking">...</span>
+                )}
+
+                {targetUserStatus === 'valid' && (
+                  <span className="transfer-user-badge valid">✓</span>
+                )}
+
+                {targetUserStatus === 'invalid' && (
+                  <span className="transfer-user-badge invalid">!</span>
+                )}
               </div>
+
+              <small className="transfer-id-help">
+                Escribe solamente los cinco números del destinatario.
+              </small>
+
               {targetUserMessage && (
                 <small className={`transfer-user-message ${targetUserStatus}`}>
                   {targetUserMessage}
                 </small>
               )}
             </label>
+
             <label>
               Cantidad de monedas
               <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} placeholder="100" />
@@ -1211,17 +1653,70 @@ function WalletActionModal({
               <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} placeholder="50" />
             </label>
             <label>
-              Dirección BSC / BEP20
+              Direccion USDT destino
               <input value={address} onChange={e => setAddress(e.target.value)} placeholder="0x..." />
             </label>
           </>
         )}
 
         {action === 'deposit' && (
-          <label>
-            Cantidad USDT a recargar
-            <input type="number" min={1} value={amount} onChange={e => setAmount(e.target.value)} placeholder="100" />
-          </label>
+          <>
+            <label>
+              Wallet origen
+              <input
+                value={depositSourceWallet}
+                disabled={loading || !!depositIntent}
+                onChange={e => updateDepositWalletDetection(e.target.value.trim())}
+                placeholder="0x... wallet desde donde enviaras USDT"
+              />
+            </label>
+
+            {depositDetectStatus !== 'idle' && (
+              <div
+                className="wallet-action-balance"
+                style={{
+                  borderColor: depositDetectStatus === 'valid' ? '#22c55e' : depositDetectStatus === 'warning' ? '#f59e0b' : '#ef4444',
+                  color: depositDetectStatus === 'valid' ? '#22c55e' : depositDetectStatus === 'warning' ? '#f59e0b' : '#ef4444'
+                }}
+              >
+                <strong>
+                  {depositDetectStatus === 'valid' ? 'Red: ' : 'Aviso: '}
+                  {depositDetectedLabel || 'No identificada'}
+                </strong>
+                <small>{depositDetectMessage}</small>
+              </div>
+            )}
+
+            {depositDetectStatus === 'valid' && (
+              <label>
+                Monto a recargar
+                <input
+                  type="number"
+                  min={1}
+                  value={amount}
+                  disabled={loading || !!depositIntent}
+                  onChange={e => {
+                    setAmount(e.target.value);
+                    setDepositIntent(null);
+                    setStatus('');
+                  }}
+                  placeholder="100"
+                />
+              </label>
+            )}
+
+            {depositIntent && (
+              <div className="wallet-action-balance">
+                <div><strong>Recarga creada</strong></div>
+                <small>Carretera: {depositIntent.networkLabel || depositIntent.network || depositDetectedLabel}</small>
+                <small>Estado: {depositIntent.status || 'Pendiente de pago'}</small>
+                <small>Intent: {depositIntent.intentId || depositIntent.orderId || depositIntent.id}</small>
+                <code style={{ display: 'block', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {depositIntent.depositAddress || depositIntent.address || depositIntent.walletAddress || depositIntent.toAddress}
+                </code>
+              </div>
+            )}
+          </>
         )}
 
         {action === 'sell-p2p' && sellView === 'menu' && (
@@ -1328,7 +1823,7 @@ function WalletActionModal({
           </div>
         )}
 
-        {status && <div className="wallet-action-modal-status">{status}</div>}
+        {status && <pre className="wallet-action-modal-status" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{status}</pre>}
 
         <div className="wallet-action-modal-actions">
           <button className="secondary" type="button" onClick={onClose} disabled={loading}>X</button>
@@ -1358,7 +1853,7 @@ function WalletActionModal({
                   ? transferStep === 'pending'
                     ? 'Pago recibido'
                     : transferStep === 'ready'
-                      ? 'Â¿Estás seguro?'
+                      ? 'Ã‚¿Estás seguro?'
                       : transferStep === 'confirmed'
                         ? 'Cerrar'
                         : 'Continuar'
@@ -1428,7 +1923,7 @@ function getRaceLapProgress(cycle: CycleInfo, horse: number, rank: number) {
   const timeSeconds = cycle.phaseElapsed / 1000;
 
   // Movimiento visual abierto: variaciones de ritmo durante toda la carrera.
-  // El resultado oficial sigue siendo el Top 3 interno calculado por menor exposiciÃƒÆ’Ã‚Â³n.
+  // El resultado oficial sigue siendo el Top 3 interno calculado por menor exposición.
   const waveA = seededWave(cycle.seed, horse, timeSeconds, 1) * 0.018;
   const waveB = seededWave(cycle.seed, horse, timeSeconds, 2) * 0.012;
   const surge = seededWave(cycle.seed, horse, timeSeconds * 0.55, 3) * 0.02;
@@ -1436,7 +1931,7 @@ function getRaceLapProgress(cycle: CycleInfo, horse: number, rank: number) {
 
   const packProgress = smoothStep(progress) * 0.92 + visualNoise;
 
-  // El remate solo aparece al final para que no se vea estÃƒÆ’Â¡tico ni predecible.
+  // El remate solo aparece al final para que no se vea estÃƒÆ’Ã†’Ã‚¡tico ni predecible.
   const sprintMix = smoothStep((progress - 0.82) / 0.18);
   const officialFinish = rank === 1
     ? 1.035
@@ -1464,7 +1959,7 @@ function getTrackPoint(cycle: CycleInfo, horse: number, rank: number, running: b
   const lap = running ? getRaceLapProgress(cycle, horse, rank) : 0.004 + horse * 0.002;
   const angle = lap * Math.PI * 2;
 
-  // Carril ovalado, similar a pista hÃƒÆ’Ã‚Â­pica. Cada caballo corre en su propia lÃƒÆ’Ã‚Â­nea.
+  // Carril ovalado, similar a pista hípica. Cada caballo corre en su propia línea.
   const rx = 38.5 + laneIndex * 1.12;
   const ry = 27.5 + laneIndex * 0.72;
   const cx = 50;
@@ -1473,7 +1968,7 @@ function getTrackPoint(cycle: CycleInfo, horse: number, rank: number, running: b
   const x = cx + rx * Math.cos(angle);
   const y = cy + ry * Math.sin(angle);
 
-  // Tangente del ÃƒÆ’Ã‚Â³valo para orientar caballo y jinete con la curva.
+  // Tangente del óvalo para orientar caballo y jinete con la curva.
   const dx = -rx * Math.sin(angle);
   const dy = ry * Math.cos(angle);
   const rotation = Math.atan2(dy, dx) * 180 / Math.PI;
@@ -1765,7 +2260,7 @@ function RaceTrack({ cycle, resultOrder, selectedHorse, lastResult }: { cycle: C
           </div>
         </div>
         <strong>{top3.map((h, i) => `${i + 1}o #${h}`).join('   |   ')}</strong>
-        <small>{userWon === undefined ? 'Carrera finalizada.' : userWon ? 'GANASTE - tu caballo entrÃƒÆ’Ã‚Â³ en el Top 3.' : 'PERDISTE - tu caballo quedÃƒÆ’Ã‚Â³ fuera del Top 3.'}</small>
+        <small>{userWon === undefined ? 'Carrera finalizada.' : userWon ? 'GANASTE - tu caballo entró en el Top 3.' : 'PERDISTE - tu caballo quedó fuera del Top 3.'}</small>
       </div>}
     </div>
 
@@ -1774,13 +2269,13 @@ function RaceTrack({ cycle, resultOrder, selectedHorse, lastResult }: { cycle: C
       <span>
         {running
           ? (photoFinish
-            ? ' los ganadores cruzan la lÃƒÆ’Ã‚Â­nea de meta y desaparecen de la pista para revelar el Top 3 oficial.'
+            ? ' los ganadores cruzan la línea de meta y desaparecen de la pista para revelar el Top 3 oficial.'
             : finalSprint
               ? ' se abre la recta final, los caballos aceleran y el lote se estira antes de la meta.'
-              : ' el grupo corre por carriles, cambia el ritmo y nadie muestra todavÃƒÆ’Ã‚Â­a una ventaja definitiva.')
+              : ' el grupo corre por carriles, cambia el ritmo y nadie muestra todavía una ventaja definitiva.')
           : resultPhase
             ? ' se muestra el Top 3 durante 10 segundos y luego empieza una nueva ventana de apuestas.'
-            : ' los caballos permanecen ocultos en el partidor; al cerrar el contador se abrirÃƒÆ’Â¡n las compuertas.'}
+            : ' los caballos permanecen ocultos en el partidor; al cerrar el contador se abrirÃƒÆ’Ã†’Ã‚¡n las compuertas.'}
       </span>
     </div>
 
@@ -1806,7 +2301,7 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
   const serverRoundRef = useRef<number | null>(null);
   const settledServerResultRef = useRef<string | null>(null);
   const resultHoldTimerRef = useRef<number | null>(null);
-  const [raceScreenActive, setRaceScreenActive] = useState(false);
+  const [raceScreenActive, setRaceScreenActive] = useState(() => localStorage.getItem('hipiplay_demo_entry_target') === 'race' || document.body.classList.contains('hipiplay-race-mode'));
   const [pendingNextServerBet, setPendingNextServerBet] = useState<null | {
     horse: number;
     amount: number;
@@ -1838,6 +2333,27 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
 
     syncRaceScreenActive();
 
+    if (localStorage.getItem('hipiplay_demo_entry_target') === 'race') {
+      localStorage.removeItem('hipiplay_demo_entry_target');
+
+      requestAnimationFrame(() => {
+        document.body.classList.remove('hipiplay-home-mode');
+        document.body.classList.add('hipiplay-race-mode');
+
+        window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+          detail: { view: 'race' }
+        }));
+
+        const raceSection = document.querySelector('.horse-bet-panel, .horse-grid, .horses-grid, .race-horses-grid, .horse-select-grid');
+
+        if (raceSection) {
+          raceSection.scrollIntoView({ behavior: 'auto', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+      });
+    }
+
     window.addEventListener('hipiplay-view-change', syncRaceScreenActive as EventListener);
 
     return () => {
@@ -1854,7 +2370,7 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
     try {
       await syncPendingQueue(20);
     } catch {
-      // La sincronizaciÃƒÆ’Ã‚Â³n no debe interrumpir la carrera.
+      // La sincronización no debe interrumpir la carrera.
     } finally {
       await refreshLocal();
     }
@@ -1966,7 +2482,7 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
         )
       : localCurrentUserBet;
   const currentExposure = exposureForRace(cycle, currentUserBet, cycle.phase === 'running' || cycle.phase === 'result' ? 1 : cycle.bettingProgress);
-  // Resultado interno: se calcula con la exposiciÃƒÆ’Ã‚Â³n del mercado, pero el jugador solo ve el resultado final.
+  // Resultado interno: se calcula con la exposición del mercado, pero el jugador solo ve el resultado final.
   const resultOrder = buildResultOrderFromExposure(currentExposure, cycle.seed);
   const pendingCount = bets.filter(b => b.status === 'pending').length;
   const lastBet = bets[0];
@@ -2024,8 +2540,11 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
     ['BETTING', 'RACE'].includes(serverPhase)
   );
   const isServerResultsPhase = Boolean(
+    raceScreenActive &&
     serverOnline &&
     serverRaceState &&
+    currentUserBet &&
+    currentUserBet.raceId === `server-round-${serverRaceState.roundId}` &&
     serverPhase.startsWith('RESULT')
   );
 
@@ -2121,7 +2640,7 @@ function DerbyGame({ user, wallet, refreshLocal }: { user: User; wallet: LocalWa
   }, [cycle.phase, cycle.raceId, cycle.raceCode, resultOrder]);
 
   useEffect(() => {
-    // La sesiÃƒÆ’Ã‚Â³n del video se limpia desde onFinish, despuÃƒÆ’Ã‚Â©s de mostrar el resultado.
+    // La sesión del video se limpia desde onFinish, después de mostrar el resultado.
   }, [videoRaceSession]);
 useEffect(() => {
     if (cycle.phase !== 'result') return;
@@ -2221,12 +2740,12 @@ function getCurrentWalletBalance() {
 
   async function bet() {
     if (!serverOnline || !serverRaceState) {
-      setMessage('No hay conexiÃƒÆ’Ã‚Â³n con el servidor. No se puede apostar.');
+      setMessage('No hay conexión con el servidor. No se puede apostar.');
       return;
     }
 
     if (serverRaceState.phase !== 'BETTING') {
-      setMessage('Las apuestas estÃƒÆ’Â¡n cerradas. Espera la prÃƒÆ’Ã‚Â³xima ronda.');
+      setMessage('Las apuestas estÃƒÆ’Ã†’Ã‚¡n cerradas. Espera la próxima ronda.');
       return;
     }
 
@@ -2302,6 +2821,25 @@ function getCurrentWalletBalance() {
   }
   }
   const [walletAction, setWalletAction] = useState<WalletAction | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  useEffect(() => {
+    function openProfile() {
+      setProfileOpen(true);
+    }
+
+    window.addEventListener(
+      'hipiplay-request-profile',
+      openProfile
+    );
+
+    return () => {
+      window.removeEventListener(
+        'hipiplay-request-profile',
+        openProfile
+      );
+    };
+  }, []);
 
 
 
@@ -2334,8 +2872,9 @@ function getCurrentWalletBalance() {
     .slice(0, 3);
 return <div className={`player-screen ${isWaitingInCurrentRound ? 'hipiplay-loader-horses-screen' : ''}`}>
     <PlayerSummary wallet={wallet} pendingCount={pendingCount} lastBet={lastBet} lastResult={lastResult} />
-    <WalletActionsPanel user={user} onAction={setWalletAction} />
+    {!raceScreenActive && <WalletActionsPanel user={user} onAction={setWalletAction} />}
 {walletAction && <WalletActionModal action={walletAction} user={user} wallet={wallet} onClose={() => setWalletAction(null)} onDone={async () => { await refreshLocal(); }} />}
+{profileOpen && <DemoProfileModal user={user} wallet={wallet} onClose={() => setProfileOpen(false)} />}
 <div className="horse-bet-panel glass">
       
 
@@ -2411,9 +2950,9 @@ return <div className={`player-screen ${isWaitingInCurrentRound ? 'hipiplay-load
       ) : null
     ) : (
       <section className="server-required-panel glass">
-        <strong>Sin conexiÃƒÆ’Ã‚Â³n con el servidor</strong>
+        <strong>Sin conexión con el servidor</strong>
         <span>
-          Las apuestas, el cronÃƒÆ’Ã‚Â³metro, la carrera y los resultados se mostrarÃƒÆ’Â¡n cuando la PWA sincronice con el servidor central.
+          Las apuestas, el cronómetro, la carrera y los resultados se mostrarÃƒÆ’Ã†’Ã‚¡n cuando la PWA sincronice con el servidor central.
         </span>
       </section>
     )}
@@ -2629,7 +3168,7 @@ function PwaInstallButton() {
         <div className="pwa-install-help-backdrop" onClick={() => setShowInstallHelp(false)}>
           <section className="pwa-install-help-card" onClick={event => event.stopPropagation()}>
             <strong>Instalar HipiPlay</strong>
-            <p>Para instalar la app, toca el menú de Chrome Ã¢â€¹Â® y selecciona <b>Instalar app</b> o <b>Agregar a pantalla principal</b>.</p>
+            <p>Para instalar la app, toca el menú de Chrome ÃƒÂ¢Ã¢â‚¬Â¹Ã‚Â® y selecciona <b>Instalar app</b> o <b>Agregar a pantalla principal</b>.</p>
             <button type="button" onClick={() => setShowInstallHelp(false)}>Entendido</button>
           </section>
         </div>
@@ -2641,6 +3180,7 @@ export function App() {
   const [user, setUser] = useState<User | null>(null);
   const [localWallet, setLocalWallet] = useState<LocalWalletState | null>(null);
   const [tab, setTab] = useState<Tab>('games');
+
   useEffect(() => {
     function openHistoryFromHome() {
       setTab('history');
@@ -2653,7 +3193,38 @@ export function App() {
       window.removeEventListener('hipiplay-request-history', openHistoryFromHome);
     };
   }, []);
-const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    function logoutToDemo() {
+      clearLocalUser();
+      logout();
+
+      localStorage.removeItem('hipiplay_demo_entry_target');
+
+      document.body.classList.remove(
+        'hipiplay-home-mode',
+        'hipiplay-race-mode',
+        'hipiplay-race-fullscreen-phase',
+        'hipiplay-server-race-phase',
+        'hipiplay-server-results-phase'
+      );
+
+      setUser(null);
+      setLocalWallet(null);
+      setTab('games');
+
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    window.addEventListener('hipiplay-request-logout', logoutToDemo);
+
+    return () => {
+      window.removeEventListener('hipiplay-request-logout', logoutToDemo);
+    };
+  }, []);
+
+  const [loading, setLoading] = useState(true);
+  
 async function refreshLocal(userId = user?.id) {
     if (!userId) return;
 
@@ -2706,6 +3277,577 @@ async function refreshLocal(userId = user?.id) {
       })
     );
   }
+  // HIPIPLAY DEMO LOGIN FLOW - START
+  const [demoAccessMode, setDemoAccessMode] = useState<'checking' | 'register' | 'login'>('checking');
+
+  function hipiGetOrCreateInstallationId() {
+    const storageKey = 'hipiplay_installation_id';
+
+    let installationId = localStorage.getItem(storageKey) || '';
+
+    if (!installationId) {
+      installationId =
+        typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : `hipi-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+      localStorage.setItem(storageKey, installationId);
+    }
+
+    return installationId;
+  }
+
+  async function hipiSha256(value: string) {
+    try {
+      if (!crypto.subtle) return '';
+
+      const input = new TextEncoder().encode(value);
+      const digest = await crypto.subtle.digest('SHA-256', input);
+
+      return Array.from(new Uint8Array(digest))
+        .map(byte => byte.toString(16).padStart(2, '0'))
+        .join('');
+    } catch {
+      return '';
+    }
+  }
+
+  async function hipiCollectDeviceSignals() {
+    const navigatorAny = navigator as any;
+
+    let highEntropyValues: Record<string, any> = {};
+
+    try {
+      if (navigatorAny.userAgentData?.getHighEntropyValues) {
+        highEntropyValues =
+          await navigatorAny.userAgentData.getHighEntropyValues([
+            'platform',
+            'platformVersion',
+            'architecture',
+            'bitness',
+            'model'
+          ]);
+      }
+    } catch {
+      highEntropyValues = {};
+    }
+
+    let canvasHash = '';
+
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 280;
+      canvas.height = 80;
+
+      const context = canvas.getContext('2d');
+
+      if (context) {
+        context.textBaseline = 'top';
+        context.font = '16px Arial';
+        context.fillText('HipiPlay dispositivo seguro 2026', 8, 8);
+        context.fillText(`${screen.width}x${screen.height}`, 8, 34);
+
+        canvasHash = await hipiSha256(canvas.toDataURL('image/png'));
+      }
+    } catch {
+      canvasHash = '';
+    }
+
+    let webglVendor = '';
+    let webglRenderer = '';
+
+    try {
+      const webglCanvas = document.createElement('canvas');
+
+      const gl =
+        webglCanvas.getContext('webgl') ||
+        webglCanvas.getContext('experimental-webgl');
+
+      if (gl) {
+        const webgl = gl as WebGLRenderingContext;
+        const debugInfo = webgl.getExtension('WEBGL_debug_renderer_info') as any;
+
+        if (debugInfo) {
+          webglVendor =
+            String(webgl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || '');
+
+          webglRenderer =
+            String(webgl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '');
+        }
+      }
+    } catch {
+      webglVendor = '';
+      webglRenderer = '';
+    }
+
+    const platformVersion =
+      String(highEntropyValues.platformVersion || '');
+
+    return {
+      userAgent: navigator.userAgent || '',
+
+      platform:
+        String(
+          highEntropyValues.platform ||
+          navigatorAny.platform ||
+          ''
+        ),
+
+      platformVersionMajor:
+        platformVersion
+          ? platformVersion.split('.')[0]
+          : '',
+
+      architecture:
+        String(highEntropyValues.architecture || ''),
+
+      bitness:
+        String(highEntropyValues.bitness || ''),
+
+      model:
+        String(highEntropyValues.model || ''),
+
+      language:
+        navigator.language || '',
+
+      timeZone:
+        Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+
+      screenWidth:
+        Number(screen.width || 0),
+
+      screenHeight:
+        Number(screen.height || 0),
+
+      colorDepth:
+        Number(screen.colorDepth || 0),
+
+      pixelRatio:
+        Number(window.devicePixelRatio || 1),
+
+      hardwareConcurrency:
+        Number(navigator.hardwareConcurrency || 0),
+
+      deviceMemory:
+        Number(navigatorAny.deviceMemory || 0),
+
+      maxTouchPoints:
+        Number(navigator.maxTouchPoints || 0),
+
+      webglVendor,
+      webglRenderer,
+      canvasHash
+    };
+  }
+
+  async function hipiBuildDemoDeviceContext() {
+    try {
+      await navigator.storage?.persist?.();
+    } catch {
+      // El navegador decide si concede almacenamiento persistente.
+    }
+
+    return {
+      existingPlayerId:
+        localStorage.getItem('hipiplay_demo_player_id') || '',
+
+      installationId:
+        hipiGetOrCreateInstallationId(),
+
+      deviceSignals:
+        await hipiCollectDeviceSignals(),
+
+      origin:
+        window.location.origin,
+
+      pathname:
+        window.location.pathname
+    };
+  }
+
+  async function hipiDemoPost(
+    url: string,
+    payload: Record<string, unknown>
+  ) {
+    const response = await fetch(url, {
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
+      cache: 'no-store',
+
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok || !data?.ok) {
+      const requestError = new Error(
+        data?.message ||
+        'No se pudo completar el acceso seguro.'
+      ) as Error & {
+        code?: string;
+        mode?: string;
+        buttonLabel?: string;
+      };
+
+      requestError.code = data?.code;
+      requestError.mode = data?.mode;
+      requestError.buttonLabel = data?.buttonLabel;
+
+      throw requestError;
+    }
+
+    return data;
+  }
+
+  async function hipiAuthenticateDemo(
+    deviceContext: Record<string, unknown>
+  ) {
+    const optionsResponse =
+      await hipiDemoPost(
+        '/api/demo/passkey/auth/options',
+        deviceContext
+      );
+
+    const credential =
+      await startAuthentication({
+        optionsJSON: optionsResponse.options
+      } as any);
+
+    return hipiDemoPost(
+      '/api/demo/passkey/auth/verify',
+      {
+        ceremonyId:
+          optionsResponse.ceremonyId,
+
+        response:
+          credential
+      }
+    );
+  }
+
+  async function hipiRegisterDemo(
+    deviceContext: Record<string, unknown>
+  ) {
+    const optionsResponse =
+      await hipiDemoPost(
+        '/api/demo/passkey/register/options',
+        deviceContext
+      );
+
+    const credential =
+      await startRegistration({
+        optionsJSON: optionsResponse.options
+      } as any);
+
+    return hipiDemoPost(
+      '/api/demo/passkey/register/verify',
+      {
+        ceremonyId:
+          optionsResponse.ceremonyId,
+
+        response:
+          credential
+      }
+    );
+  }
+
+  async function hipiCompleteDemoAccess(data: any) {
+    const demoUser = data.user || {
+      id: data.playerId,
+      username: 'DEMO',
+      mode: 'DEMO',
+      demo: true
+    };
+
+    const demoWallet = data.wallet || {
+      userId: demoUser.id,
+      demoBalance: Number(data.balance || 0),
+      realBalance: 0,
+      giftLocked: 0,
+      serverManaged: true
+    };
+
+    if (!demoUser?.id || !data?.token) {
+      throw new Error(
+        'El servidor no devolvió una sesión DEMO válida.'
+      );
+    }
+
+    localStorage.setItem(
+      'hipiplay_demo_player_id',
+      String(demoUser.id)
+    );
+
+    localStorage.setItem(
+      'hipiplay_demo_wallet',
+      JSON.stringify(
+        data.internalWallet ||
+        demoWallet.internalWallet ||
+        {}
+      )
+    );
+
+    localStorage.setItem(
+      'hipiplay_demo_access_mode',
+      'login'
+    );
+
+    setToken(data.token);
+
+    localStorage.setItem(
+      'hipiplay_demo_auth_token',
+      String(data.token)
+    );
+
+    setDemoAccessMode('login');
+
+    localStorage.setItem(
+      'hipiplay_demo_entry_target',
+      'race'
+    );
+
+    document.body.classList.remove(
+      'hipiplay-home-mode'
+    );
+
+    document.body.classList.add(
+      'hipiplay-race-mode'
+    );
+
+    window.dispatchEvent(
+      new CustomEvent(
+        'hipiplay-view-change',
+        {
+          detail: {
+            view: 'race'
+          }
+        }
+      )
+    );
+
+    await bootstrap(
+      demoUser as User,
+      demoWallet as Wallet
+    );
+
+    requestAnimationFrame(() => {
+      const raceSection =
+        document.querySelector(
+          '.horse-bet-panel, .horse-grid, .horses-grid, .race-horses-grid, .horse-select-grid'
+        );
+
+      if (raceSection) {
+        raceSection.scrollIntoView({
+          behavior: 'auto',
+          block: 'start'
+        });
+      } else {
+        window.scrollTo({
+          top: 0,
+          behavior: 'auto'
+        });
+      }
+    });
+  }
+
+  async function hipiStartSecureDemoAccess() {
+    const deviceContext =
+      await hipiBuildDemoDeviceContext();
+
+    const sessionData =
+      await hipiDemoPost(
+        '/api/demo/session',
+        deviceContext
+      );
+
+    setDemoAccessMode('login');
+
+    await hipiCompleteDemoAccess(
+      sessionData
+    );
+  }
+  useEffect(() => {
+    if (user) return;
+
+    let cancelled = false;
+
+    async function checkDemoAccessStatus() {
+      setDemoAccessMode('checking');
+
+      try {
+        const deviceContext =
+          await hipiBuildDemoDeviceContext();
+
+        const status =
+          await hipiDemoPost(
+            '/api/demo/passkey/status',
+            deviceContext
+          );
+
+        if (cancelled) return;
+
+        setDemoAccessMode(
+          status.known ||
+          status.action === 'login'
+            ? 'login'
+            : 'register'
+        );
+      } catch (error) {
+        console.warn(
+          'No se pudo consultar el estado DEMO:',
+          error
+        );
+
+        if (!cancelled) {
+          setDemoAccessMode(
+            localStorage.getItem(
+              'hipiplay_demo_player_id'
+            )
+              ? 'login'
+              : 'register'
+          );
+        }
+      }
+    }
+
+    checkDemoAccessStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) return;
+
+    const existing =
+      document.getElementById(
+        'hipiplay-demo-login-entry'
+      );
+
+    if (existing) {
+      existing.remove();
+    }
+
+    const buttonLabel =
+      demoAccessMode === 'checking'
+        ? 'VALIDANDO...'
+        : demoAccessMode === 'login'
+          ? 'ENTRAR'
+          : 'DEMO';
+
+    const helpText =
+      demoAccessMode === 'checking'
+        ? 'Verificando el acceso seguro del dispositivo...'
+        : demoAccessMode === 'login'
+          ? 'Confirma tu huella, rostro o PIN para recuperar tu cuenta.'
+          : 'Activa tu acceso con huella, rostro o PIN.';
+
+    const root =
+      document.createElement('div');
+
+    root.id =
+      'hipiplay-demo-login-entry';
+
+    root.innerHTML = `
+      <div class="hipiplay-demo-login-card">
+        <img
+          src="${hipiPlayLogo}"
+          alt="HipiPlay"
+          class="hipiplay-demo-login-logo-image"
+        />
+
+        <div class="hipiplay-demo-login-logo">
+          HipiPlay
+        </div>
+
+        <div class="hipiplay-demo-login-title">
+          Invierte, Espera y Duplica cada 1 minuto
+        </div>
+
+        <p class="hipiplay-demo-login-text">
+          ${helpText}
+        </p>
+
+        <button
+          type="button"
+          class="hipiplay-demo-start-button"
+          ${demoAccessMode === 'checking' ? 'disabled' : ''}
+        >
+          ${buttonLabel}
+        </button>
+      </div>
+    `;
+
+    document.body.appendChild(root);
+
+    const button =
+      root.querySelector(
+        '.hipiplay-demo-start-button'
+      ) as HTMLButtonElement | null;
+
+    const onClick = async () => {
+      if (
+        !button ||
+        demoAccessMode === 'checking'
+      ) {
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent =
+        demoAccessMode === 'login'
+          ? 'VALIDANDO...'
+          : 'ACTIVANDO...';
+
+      try {
+        await hipiStartSecureDemoAccess();
+      } catch (error) {
+        console.error(
+          'Error de acceso DEMO seguro:',
+          error
+        );
+
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'No se pudo completar el acceso seguro.';
+
+        alert(message);
+      } finally {
+        if (
+          button &&
+          document.body.contains(button)
+        ) {
+          button.disabled = false;
+
+          button.textContent =
+            demoAccessMode === 'login'
+              ? 'ENTRAR'
+              : 'DEMO';
+        }
+      }
+    };
+
+    button?.addEventListener(
+      'click',
+      onClick
+    );
+
+    return () => {
+      button?.removeEventListener(
+        'click',
+        onClick
+      );
+
+      root.remove();
+    };
+  }, [user, demoAccessMode]);
+  // HIPIPLAY DEMO LOGIN FLOW - END
 
   async function bootstrap(u: User, w: Wallet) {
   setUser(u);
@@ -2769,6 +3911,91 @@ async function refreshLocal(userId = user?.id) {
     api.me().then(res => bootstrap(res.user, res.wallet)).catch(() => null).finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    function trackHipiView(event: Event) {
+      const detail = event instanceof CustomEvent ? event.detail : {};
+      const nextView = String(detail?.view || '').trim();
+
+      if (!nextView) return;
+
+      const currentView = sessionStorage.getItem('hipiplay_current_view') || '';
+
+      if (currentView && currentView !== nextView) {
+        sessionStorage.setItem('hipiplay_previous_view', currentView);
+      }
+
+      sessionStorage.setItem('hipiplay_current_view', nextView);
+    }
+
+    if (!sessionStorage.getItem('hipiplay_current_view')) {
+      sessionStorage.setItem(
+        'hipiplay_current_view',
+        document.body.classList.contains('hipiplay-race-mode') ? 'race' : 'home'
+      );
+    }
+
+    window.addEventListener('hipiplay-view-change', trackHipiView as EventListener);
+
+    return () => {
+      window.removeEventListener('hipiplay-view-change', trackHipiView as EventListener);
+    };
+  }, []);
+
+  function goBackFromMenu() {
+    const dropdown = document.querySelector('.mobile-header-dropdown') as HTMLDetailsElement | null;
+
+    if (dropdown) {
+      dropdown.open = false;
+    }
+
+    const previousView = sessionStorage.getItem('hipiplay_previous_view') || '';
+
+    if (previousView === 'race' || previousView === 'bet') {
+      document.body.classList.remove('hipiplay-home-mode');
+      document.body.classList.add('hipiplay-race-mode');
+
+      window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+        detail: { view: 'race' }
+      }));
+
+      setTab('games');
+
+      requestAnimationFrame(() => {
+        const raceSection = document.querySelector('.horse-bet-panel, .horse-grid, .horses-grid, .race-horses-grid, .horse-select-grid');
+
+        if (raceSection) {
+          raceSection.scrollIntoView({ behavior: 'auto', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+      });
+
+      return;
+    }
+
+    if (previousView === 'history') {
+      setTab('history');
+
+      window.dispatchEvent(new CustomEvent('hipiplay-view-change', {
+        detail: { view: 'history' }
+      }));
+
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      return;
+    }
+
+    if (previousView === 'home') {
+      goToHomeMenu();
+      return;
+    }
+
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+
+    goToHomeMenu();
+  }
   function goToHomeMenu() {
     document.body.classList.add('hipiplay-home-mode');
     document.body.classList.remove(
@@ -2795,7 +4022,6 @@ async function refreshLocal(userId = user?.id) {
         <div className="mobile-brand-text-balance">
           <div className="mobile-brand-text">
             <strong>HipiPlay</strong>
-            <small>Carreras Hípicas</small>
           </div>
           <span className="mobile-header-balance" title="Monedas disponibles">
             🪙 {coins(Number(localWallet?.demoBalance || 0))}
@@ -2810,6 +4036,13 @@ async function refreshLocal(userId = user?.id) {
               </summary>
 
               <div className="mobile-header-dropdown-panel">
+                <button
+                  type="button"
+                  onClick={goBackFromMenu}
+                >
+                  Atrás
+                </button>
+
     <button
       type="button"
       onClick={() => {
@@ -2849,8 +4082,9 @@ async function refreshLocal(userId = user?.id) {
                 <button
                   type="button"
                   onClick={() => {
-                    window.dispatchEvent(new CustomEvent('hipiplay-open-profile'));
-                    alert('Perfil del jugador');
+                    window.dispatchEvent(
+                      new CustomEvent('hipiplay-request-profile')
+                    );
                   }}
                 >
                   Perfil
@@ -2868,11 +4102,16 @@ async function refreshLocal(userId = user?.id) {
                 <button
                   type="button"
                   onClick={() => {
-                    window.dispatchEvent(new CustomEvent('hipiplay-view-change', { detail: { view: 'home' } }));
-                    window.location.href = '/pwa/?v=home-' + Date.now();
+                    const dropdown = document.querySelector('.mobile-header-dropdown') as HTMLDetailsElement | null;
+
+                    if (dropdown) {
+                      dropdown.open = false;
+                    }
+
+                    goToHomeMenu();
                   }}
                 >
-                  Volver al inicio
+                  Menú principal
                 </button>
 
                 <button
@@ -2893,7 +4132,7 @@ async function refreshLocal(userId = user?.id) {
       </div>
     </header>
     <header className="topbar glass clean-topbar">
-      <div className="brand brand-hipiplay"><img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo topbar-logo" /><div><strong>HipiPlay</strong><small>Carreras HÃƒÆ’Ã‚Â­picas con monedas</small></div></div>
+      <div className="brand brand-hipiplay"><img src={hipiPlayLogo} alt="HipiPlay" className="hipiplay-logo topbar-logo" /><div><strong>HipiPlay</strong></div></div>
       <nav>
         <button className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}><History size={17}/> Historial</button>
       </nav>
