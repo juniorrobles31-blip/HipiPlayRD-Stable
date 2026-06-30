@@ -1,0 +1,87 @@
+﻿==============================================
+ HIPIPLAY BLOCKCHAIN - ESTADO FINAL
+==============================================
+Fecha: 2026-06-27 21:50:54
+
+1. SERVICIOS / PUERTOS
+----------------------------------------------
+Backend principal 4000: ACTIVO PID 5488
+Panel Blockchain V2 4105: ACTIVO PID 9228
+Watcher PAID -> compradas: ACTIVO PID 4068
+Watchdog stack: ACTIVO PID 8364
+Detector real automatico: ACTIVO PID 6188
+
+2. TAREAS WINDOWS
+----------------------------------------------
+HipiPlay Stack Watchdog Loop: Running
+HipiPlay Real Deposit Detector Loop: Running
+
+3. APIS
+----------------------------------------------
+API principal /api/state: HTTP 200
+Panel V2 /api/health ok: True
+Panel V2 total intents: 
+
+4. CONFIGURACION BLOCKCHAIN
+----------------------------------------------
+Red: BSC
+Network label: BSC / BEP20
+Chain ID: 56
+RPC: https://bsc-dataseed.bnbchain.org
+USDT Contract: 0x55d398326f99059fF775485246999027B3197955
+USDT Decimals: 18
+
+5. DETECTOR REAL
+----------------------------------------------
+enabled: True
+autoMarkPaid: True
+useEventLogs: False
+scanOnlyAssignedWallets: True
+requireExactOrGreaterAmount: True
+
+6. WALLETS CUSTODY
+----------------------------------------------
+Total wallets: 1
+Deposit holding: 1
+Payout hot: 1
+Disponibles: 1
+Asignadas: 1
+Con privateKey cifrada: 1
+PrivateKey visible en plano: NO
+Payout wallet: System.Object&, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089 Address(int )
+
+7. RETIROS / CONSOLIDACION
+----------------------------------------------
+broadcastEnabled: False
+payoutWalletAddress: 0xecfeCeE0Ea836036326723b78249AC07366AdDDf
+maxSourcesPerWithdrawal: 12
+directToCustomerIfOneSource: False
+
+8. ARCHIVOS PRINCIPALES
+----------------------------------------------
+Wallet manager: C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\custody-wallet-manager.js
+Balance sync: C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\custody-balance-sync.js
+Detector real: C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\custody-real-deposit-detector.js
+Detector loop: C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\custody-real-deposit-detector-loop.ps1
+Withdrawal manager: C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\custody-withdrawal-manager.js
+Wallets JSON: C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\data\blockchain-v2\custody-wallets-bsc.json
+Master key: C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\custody-master-key.hex
+
+9. ESTADO DE ENTREGA
+----------------------------------------------
+Wallets reales BSC: SI
+Public address: SI
+Public key: SI
+Private key cifrada: SI
+Validacion saldos reales BSC: SI
+Detector real automatico: SI
+Auto PAID por deposito real: SI
+Watcher acredita fichas compradas: SI
+Retiro/consolidacion preparado: SI
+Retiro broadcast real activado: NO, por seguridad
+server.js modificado: NO
+
+==============================================
+ REPORTE GENERADO
+==============================================
+C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\HIPIPLAY_BLOCKCHAIN_ESTADO_FINAL_20260627_215054.txt

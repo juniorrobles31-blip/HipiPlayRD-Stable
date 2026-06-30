@@ -1,0 +1,164 @@
+{
+  "raceNumber": 3,
+  "roundId": 3,
+  "roundStatus": "VALID",
+  "cancelReason": null,
+  "finishedAt": "2026-06-17T22:20:28.405Z",
+  "totalBetsReceived": 1,
+  "activeHorseCount": 1,
+  "minActiveHorsesRequired": 1,
+  "totalAmountReceived": 100,
+  "totalPayout": 0,
+  "totalRefunded": 0,
+  "houseRevenue": 100,
+  "houseResult": "PROFIT",
+  "payoutMultipliers": {
+    "first": 2,
+    "second": 1.5,
+    "third": 1.5
+  },
+  "roundCancelReason": null,
+  "orderedResults": [
+    {
+      "position": 1,
+      "horseId": 6,
+      "name": "Caballo 6",
+      "color": "Blanco",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 2,
+      "horseId": 4,
+      "name": "Caballo 4",
+      "color": "Amarillo",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 3,
+      "horseId": 3,
+      "name": "Caballo 3",
+      "color": "Verde",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 4,
+      "horseId": 5,
+      "name": "Caballo 5",
+      "color": "Negro",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 5,
+      "horseId": 1,
+      "name": "Caballo 1",
+      "color": "Rojo",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 6,
+      "horseId": 2,
+      "name": "Caballo 2",
+      "color": "Azul",
+      "totalAmount": 100,
+      "totalBets": 1,
+      "active": true
+    }
+  ],
+  "winners": [
+    {
+      "position": 1,
+      "horseId": 6,
+      "name": "Caballo 6",
+      "color": "Blanco",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 2,
+      "horseId": 4,
+      "name": "Caballo 4",
+      "color": "Amarillo",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 3,
+      "horseId": 3,
+      "name": "Caballo 3",
+      "color": "Verde",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    }
+  ],
+  "settlements": [
+    {
+      "raceNumber": 3,
+      "roundId": 3,
+      "betId": "1781734768779-538401",
+      "playerId": "usr_b1a7c032-b409-4695-9c13-df2b547a8e3f",
+      "clientName": "JRobles",
+      "horseId": 2,
+      "horseName": "Caballo 2",
+      "amount": 100,
+      "balanceBeforeBet": 200,
+      "balanceApostado": 100,
+      "balanceAfterBet": 100,
+      "won": false,
+      "cancelled": false,
+      "refunded": false,
+      "refundAmount": 0,
+      "payout": 0,
+      "finalBalance": 100,
+      "multiplier": 0,
+      "winners": [
+        {
+          "position": 1,
+          "horseId": 6,
+          "multiplier": 2
+        },
+        {
+          "position": 2,
+          "horseId": 4,
+          "multiplier": 1.5
+        },
+        {
+          "position": 3,
+          "horseId": 3,
+          "multiplier": 1.5
+        }
+      ],
+      "createdAt": "2026-06-17T22:20:18.343Z"
+    }
+  ],
+  "bets": [
+    {
+      "id": "1781734768779-538401",
+      "roundId": 3,
+      "raceNumber": 3,
+      "playerId": "usr_b1a7c032-b409-4695-9c13-df2b547a8e3f",
+      "clientName": "JRobles",
+      "horseId": 2,
+      "horseName": "Caballo 2",
+      "amount": 100,
+      "balanceApostado": 100,
+      "balanceTotal": 200,
+      "balanceBeforeBet": 200,
+      "balanceAfterBet": 100,
+      "clientReportedBalance": 200,
+      "createdAt": "2026-06-17T22:19:28.779Z"
+    }
+  ]
+}

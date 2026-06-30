@@ -1,0 +1,92 @@
+{
+  "raceNumber": 421,
+  "roundId": 421,
+  "finishedAt": "2026-06-14T11:58:20.664Z",
+  "totalBetsReceived": 0,
+  "totalAmountReceived": 0,
+  "totalPayout": 0,
+  "houseRevenue": 0,
+  "payoutMultipliers": {
+    "first": 2,
+    "second": 1.5,
+    "third": 1.5
+  },
+  "orderedResults": [
+    {
+      "position": 1,
+      "horseId": 6,
+      "name": "Caballo 6",
+      "color": "Blanco",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 2,
+      "horseId": 1,
+      "name": "Caballo 1",
+      "color": "Rojo",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 3,
+      "horseId": 5,
+      "name": "Caballo 5",
+      "color": "Negro",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 4,
+      "horseId": 2,
+      "name": "Caballo 2",
+      "color": "Azul",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 5,
+      "horseId": 3,
+      "name": "Caballo 3",
+      "color": "Verde",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 6,
+      "horseId": 4,
+      "name": "Caballo 4",
+      "color": "Amarillo",
+      "totalAmount": 0,
+      "totalBets": 0
+    }
+  ],
+  "winners": [
+    {
+      "position": 1,
+      "horseId": 6,
+      "name": "Caballo 6",
+      "color": "Blanco",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 2,
+      "horseId": 1,
+      "name": "Caballo 1",
+      "color": "Rojo",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 3,
+      "horseId": 5,
+      "name": "Caballo 5",
+      "color": "Negro",
+      "totalAmount": 0,
+      "totalBets": 0
+    }
+  ],
+  "settlements": [],
+  "bets": []
+}

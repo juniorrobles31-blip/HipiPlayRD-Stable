@@ -1,0 +1,23 @@
+{
+  "usr_demo_mqn4ih1s_9bb85b73": {
+    "playerId": "usr_demo_mqn4ih1s_9bb85b73",
+    "bonusGranted": true,
+    "createdAt": "2026-06-21T02:52:02.557Z",
+    "deviceHashes": [
+      "94304a1b7f191908ae9fe6fc20fa212a57d33a7f99a061756db3cc2e2d6346b2"
+    ],
+    "installationHashes": [
+      "b04f91bc55924d73aec03a743ba99d19883456d2ccb4a3749b75d9cfe0292a5d",
+      "b2a431dc3f83b925457ea0bcd1c8040752be3ade707275e363d561e8811078b8",
+      "1cea79233290d57cf0631e95e55901840fadef50acb5e708f805e7e6769e6e76"
+    ],
+    "ipHashes": [
+      "b1fa497226526a4ca34ee7ba09423a3604b0c8c375b5f39649dc524fc85d9b1c"
+    ],
+    "userAgentHashes": [
+      "1f0551170d4a33ee058483b758899a227e5f7c6a7c0aa0a6f41b34168c293693"
+    ],
+    "updatedAt": "2026-06-21T21:14:43.160Z",
+    "lastSeenAt": "2026-06-21T21:14:43.160Z"
+  }
+}

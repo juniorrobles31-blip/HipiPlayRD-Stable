@@ -1,0 +1,3 @@
+@echo off
+cd /d "C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2"
+"C:\Program Files\nodejs\node.exe" "C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\payment-console-server.js" >> "C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\payment-console-4105.stdout.log" 2>> "C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\blockchain-v2\payment-console-4105.stderr.log"

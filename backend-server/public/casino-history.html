@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Historial Casino - HipiPlay Admin</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #07130d;
+      color: #f4fff8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(17, 119, 65, .35), transparent 35%),
+        linear-gradient(180deg, #07130d 0%, #020704 100%);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 22px;
+      background: rgba(0, 0, 0, .55);
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+      backdrop-filter: blur(14px);
+    }
+
+    h1, h2, h3 { margin: 0; }
+
+    h1 { font-size: 1.2rem; }
+
+    a, button {
+      color: inherit;
+      font: inherit;
+    }
+
+    .btn {
+      border: 1px solid rgba(255, 215, 0, .45);
+      background: rgba(255, 215, 0, .12);
+      color: #ffe98a;
+      border-radius: 12px;
+      padding: 10px 14px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    main {
+      width: min(1500px, calc(100% - 28px));
+      margin: 18px auto 40px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: rgba(0, 0, 0, .34);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, .25);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .metric small {
+      display: block;
+      opacity: .72;
+      margin-bottom: 6px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.45rem;
+    }
+
+    .profit { color: #65ff9c; }
+    .loss { color: #ff6d6d; }
+    .gold { color: #ffe98a; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .race-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 72vh;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .race-btn {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .05);
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .race-btn.active {
+      border-color: rgba(255, 215, 0, .75);
+      background: rgba(255, 215, 0, .14);
+    }
+
+    .race-btn span,
+    .race-btn small {
+      display: block;
+    }
+
+    .race-btn small {
+      opacity: .76;
+      margin-top: 5px;
+      line-height: 1.35;
+    }
+
+    .section-title {
+      margin: 18px 0 10px;
+      font-size: 1rem;
+      color: #ffe98a;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      background: rgba(0, 0, 0, .16);
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+      text-align: left;
+      vertical-align: top;
+      font-size: .92rem;
+    }
+
+    th {
+      color: #ffe98a;
+      font-weight: 700;
+      background: rgba(0, 0, 0, .24);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: .78rem;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+    }
+
+    .badge.win {
+      border-color: rgba(101, 255, 156, .45);
+      color: #65ff9c;
+    }
+
+    .badge.lose {
+      border-color: rgba(255, 109, 109, .45);
+      color: #ff9b9b;
+    }
+
+    .live-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .horse-live {
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .horse-live strong,
+    .horse-live small {
+      display: block;
+    }
+
+    .horse-live small {
+      opacity: .75;
+      margin-top: 4px;
+    }
+
+    .error {
+      color: #ff9b9b;
+      background: rgba(255, 0, 0, .12);
+      border: 1px solid rgba(255, 0, 0, .25);
+      padding: 12px;
+      border-radius: 14px;
+    }
+
+    @media (max-width: 950px) {
+      .summary,
+      .layout,
+      .live-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Historial Casino</h1>
+      <small>Panel administrativo de carreras, apuestas, pagos y ganancia de la casa.</small>
+    </div>
+    <div>
+      <a class="btn" href="/admin.html">Volver al Admin</a>
+      <button class="btn" onclick="loadAll()">Actualizar</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Carrera actual</h2>
+      <div id="liveState">Cargando estado...</div>
+    </section>
+
+    <section class="summary">
+      <div class="metric">
+        <small>Total apostado histórico</small>
+        <strong id="sumBet">0</strong>
+      </div>
+      <div class="metric">
+        <small>Total pagado histórico</small>
+        <strong id="sumPaid">0</strong>
+      </div>
+      <div class="metric">
+        <small>Ganancia histórica casino</small>
+        <strong id="sumRevenue" class="profit">0</strong>
+      </div>
+      <div class="metric">
+        <small>Balance acumulado casino</small>
+        <strong id="casinoBalance" class="profit">0</strong>
+      </div>
+
+      <div class="metric">
+        <small>Carreras registradas</small>
+        <strong id="sumRaces">0</strong>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h2>Carreras</h2>
+        <div id="raceList" class="race-list">Cargando carreras...</div>
+      </div>
+
+      <div class="card">
+        <div id="raceDetail">Selecciona una carrera.</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let historyItems = [];
+    let selectedRaceNumber = null;
+    let latestAdminState = null;
+
+    const money = (value) => Number(value || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    });
+
+    const safeDate = (value) => {
+      if (!value) return 'Sin fecha';
+      try { return new Date(value).toLocaleString(); } catch { return value; }
+    };
+
+    function multiplierForPosition(race, position) {
+      const m = race && race.payoutMultipliers ? race.payoutMultipliers : {};
+      if (Number(position) === 1) return Number(m.first || 2);
+      if (Number(position) === 2) return Number(m.second || 1.5);
+      if (Number(position) === 3) return Number(m.third || 1.5);
+      return 0;
+    }
+
+    function winnerPaidAmount(race, horseId) {
+      return (race.settlements || [])
+        .filter(item => item.won && Number(item.horseId) === Number(horseId))
+        .reduce((sum, item) => sum + Number(item.payout || 0), 0);
+    }
+
+    function winnerBetCount(race, horseId) {
+      return (race.settlements || [])
+        .filter(item => item.won && Number(item.horseId) === Number(horseId))
+        .length;
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`${url} respondió ${response.status}`);
+      return response.json();
+    }
+
+    async function loadAll() {
+      try {
+        const [stateData, historyData] = await Promise.all([
+          fetchJson('/api/admin/state'),
+          fetchJson('/api/admin/history')
+        ]);
+
+        historyItems = Array.isArray(historyData.history) ? historyData.history : [];
+        latestAdminState = stateData;
+
+        if (!selectedRaceNumber && historyItems[0]) {
+          selectedRaceNumber = historyItems[0].raceNumber;
+        }
+
+        renderLiveState(stateData);
+        renderSummary();
+        renderRaceList();
+        renderRaceDetail();
+      } catch (error) {
+        document.getElementById('raceDetail').innerHTML = `<div class="error">${error.message || error}</div>`;
+      }
+    }
+
+    function renderLiveState(state) {
+      const totals = Array.isArray(state.totals) ? state.totals : [];
+      const phase = state.phase || '-';
+      const seconds = state.secondsRemaining ?? '-';
+      const raceNumber = state.raceNumber || state.roundId || '-';
+
+      document.getElementById('liveState').innerHTML = `
+        <p>
+          <strong>Carrera #${raceNumber}</strong> · Fase: <span class="gold">${phase}</span> · Segundos: ${seconds}
+        </p>
+        <div class="live-grid">
+          ${totals.map(horse => `
+            <div class="horse-live">
+              <strong>#${horse.horseId} ${horse.name || ''}</strong>
+              <small>Apuestas: ${money(horse.totalBets)}</small>
+              <small>Monto: ${money(horse.totalAmount)}</small>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderSummary() {
+      const totals = historyItems.reduce((acc, race) => {
+        acc.bet += Number(race.totalAmountReceived || 0);
+        acc.paid += Number(race.totalPayout || 0);
+        acc.revenue += Number(race.houseRevenue || 0);
+        return acc;
+      }, { bet: 0, paid: 0, revenue: 0 });
+
+      document.getElementById('sumBet').textContent = money(totals.bet);
+      document.getElementById('sumPaid').textContent = money(totals.paid);
+      document.getElementById('sumRevenue').textContent = money(totals.revenue);
+      document.getElementById('sumRevenue').className = totals.revenue >= 0 ? 'profit' : 'loss';
+      const casinoBalanceValue = latestAdminState && latestAdminState.casinoBalance
+        ? Number(latestAdminState.casinoBalance.balance || 0)
+        : totals.revenue;
+
+      const casinoBalanceEl = document.getElementById('casinoBalance');
+      if (casinoBalanceEl) {
+        casinoBalanceEl.textContent = money(casinoBalanceValue);
+        casinoBalanceEl.className = casinoBalanceValue >= 0 ? 'profit' : 'loss';
+      }
+
+      document.getElementById('sumRaces').textContent = money(historyItems.length);
+    }
+
+    function renderRaceList() {
+      const list = document.getElementById('raceList');
+
+      if (!historyItems.length) {
+        list.innerHTML = '<p>No hay carreras registradas.</p>';
+        return;
+      }
+
+      list.innerHTML = historyItems.map(race => `
+        <button class="race-btn ${Number(race.raceNumber) === Number(selectedRaceNumber) ? 'active' : ''}" onclick="selectRace(${race.raceNumber})">
+          <span>Carrera #${race.raceNumber}</span>
+          <small>
+            Apostado: ${money(race.totalAmountReceived)}
+            <br>
+            Pagado: ${money(race.totalPayout)}
+            <br>
+            Casino: ${money(race.houseRevenue)}
+          </small>
+        </button>
+      `).join('');
+    }
+
+    function selectRace(raceNumber) {
+      selectedRaceNumber = raceNumber;
+      renderRaceList();
+      renderRaceDetail();
+    }
+
+    function renderRaceDetail() {
+      const panel = document.getElementById('raceDetail');
+      const race = historyItems.find(item => Number(item.raceNumber) === Number(selectedRaceNumber)) || historyItems[0];
+
+      if (!race) {
+        panel.innerHTML = '<p>No hay información de carrera.</p>';
+        return;
+      }
+
+      const orderedResults = Array.isArray(race.orderedResults) ? race.orderedResults : [];
+      const settlements = Array.isArray(race.settlements) ? race.settlements : [];
+      const winners = Array.isArray(race.winners) ? race.winners.slice(0, 3) : [];
+      const winnerIds = new Set(winners.map(w => Number(w.horseId)));
+
+      panel.innerHTML = `
+        <h2>Carrera #${race.raceNumber}</h2>
+        <p>
+          Fecha: ${safeDate(race.finishedAt)}
+          <br>
+          Estado: <span class="gold">${race.roundStatus || 'VALID'}</span>
+        </p>
+
+        <div class="summary">
+          <div class="metric"><small>Total apostado</small><strong>${money(race.totalAmountReceived)}</strong></div>
+          <div class="metric"><small>Total pagado</small><strong>${money(race.totalPayout)}</strong></div>
+          <div class="metric"><small>Ganancia casino</small><strong class="${Number(race.houseRevenue || 0) >= 0 ? 'profit' : 'loss'}">${money(race.houseRevenue)}</strong></div>
+          <div class="metric"><small>Apuestas recibidas</small><strong>${money(race.totalBetsReceived)}</strong></div>
+        </div>
+
+        <h3 class="section-title">Cantidad de apuestas por caballo</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Posición</th>
+                <th>Caballo</th>
+                <th>Cantidad de apuestas</th>
+                <th>Monto apostado</th>
+                <th>¿Ganador?</th>
+                <th>Total pagado en ese caballo</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${orderedResults.map(horse => `
+                <tr>
+                  <td>${horse.position || '-'}</td>
+                  <td>#${horse.horseId} ${horse.name || ''}</td>
+                  <td>${money(horse.totalBets)}</td>
+                  <td>${money(horse.totalAmount)}</td>
+                  <td>${winnerIds.has(Number(horse.horseId)) ? '<span class="badge win">Ganador</span>' : '<span class="badge lose">No</span>'}</td>
+                  <td>${money(winnerPaidAmount(race, horse.horseId))}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="section-title">Ganadores y pago por posición</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Posición</th>
+                <th>Caballo</th>
+                <th>Multiplicador</th>
+                <th>Apuestas ganadoras</th>
+                <th>Total pagado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${winners.map((winner, index) => `
+                <tr>
+                  <td>${winner.position || index + 1}</td>
+                  <td>#${winner.horseId} ${winner.name || ''}</td>
+                  <td>x${multiplierForPosition(race, winner.position || index + 1)}</td>
+                  <td>${money(winnerBetCount(race, winner.horseId))}</td>
+                  <td>${money(winnerPaidAmount(race, winner.horseId))}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="section-title">Detalle de apuestas y pagos</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Jugador</th>
+                <th>Caballo</th>
+                <th>Monto apostado</th>
+                <th>Resultado</th>
+                <th>Multiplicador</th>
+                <th>Pago</th>
+                <th>Balance final</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${settlements.map(item => `
+                <tr>
+                  <td>${item.clientName || item.playerId || '-'}</td>
+                  <td>#${item.horseId} ${item.horseName || ''}</td>
+                  <td>${money(item.amount)}</td>
+                  <td>${item.won ? '<span class="badge win">Ganó</span>' : '<span class="badge lose">Perdió</span>'}</td>
+                  <td>${item.multiplier ? 'x' + item.multiplier : '-'}</td>
+                  <td>${money(item.payout)}</td>
+                  <td>${money(item.finalBalance)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    loadAll();
+    setInterval(loadAll, 5000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+{
+  "raceNumber": 367,
+  "roundId": 367,
+  "roundStatus": "CANCELLED",
+  "cancelReason": "Carrera cancelada: solo 1 caballo(s) activo(s). Mínimo requerido: 4.",
+  "finishedAt": "2026-06-15T20:19:32.799Z",
+  "totalBetsReceived": 1,
+  "activeHorseCount": 1,
+  "minActiveHorsesRequired": 4,
+  "totalAmountReceived": 1000,
+  "totalPayout": 0,
+  "totalRefunded": 1000,
+  "houseRevenue": 0,
+  "houseResult": "PROFIT",
+  "payoutMultipliers": {
+    "first": 2,
+    "second": 1.5,
+    "third": 1.5
+  },
+  "roundCancelReason": "Carrera cancelada: solo 1 caballo(s) activo(s). Mínimo requerido: 4.",
+  "orderedResults": [
+    {
+      "position": 1,
+      "horseId": 2,
+      "name": "Caballo 2",
+      "color": "Azul",
+      "totalAmount": 1000,
+      "totalBets": 1,
+      "active": true
+    },
+    {
+      "position": 2,
+      "horseId": 3,
+      "name": "Caballo 3",
+      "color": "Verde",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 3,
+      "horseId": 1,
+      "name": "Caballo 1",
+      "color": "Rojo",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 4,
+      "horseId": 6,
+      "name": "Caballo 6",
+      "color": "Blanco",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 5,
+      "horseId": 5,
+      "name": "Caballo 5",
+      "color": "Negro",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    },
+    {
+      "position": 6,
+      "horseId": 4,
+      "name": "Caballo 4",
+      "color": "Amarillo",
+      "totalAmount": 0,
+      "totalBets": 0,
+      "active": false
+    }
+  ],
+  "winners": [],
+  "settlements": [
+    {
+      "raceNumber": 367,
+      "roundId": 367,
+      "betId": "1781554730622-386005",
+      "playerId": "usr_fbbb8702837d44cfbc5ff20df6974c1b",
+      "clientName": "simulador01",
+      "horseId": 2,
+      "horseName": "Caballo 2",
+      "amount": 1000,
+      "balanceBeforeBet": 8900,
+      "balanceApostado": 1000,
+      "balanceAfterBet": 7900,
+      "won": false,
+      "cancelled": true,
+      "refunded": true,
+      "refundAmount": 1000,
+      "payout": 0,
+      "finalBalance": 8900,
+      "multiplier": 0,
+      "winners": [],
+      "createdAt": "2026-06-15T20:19:22.740Z"
+    }
+  ],
+  "bets": [
+    {
+      "id": "1781554730622-386005",
+      "roundId": 367,
+      "raceNumber": 367,
+      "playerId": "usr_fbbb8702837d44cfbc5ff20df6974c1b",
+      "clientName": "simulador01",
+      "horseId": 2,
+      "horseName": "Caballo 2",
+      "amount": 1000,
+      "balanceApostado": 1000,
+      "balanceTotal": 8900,
+      "balanceBeforeBet": 8900,
+      "balanceAfterBet": 7900,
+      "clientReportedBalance": 8900,
+      "createdAt": "2026-06-15T20:18:50.622Z"
+    }
+  ]
+}

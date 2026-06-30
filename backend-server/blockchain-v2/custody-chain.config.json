@@ -1,0 +1,11 @@
+﻿{
+    "network":  "BSC",
+    "networkLabel":  "BSC / BEP20",
+    "chainId":  56,
+    "rpcUrl":  "https://bsc-dataseed.bnbchain.org",
+    "usdtContract":  "0x55d398326f99059fF775485246999027B3197955",
+    "usdtDecimals":  18,
+    "nativeSymbol":  "BNB",
+    "minGasBNB":  "0.003",
+    "productionMode":  false
+}

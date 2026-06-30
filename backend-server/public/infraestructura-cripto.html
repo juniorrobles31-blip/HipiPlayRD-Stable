@@ -1,0 +1,259 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#06111f">
+<meta name="robots" content="noindex,nofollow">
+<title>HipiPlay | Panel Tecnico Criptografico</title>
+<style>
+:root{--bg:#050c16;--panel:#0a1728;--line:#20334d;--text:#f4f7fb;--muted:#9fb0c7;--cyan:#3ed9ff;--green:#48e09a;--yellow:#ffc857;--red:#ff6b7a;--blue:#6b9cff;--shadow:0 20px 55px rgba(0,0,0,.35);--radius:18px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 0,rgba(62,217,255,.09),transparent 26%),radial-gradient(circle at 90% 10%,rgba(107,156,255,.09),transparent 30%),linear-gradient(180deg,#050b14,#071522 58%,#050c16);color:var(--text);font:14px/1.5 Inter,Segoe UI,system-ui,sans-serif;min-height:100vh}
+button,input,select{font:inherit}.wrap{width:min(1440px,calc(100% - 28px));margin:auto}
+header{position:sticky;top:0;z-index:20;background:rgba(5,12,22,.86);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.topbar{height:66px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800}.brandmark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#04101a;background:linear-gradient(135deg,var(--cyan),var(--green));font-weight:900}
+.server{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.dot{width:9px;height:9px;border-radius:50%;background:var(--yellow);box-shadow:0 0 12px currentColor}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
+main{padding:32px 0 70px}.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;margin-bottom:18px}
+.panel{background:rgba(10,23,40,.9);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+.eyebrow{color:var(--cyan);font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:800}
+h1{font-size:clamp(30px,5vw,58px);line-height:1.02;letter-spacing:-.045em;margin:12px 0 16px}h2{font-size:23px;letter-spacing:-.02em;margin:0}h3{font-size:16px;margin:0}p{color:var(--muted)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--muted);background:#081321}.pill strong{color:var(--text)}
+.notice{border:1px solid rgba(255,200,87,.25);background:rgba(255,200,87,.06);color:#ffe2a6;padding:16px;border-radius:14px;margin-top:14px}.danger{border-color:rgba(255,107,122,.25);background:rgba(255,107,122,.06);color:#ffc2c8}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.kv:last-child{border-bottom:0}.kv span{color:var(--muted)}.kv strong{word-break:break-word}
+code{font-family:Consolas,monospace;color:#c8f4ff;background:#071421;border:1px solid #16364a;border-radius:7px;padding:2px 6px}
+.metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:18px}.metric{padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}.metric b{display:block;font-size:28px;letter-spacing:-.04em;color:var(--cyan)}.metric span{color:var(--muted);font-size:12px}
+.section{margin-top:18px}.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:12px}.sectionhead p{margin:0;max-width:700px}
+.tablebox{overflow:auto;border:1px solid var(--line);border-radius:16px;background:var(--panel)}table{width:100%;border-collapse:collapse;min-width:1000px}
+th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#0c1b2d;color:#b9c8da;font-size:11px;text-transform:uppercase;letter-spacing:.08em;z-index:2}td{font-size:13px}tr:hover td{background:rgba(62,217,255,.025)}
+.mono{font-family:Consolas,monospace;white-space:nowrap}.badge{display:inline-flex;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900;border:1px solid}.ok{color:#9ff1c7;background:rgba(72,224,154,.08);border-color:rgba(72,224,154,.28)}.warn{color:#ffe0a0;background:rgba(255,200,87,.08);border-color:rgba(255,200,87,.28)}.bad{color:#ffb3bb;background:rgba(255,107,122,.08);border-color:rgba(255,107,122,.28)}.info{color:#c5d5ff;background:rgba(107,156,255,.08);border-color:rgba(107,156,255,.28)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}.toolbar input,.toolbar select{background:#071321;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px}.toolbar input{min-width:300px}.toolbar button{background:#0d2540;color:var(--text);border:1px solid #24547a;border-radius:10px;padding:10px 13px;cursor:pointer}.toolbar button:hover{border-color:var(--cyan)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.component{padding:16px;border-radius:14px;border:1px solid var(--line);background:#081421}.component p{margin:7px 0 0;font-size:12px}.component-list{display:grid;gap:10px}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:stretch}.step{border:1px solid var(--line);border-radius:14px;background:#081421;padding:14px}.step small{color:var(--cyan);font-weight:900}.step strong{display:block;margin-top:6px}.step p{font-size:12px;margin:7px 0 0}
+footer{color:var(--muted);font-size:12px;margin-top:28px;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:1050px){.hero,.grid2{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(3,1fr)}.flow{grid-template-columns:1fr}}
+@media(max-width:620px){.metrics{grid-template-columns:repeat(2,1fr)}.kv{grid-template-columns:1fr}.toolbar input{min-width:100%}}
+@media print{header,.toolbar{display:none!important}body{background:#fff;color:#111}.panel,.metric,.tablebox,.component,.step{box-shadow:none;background:#fff;border-color:#ccd4df}p,.kv span,.metric span,footer{color:#4b5563}th{position:static;background:#eef2f7;color:#111}}
+</style>
+</head>
+<body>
+<header><div class="wrap topbar"><div class="brand"><div class="brandmark">H</div><div>HipiPlay - Panel Tecnico Criptografico</div></div><div class="server"><span id="serverDot" class="dot"></span><span id="serverText">Consultando backend...</span></div></div></header>
+<main class="wrap">
+<section class="hero">
+<article class="panel">
+<div class="eyebrow">Arquitectura de recepcion - Entorno de prueba</div>
+<h1>Infraestructura HD, pool de direcciones y carreteras blockchain</h1>
+<p>Vista tecnica de la raiz criptografica, la rama publica, las 50 direcciones derivadas, las ordenes asignadas y las redes admitidas o planificadas.</p>
+<div class="hero-meta">
+<span class="pill">Entorno: <strong id="environment"></strong></span>
+<span class="pill">Pool ID: <strong id="poolIdHero"></strong></span>
+<span class="pill">Ruta base: <strong id="branchHero"></strong></span>
+<span class="pill">Generado: <strong id="generatedAt"></strong></span>
+</div>
+<div class="notice">La cartera principal es una raiz HD protegida. No se publica la mnemonica, la XPUB completa ni ninguna clave privada. La direccion de tesoreria final todavia no esta definida.</div>
+</article>
+<article class="panel">
+<div class="eyebrow">Cartera principal / raiz HD</div>
+<div class="kv"><span>Tipo</span><strong id="rootType"></strong></div>
+<div class="kv"><span>Estado</span><strong id="rootStatus"></strong></div>
+<div class="kv"><span>Semilla</span><strong id="mnemonic"></strong></div>
+<div class="kv"><span>Custodia</span><strong id="seedStorage"></strong></div>
+<div class="kv"><span>XPUB</span><strong id="xpubMasked"></strong></div>
+<div class="kv"><span>Tesoreria</span><strong id="treasury"></strong></div>
+</article>
+</section>
+
+<section class="metrics">
+<article class="metric"><b id="mTotal">0</b><span>Direcciones HD</span></article>
+<article class="metric"><b id="mAvailable">0</b><span>Disponibles</span></article>
+<article class="metric"><b id="mAssigned">0</b><span>Asignadas</span></article>
+<article class="metric"><b id="mUsed">0</b><span>Utilizadas</span></article>
+<article class="metric"><b id="mOrders">0</b><span>Ordenes totales</span></article>
+<article class="metric"><b id="mPending">0</b><span>Ordenes pendientes</span></article>
+</section>
+
+<section class="section">
+<div class="sectionhead"><div><div class="eyebrow">Carreteras de pago</div><h2>Redes blockchain y estado de habilitacion</h2></div><p>Solo Ethereum Sepolia esta conectado al pool HD actual. Las demas redes requieren implementacion independiente.</p></div>
+<div class="tablebox"><table><thead><tr><th>Carretera</th><th>Protocolo</th><th>Chain ID</th><th>Activo</th><th>Entorno</th><th>Depositos</th><th>Pool HD</th><th>Monitor</th><th>Liquidacion</th><th>Observacion</th></tr></thead><tbody id="networkRows"></tbody></table></div>
+</section>
+
+<section class="section">
+<div class="sectionhead"><div><div class="eyebrow">Pool publico</div><h2>Las 50 direcciones derivadas</h2></div><p>Las direcciones se muestran enmascaradas por defecto. El boton permite verlas completas.</p></div>
+<div class="toolbar">
+<input id="addressSearch" type="search" placeholder="Buscar por indice, direccion, ruta u orden...">
+<select id="statusFilter"><option value="">Todos los estados</option><option value="AVAILABLE">AVAILABLE</option><option value="ASSIGNED">ASSIGNED</option><option value="USED">USED</option><option value="RETIRED">RETIRED</option></select>
+<button id="toggleAddresses" type="button">Mostrar direcciones completas</button>
+<button type="button" onclick="window.print()">Imprimir / PDF</button>
+</div>
+<div class="tablebox"><table><thead><tr><th>Indice</th><th>Ruta HD</th><th>Direccion publica</th><th>Estado</th><th>Orden asignada</th><th>Jugador</th><th>Fecha de asignacion</th></tr></thead><tbody id="addressRows"></tbody></table></div>
+</section>
+
+<section class="section">
+<div class="sectionhead"><div><div class="eyebrow">Ordenes</div><h2>Asignaciones y depositos registrados</h2></div><p>Una orden enlaza jugador, monto, red, indice HD y direccion de recepcion.</p></div>
+<div class="tablebox"><table><thead><tr><th>Order ID</th><th>Jugador</th><th>Red</th><th>Chain ID</th><th>Token</th><th>Monto esperado</th><th>Indice HD</th><th>Direccion</th><th>Estado</th><th>Blockchain</th><th>Confirmaciones</th><th>TX Hash</th></tr></thead><tbody id="depositRows"></tbody></table></div>
+</section>
+
+<section class="section grid2">
+<article class="panel"><div class="sectionhead"><div><div class="eyebrow">Componentes</div><h2>Separacion tecnica</h2></div></div><div id="componentRows" class="component-list"></div></article>
+<article class="panel">
+<div class="sectionhead"><div><div class="eyebrow">Wallet auxiliar</div><h2>Despliegue de contratos</h2></div></div>
+<div class="kv"><span>Direccion</span><strong class="mono" id="deployerAddress"></strong></div>
+<div class="kv"><span>Proposito</span><strong id="deployerPurpose"></strong></div>
+<div class="kv"><span>Red</span><strong id="deployerNetwork"></strong></div>
+<div class="kv"><span>Custodia</span><strong id="deployerKeyStorage"></strong></div>
+<div class="kv"><span>Recibe pagos</span><strong id="deployerReceives"></strong></div>
+<div class="kv"><span>Gas de prueba</span><strong id="deployerGas"></strong></div>
+<div class="notice danger">Esta wallet no es la tesoreria ni una direccion de deposito de clientes.</div>
+</article>
+</section>
+
+<section class="section">
+<div class="sectionhead"><div><div class="eyebrow">Flujo tecnico</div><h2>Proceso de recepcion disenado</h2></div></div>
+<div class="flow">
+<div class="step"><small>01</small><strong>Usuario autenticado</strong><p>El backend obtiene el playerId desde el token Bearer.</p></div>
+<div class="step"><small>02</small><strong>Reserva de indice</strong><p>Se toma una direccion AVAILABLE del pool HD.</p></div>
+<div class="step"><small>03</small><strong>Orden PENDING</strong><p>Se fija red, activo, monto, direccion e indice.</p></div>
+<div class="step"><small>04</small><strong>Monitor blockchain</strong><p>Pendiente: detectar Transfer real, monto y confirmaciones.</p></div>
+<div class="step"><small>05</small><strong>Sweep / tesoreria</strong><p>Pendiente: firmador aislado para consolidar fondos.</p></div>
+</div>
+</section>
+
+<footer><div>HIPIPLAY_CRYPTO_TECHNICAL_DASHBOARD - Pagina publica de diagnostico tecnico.</div><div>No contiene mnemonica, XPUB completa ni claves privadas.</div></footer>
+</main>
+
+<script>
+var DATA = {"generatedAt":"2026-06-23T15:42:50.2861786Z","environment":"TEST","principalWallet":{"type":"HD ROOT / WATCH-ONLY","status":"CREATED","mnemonic":"BIP39 / 24 WORDS / 256 BITS","seedStorage":"WINDOWS DPAPI","privateKeysInBackend":false,"privateKeysInPwa":false,"publicBranch":"m/44\u0027/60\u0027/0\u0027/0","poolId":"9385d3db-7c33-4c45-bf65-144477939611","xpubMasked":"xpub6EFE...3FyAhMeA3M","treasuryAddress":"PENDING DEFINITION"},"deploymentWallet":{"address":"0x3054d992696952AB254D781718920Cd0f4d01197","purpose":"Future deployment of test contracts","network":"Ethereum Sepolia","receivesCustomerDeposits":false,"hasTestGas":false,"keyStorage":"WINDOWS DPAPI"},"pool":{"network":"SEPOLIA","chainId":11155111,"branchPath":"m/44\u0027/60\u0027/0\u0027/0","poolId":"9385d3db-7c33-4c45-bf65-144477939611","total":50,"available":49,"assigned":1,"used":0,"retired":0,"addresses":[{"index":0,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/0","address":"0x1a41461DCb18646Aa2160A6CC0b7375Af69420A4","maskedAddress":"0x1a4146...9420A4","status":"ASSIGNED","assignedDepositId":"SEP-DEP-MQOODMHM-D5E1A33171","assignedPlayerId":"usr_d...6fc5","assignedAt":"2026-06-22T03:48:05.530Z"},{"index":1,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/1","address":"0x1006B4DA1627a94E8Ce9dfb1715733842118126F","maskedAddress":"0x1006B4...18126F","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":2,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/2","address":"0x0395405Db747102171727cf5d6c86d9AA2EE20ee","maskedAddress":"0x039540...EE20ee","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":3,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/3","address":"0xcb1EF43a6d8149D1cE148b4733EDD0d1C99B84c4","maskedAddress":"0xcb1EF4...9B84c4","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":4,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/4","address":"0x5051BE0Bce6edD03387F4776A74E50F6b335C103","maskedAddress":"0x5051BE...35C103","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":5,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/5","address":"0xB15874f571F671C55708Bef114265b30e3995F60","maskedAddress":"0xB15874...995F60","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":6,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/6","address":"0xAaE8c61ac208b45BD2379B594b3fb114e9Bc1789","maskedAddress":"0xAaE8c6...Bc1789","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":7,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/7","address":"0x005c1f954752447f8e8ac2ed1BC7584b2af84b4D","maskedAddress":"0x005c1f...f84b4D","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":8,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/8","address":"0xf8B219f48fcc658E2Ce4B6158AcA9EccbD5D5472","maskedAddress":"0xf8B219...5D5472","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":9,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/9","address":"0xb20098D33683456b7765CB3a3d1BA15030f6B068","maskedAddress":"0xb20098...f6B068","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":10,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/10","address":"0x6589915e87Da7D76651DE73B39c24F1dD5cBB1AD","maskedAddress":"0x658991...cBB1AD","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":11,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/11","address":"0xb0Ab48e84Ac4582C35279221Db3654DF9B0b2f29","maskedAddress":"0xb0Ab48...0b2f29","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":12,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/12","address":"0x55BF3e1363561F4F474B5f28463d2409c01c722D","maskedAddress":"0x55BF3e...1c722D","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":13,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/13","address":"0x09427868b8fAF9CEbBE4852E1EfF78FE59F34362","maskedAddress":"0x094278...F34362","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":14,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/14","address":"0x0FB7AdEdd594BcC6913D810C60D54BFF4F0CCff1","maskedAddress":"0x0FB7Ad...0CCff1","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":15,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/15","address":"0xa659736b3d2344086609e2d549BC2Ce72Fa6e8E9","maskedAddress":"0xa65973...a6e8E9","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":16,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/16","address":"0x9D1E4782Abfa852480c4Ad9A030aA9fB71B0aA58","maskedAddress":"0x9D1E47...B0aA58","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":17,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/17","address":"0x319c456b1a37adfe71A753964DaFBcAa92098e4a","maskedAddress":"0x319c45...098e4a","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":18,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/18","address":"0xc55ff45fe77d56B21847323b347B2C9344aD6CFd","maskedAddress":"0xc55ff4...aD6CFd","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":19,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/19","address":"0x846D6324B393f9A13916291922C338933E4b5f38","maskedAddress":"0x846D63...4b5f38","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":20,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/20","address":"0x06F5B1a946F40e5f0B387220A50524a058744Ca7","maskedAddress":"0x06F5B1...744Ca7","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":21,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/21","address":"0x11a83aB2F8E453Ef2DA3bEEc54BdE65B9875d122","maskedAddress":"0x11a83a...75d122","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":22,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/22","address":"0xF70625061d04442A8cEf3AEd5f25B8C29b78A460","maskedAddress":"0xF70625...78A460","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":23,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/23","address":"0xdcD477dc9f7615a6F1f8C09E1Db20e36B91081e5","maskedAddress":"0xdcD477...1081e5","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":24,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/24","address":"0x177B046706eA3Db505a03584330dfe57E15d0cD0","maskedAddress":"0x177B04...5d0cD0","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":25,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/25","address":"0xb187DeCB8994775bDf136a4a57080b2898BB4429","maskedAddress":"0xb187De...BB4429","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":26,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/26","address":"0x8a8c5612a8Efe937Cc6Eb4de3B385F24A9a9Ca35","maskedAddress":"0x8a8c56...a9Ca35","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":27,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/27","address":"0x462fa3aE8E5A99C53B465523C68Cbd0571327850","maskedAddress":"0x462fa3...327850","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":28,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/28","address":"0x2fB5c0bEB7171185920AeD5Ff0C6803ac1Abb856","maskedAddress":"0x2fB5c0...Abb856","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":29,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/29","address":"0x5146d040BC56205966c07eC7dc92aD2db0cf77fc","maskedAddress":"0x5146d0...cf77fc","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":30,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/30","address":"0xEd7e5ff0DBAf4BE3934Ad15d9DB75FCCde5E49a9","maskedAddress":"0xEd7e5f...5E49a9","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":31,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/31","address":"0xeD7d1c40Fbb170Ec77A839cb818517fDAb682c39","maskedAddress":"0xeD7d1c...682c39","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":32,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/32","address":"0xD261CCf44EEac2659b685014248aAd70ca4F351A","maskedAddress":"0xD261CC...4F351A","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":33,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/33","address":"0xF72a0baE675AB7A51Becfb498C2169cDEec8cCf6","maskedAddress":"0xF72a0b...c8cCf6","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":34,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/34","address":"0x247C40BdD0226330bc3572d4C17578008557D331","maskedAddress":"0x247C40...57D331","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":35,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/35","address":"0x43ba8FbF1e11e123755b501Ba0028a7CC192D6DF","maskedAddress":"0x43ba8F...92D6DF","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":36,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/36","address":"0x985a5736746dF1C578862916d6BbC8FBc4168338","maskedAddress":"0x985a57...168338","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":37,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/37","address":"0xd30d31360006d636d0Aa890C7a7CA32f363fF72b","maskedAddress":"0xd30d31...3fF72b","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":38,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/38","address":"0x6792CA1628e15A07fc4772AF219b254868B007A5","maskedAddress":"0x6792CA...B007A5","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":39,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/39","address":"0x7f945A7a987aa70842aE0E5c98535C0e35c6318E","maskedAddress":"0x7f945A...c6318E","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":40,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/40","address":"0x73881c9884e3cDD77e3ce473b0D811346C564FE8","maskedAddress":"0x73881c...564FE8","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":41,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/41","address":"0xAd003539a6A3aA0A8584FD789A7D2eeF77649118","maskedAddress":"0xAd0035...649118","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":42,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/42","address":"0x783a0e8161F4819430ddd74A19afA967503cCE92","maskedAddress":"0x783a0e...3cCE92","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":43,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/43","address":"0x64B4Fa660684172aD0c0a5599AdBe66c4C85C4D6","maskedAddress":"0x64B4Fa...85C4D6","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":44,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/44","address":"0xa4E870b4a5f4882C04A4d6f59a9C80Dc7F925D72","maskedAddress":"0xa4E870...925D72","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":45,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/45","address":"0x8F5422D2A874AE896091646321549D5375E28a59","maskedAddress":"0x8F5422...E28a59","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":46,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/46","address":"0x5B2Bf360A9426D0e6721B2a51583808515764053","maskedAddress":"0x5B2Bf3...764053","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":47,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/47","address":"0x8bdD950236dDC6C393aa130f2A13333629463ae7","maskedAddress":"0x8bdD95...463ae7","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":48,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/48","address":"0xCa4368723bf1b4f7D879a768735Cc6bCDD2577D4","maskedAddress":"0xCa4368...2577D4","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""},{"index":49,"derivationPath":"m/44\u0027/60\u0027/0\u0027/0/49","address":"0x419b56EbBf479910dF7767fE38596E493967ca62","maskedAddress":"0x419b56...67ca62","status":"AVAILABLE","assignedDepositId":"","assignedPlayerId":"","assignedAt":""}]},"deposits":{"asset":"MOCK_USDT","tokenContract":"NOT CONFIGURED","totalOrders":1,"pendingOrders":1,"orders":[{"orderId":"SEP-DEP-MQOODMHM-D5E1A33171","playerId":"usr_d...6fc5","network":"SEPOLIA","chainId":11155111,"token":"MOCK_USDT","expectedAmount":25,"addressIndex":0,"address":"0x1a41461DCb18646Aa2160A6CC0b7375Af69420A4","maskedAddress":"0x1a4146...9420A4","status":"PENDING","blockchainStatus":"WAITING_PAYMENT","confirmations":0,"txHash":"","createdAt":"2026-06-22T03:48:05.530Z","expiresAt":"2026-06-22T04:18:05.530Z"}]},"networks":[{"route":"Ethereum Sepolia","protocol":"EVM / ERC-20","chainId":"11155111","asset":"MOCK_USDT","environment":"TEST","deposits":"ENABLED","hdPool":"YES","watcher":"PENDING","settlement":"PENDING","note":"Technical route currently connected to the validated HD pool."},{"route":"Ethereum Mainnet","protocol":"EVM / ERC-20","chainId":"1","asset":"USDT","environment":"PRODUCTION","deposits":"NOT ENABLED","hdPool":"PLANNED","watcher":"NO","settlement":"NO","note":"Requires a new production root and validation of the official USDT contract."},{"route":"BNB Smart Chain","protocol":"EVM / BEP-20","chainId":"56","asset":"USDT","environment":"LEGACY / REVIEW","deposits":"NOT ENABLED IN THIS POOL","hdPool":"NO","watcher":"LEGACY","settlement":"NO","note":"An older balance-based prototype exists, but it is not part of this HD architecture."},{"route":"TRON","protocol":"TRC-20","chainId":"N/A","asset":"USDT","environment":"PLANNED","deposits":"NOT ENABLED","hdPool":"NO","watcher":"NO","settlement":"NO","note":"Requires a separate TRON implementation and independent validation."}],"components":[{"name":"Secure provisioning","status":"OPERATIVE","responsibility":"Generate mnemonic, seed, XPUB and public address pool.","secrets":"Encrypted seed; never exposed to the public backend."},{"name":"Watch-only backend","status":"OPERATIVE","responsibility":"Assign addresses, create orders and manage status.","secrets":"Does not contain the seed or private keys."},{"name":"PWA","status":"OPERATIVE","responsibility":"Request an authenticated order and display network, amount and address.","secrets":"Does not receive XPUB, seed or private keys."},{"name":"Blockchain monitor","status":"PENDING","responsibility":"Detect real Transfer events, confirmations and duplicate transactions.","secrets":"Does not require private keys."},{"name":"Signer / sweep","status":"PENDING","responsibility":"Derive child keys and consolidate funds into treasury.","secrets":"Must run isolated from the public backend."}]};
+var revealAddresses = false;
+
+function byId(id){ return document.getElementById(id); }
+function setText(id,value){ byId(id).textContent = (value === null || value === undefined || value === "") ? "-" : value; }
+function esc(value){
+  return String(value === null || value === undefined ? "" : value).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c];
+  });
+}
+function badge(value){
+  var v = String(value || "").toUpperCase();
+  var cls = "info";
+  if(["AVAILABLE","OPERATIVE","CREATED","ENABLED","YES","CONFIRMED"].indexOf(v) >= 0){ cls = "ok"; }
+  if(["ASSIGNED","PENDING","TEST","LEGACY / REVIEW","PLANNED"].indexOf(v) >= 0){ cls = "warn"; }
+  if(["NOT ENABLED","NOT ENABLED IN THIS POOL","NO","FAILED","REJECTED"].indexOf(v) >= 0){ cls = "bad"; }
+  return '<span class="badge '+cls+'">'+esc(value || "-")+'</span>';
+}
+function renderNetworks(){
+  byId("networkRows").innerHTML = DATA.networks.map(function(n){
+    return "<tr>"+
+      "<td><strong>"+esc(n.route)+"</strong></td>"+
+      "<td>"+esc(n.protocol)+"</td>"+
+      '<td class="mono">'+esc(n.chainId)+"</td>"+
+      "<td>"+esc(n.asset)+"</td>"+
+      "<td>"+badge(n.environment)+"</td>"+
+      "<td>"+badge(n.deposits)+"</td>"+
+      "<td>"+badge(n.hdPool)+"</td>"+
+      "<td>"+badge(n.watcher)+"</td>"+
+      "<td>"+badge(n.settlement)+"</td>"+
+      "<td>"+esc(n.note)+"</td>"+
+    "</tr>";
+  }).join("");
+}
+function renderAddresses(){
+  var q = byId("addressSearch").value.trim().toLowerCase();
+  var status = byId("statusFilter").value;
+  var rows = DATA.pool.addresses.filter(function(a){
+    var haystack = [a.index,a.derivationPath,a.address,a.status,a.assignedDepositId,a.assignedPlayerId].join(" ").toLowerCase();
+    return (!q || haystack.indexOf(q) >= 0) && (!status || a.status === status);
+  });
+  byId("addressRows").innerHTML = rows.map(function(a){
+    return "<tr>"+
+      '<td class="mono">'+String(a.index).padStart(2,"0")+"</td>"+
+      '<td class="mono">'+esc(a.derivationPath || "-")+"</td>"+
+      '<td class="mono">'+esc(revealAddresses ? a.address : a.maskedAddress)+"</td>"+
+      "<td>"+badge(a.status)+"</td>"+
+      '<td class="mono">'+esc(a.assignedDepositId || "-")+"</td>"+
+      "<td>"+esc(a.assignedPlayerId || "-")+"</td>"+
+      "<td>"+esc(a.assignedAt || "-")+"</td>"+
+    "</tr>";
+  }).join("");
+}
+function renderDeposits(){
+  if(!DATA.deposits.orders.length){
+    byId("depositRows").innerHTML = '<tr><td colspan="12">No existen ordenes registradas.</td></tr>';
+    return;
+  }
+  byId("depositRows").innerHTML = DATA.deposits.orders.map(function(o){
+    return "<tr>"+
+      '<td class="mono">'+esc(o.orderId)+"</td>"+
+      "<td>"+esc(o.playerId || "-")+"</td>"+
+      "<td>"+esc(o.network)+"</td>"+
+      '<td class="mono">'+esc(o.chainId)+"</td>"+
+      "<td>"+esc(o.token)+"</td>"+
+      '<td class="mono">'+esc(o.expectedAmount)+"</td>"+
+      '<td class="mono">'+esc(o.addressIndex)+"</td>"+
+      '<td class="mono">'+esc(revealAddresses ? o.address : o.maskedAddress)+"</td>"+
+      "<td>"+badge(o.status)+"</td>"+
+      "<td>"+badge(o.blockchainStatus)+"</td>"+
+      '<td class="mono">'+esc(o.confirmations || 0)+"</td>"+
+      '<td class="mono">'+esc(o.txHash || "-")+"</td>"+
+    "</tr>";
+  }).join("");
+}
+function renderComponents(){
+  byId("componentRows").innerHTML = DATA.components.map(function(c){
+    return '<div class="component">'+
+      '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h3>'+esc(c.name)+"</h3>"+badge(c.status)+"</div>"+
+      "<p><strong>Responsabilidad:</strong> "+esc(c.responsibility)+"</p>"+
+      "<p><strong>Secretos:</strong> "+esc(c.secrets)+"</p>"+
+    "</div>";
+  }).join("");
+}
+function render(){
+  setText("environment",DATA.environment);
+  setText("poolIdHero",DATA.pool.poolId);
+  setText("branchHero",DATA.pool.branchPath);
+  setText("generatedAt",new Date(DATA.generatedAt).toLocaleString());
+  setText("rootType",DATA.principalWallet.type);
+  setText("rootStatus",DATA.principalWallet.status);
+  setText("mnemonic",DATA.principalWallet.mnemonic);
+  setText("seedStorage",DATA.principalWallet.seedStorage);
+  setText("xpubMasked",DATA.principalWallet.xpubMasked);
+  setText("treasury",DATA.principalWallet.treasuryAddress);
+  setText("mTotal",DATA.pool.total);
+  setText("mAvailable",DATA.pool.available);
+  setText("mAssigned",DATA.pool.assigned);
+  setText("mUsed",DATA.pool.used);
+  setText("mOrders",DATA.deposits.totalOrders);
+  setText("mPending",DATA.deposits.pendingOrders);
+  setText("deployerAddress",DATA.deploymentWallet.address);
+  setText("deployerPurpose",DATA.deploymentWallet.purpose);
+  setText("deployerNetwork",DATA.deploymentWallet.network);
+  setText("deployerKeyStorage",DATA.deploymentWallet.keyStorage);
+  setText("deployerReceives",DATA.deploymentWallet.receivesCustomerDeposits ? "YES" : "NO");
+  setText("deployerGas",DATA.deploymentWallet.hasTestGas ? "AVAILABLE" : "NOT AVAILABLE");
+  renderNetworks();
+  renderAddresses();
+  renderDeposits();
+  renderComponents();
+}
+byId("addressSearch").addEventListener("input",renderAddresses);
+byId("statusFilter").addEventListener("change",renderAddresses);
+byId("toggleAddresses").addEventListener("click",function(){
+  revealAddresses = !revealAddresses;
+  byId("toggleAddresses").textContent = revealAddresses ? "Ocultar direcciones completas" : "Mostrar direcciones completas";
+  renderAddresses();
+  renderDeposits();
+});
+(function health(){
+  fetch("/api/state",{cache:"no-store"}).then(function(r){
+    if(!r.ok){ throw new Error("HTTP "+r.status); }
+    byId("serverDot").classList.add("ok");
+    byId("serverText").textContent = "Backend puerto 4000: EN LINEA";
+  }).catch(function(){
+    byId("serverDot").classList.add("bad");
+    byId("serverText").textContent = "Backend puerto 4000: NO DISPONIBLE";
+  });
+})();
+render();
+</script>
+</body>
+</html>

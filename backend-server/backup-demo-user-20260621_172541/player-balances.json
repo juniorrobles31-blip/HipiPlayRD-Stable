@@ -1,0 +1,230 @@
+{
+  "usr_admin": {
+    "playerId": "usr_admin",
+    "balance": 8400,
+    "createdAt": "2026-06-14T00:05:43.037Z",
+    "updatedAt": "2026-06-14T17:02:18.150Z"
+  },
+  "test_h1": {
+    "playerId": "test_h1",
+    "balance": 9090,
+    "createdAt": "2026-06-14T20:13:45.076Z",
+    "updatedAt": "2026-06-16T14:18:07.962Z"
+  },
+  "test_h2": {
+    "playerId": "test_h2",
+    "balance": 9110,
+    "createdAt": "2026-06-14T20:13:45.407Z",
+    "updatedAt": "2026-06-16T14:27:28.544Z"
+  },
+  "test_h3": {
+    "playerId": "test_h3",
+    "balance": 9150,
+    "createdAt": "2026-06-14T20:13:45.739Z",
+    "updatedAt": "2026-06-16T15:34:00.932Z"
+  },
+  "test_h4": {
+    "playerId": "test_h4",
+    "balance": 8600,
+    "createdAt": "2026-06-14T20:13:46.067Z",
+    "updatedAt": "2026-06-14T20:14:15.994Z"
+  },
+  "test_h5": {
+    "playerId": "test_h5",
+    "balance": 8490,
+    "createdAt": "2026-06-14T20:13:46.384Z",
+    "updatedAt": "2026-06-16T16:48:18.440Z"
+  },
+  "test_h6": {
+    "playerId": "test_h6",
+    "balance": 8410,
+    "createdAt": "2026-06-14T20:13:46.718Z",
+    "updatedAt": "2026-06-16T16:48:42.014Z"
+  },
+  "vendedor_001": {
+    "playerId": "vendedor_001",
+    "createdAt": "2026-06-14T21:47:25.046Z",
+    "balance": 400,
+    "updatedAt": "2026-06-14T21:47:39.446Z"
+  },
+  "comprador_001": {
+    "playerId": "comprador_001",
+    "balance": 9100,
+    "createdAt": "2026-06-14T21:48:18.392Z",
+    "updatedAt": "2026-06-14T21:48:18.392Z"
+  },
+  "vendedor_auto_001": {
+    "playerId": "vendedor_auto_001",
+    "createdAt": "2026-06-14T21:53:14.974Z",
+    "balance": 9,
+    "updatedAt": "2026-06-14T22:03:58.694Z"
+  },
+  "comprador_auto_001": {
+    "playerId": "comprador_auto_001",
+    "balance": 9001,
+    "createdAt": "2026-06-14T21:53:54.771Z",
+    "updatedAt": "2026-06-14T22:03:58.695Z"
+  },
+  "usr_3f961066fe22407e8f9c7d23417219de": {
+    "playerId": "usr_3f961066fe22407e8f9c7d23417219de",
+    "balance": 9000,
+    "createdAt": "2026-06-15T00:56:48.212Z",
+    "updatedAt": "2026-06-15T00:56:48.212Z"
+  },
+  "usr_b1a7c032-b409-4695-9c13-df2b547a8e3f": {
+    "playerId": "usr_b1a7c032-b409-4695-9c13-df2b547a8e3f",
+    "balance": 0,
+    "createdAt": "2026-06-15T02:11:49.273Z",
+    "updatedAt": "2026-06-17T22:21:22.728Z"
+  },
+  "usr_fbbb8702837d44cfbc5ff20df6974c1b": {
+    "playerId": "usr_fbbb8702837d44cfbc5ff20df6974c1b",
+    "balance": 6650,
+    "createdAt": "2026-06-15T15:45:18.746Z",
+    "updatedAt": "2026-06-19T03:16:44.337Z"
+  },
+  "JRobles": {
+    "playerId": "JRobles",
+    "balance": 9900,
+    "createdAt": "2026-06-16T18:27:23.570Z",
+    "updatedAt": "2026-06-16T18:27:51.934Z"
+  },
+  "Simulador01": {
+    "playerId": "Simulador01",
+    "balance": 9100,
+    "createdAt": "2026-06-16T18:37:09.094Z",
+    "updatedAt": "2026-06-17T16:28:01.5209167Z"
+  },
+  "PLAYER_ID": {
+    "playerId": "PLAYER_ID",
+    "balance": 9000,
+    "createdAt": "2026-06-19T02:50:19.187Z",
+    "updatedAt": "2026-06-19T02:50:19.187Z"
+  },
+  "usr_demo_mqkwjx6c_f078735b": {
+    "playerId": "usr_demo_mqkwjx6c_f078735b",
+    "createdAt": "2026-06-19T12:25:51.540Z",
+    "balance": 1000,
+    "updatedAt": "2026-06-19T12:25:51.540Z"
+  },
+  "usr_demo_mqkxgze9_b3d45e01": {
+    "playerId": "usr_demo_mqkxgze9_b3d45e01",
+    "createdAt": "2026-06-19T12:51:34.065Z",
+    "balance": 900,
+    "updatedAt": "2026-06-19T16:14:56.321Z"
+  },
+  "usr_demo_mql2gnbs_83c8c24c": {
+    "playerId": "usr_demo_mql2gnbs_83c8c24c",
+    "createdAt": "2026-06-19T15:11:16.504Z",
+    "balance": 200,
+    "updatedAt": "2026-06-19T16:29:56.112Z"
+  },
+  "usr_demo_mql3oqku_d2b9e384": {
+    "playerId": "usr_demo_mql3oqku_d2b9e384",
+    "createdAt": "2026-06-19T15:45:33.583Z",
+    "balance": 800,
+    "updatedAt": "2026-06-19T15:47:20.260Z"
+  },
+  "usr_demo_mql3wu4m_76962374": {
+    "playerId": "usr_demo_mql3wu4m_76962374",
+    "createdAt": "2026-06-19T15:51:51.430Z",
+    "balance": 840,
+    "updatedAt": "2026-06-19T15:55:08.408Z"
+  },
+  "usr_demo_mql44z9h_1065fcfe": {
+    "playerId": "usr_demo_mql44z9h_1065fcfe",
+    "createdAt": "2026-06-19T15:58:11.333Z",
+    "balance": 800,
+    "updatedAt": "2026-06-19T15:59:20.452Z"
+  },
+  "usr_demo_mql46ver_67627179": {
+    "playerId": "usr_demo_mql46ver_67627179",
+    "createdAt": "2026-06-19T15:59:39.651Z",
+    "balance": 0,
+    "updatedAt": "2026-06-19T16:05:20.129Z"
+  },
+  "usr_demo_mql5ccrm_b76f5134": {
+    "playerId": "usr_demo_mql5ccrm_b76f5134",
+    "createdAt": "2026-06-19T16:31:55.042Z",
+    "balance": 500,
+    "updatedAt": "2026-06-19T16:57:32.653Z"
+  },
+  "usr_demo_mql6cjg2_e8025794": {
+    "playerId": "usr_demo_mql6cjg2_e8025794",
+    "createdAt": "2026-06-19T17:00:03.314Z",
+    "balance": 1000,
+    "updatedAt": "2026-06-19T17:00:03.314Z"
+  },
+  "usr_demo_mql6dpc2_85d8f4eb": {
+    "playerId": "usr_demo_mql6dpc2_85d8f4eb",
+    "createdAt": "2026-06-19T17:00:57.602Z",
+    "balance": 1000,
+    "updatedAt": "2026-06-19T17:00:57.602Z"
+  },
+  "usr_demo_mql6jwx9_e905f5d0": {
+    "playerId": "usr_demo_mql6jwx9_e905f5d0",
+    "createdAt": "2026-06-19T17:05:47.373Z",
+    "balance": 890,
+    "updatedAt": "2026-06-19T17:07:44.633Z"
+  },
+  "usr_demo_mql6psny_63739eba": {
+    "playerId": "usr_demo_mql6psny_63739eba",
+    "createdAt": "2026-06-19T17:10:21.790Z",
+    "balance": 400,
+    "updatedAt": "2026-06-19T18:35:20.572Z"
+  },
+  "usr_demo_mql6uj4s_62176010": {
+    "playerId": "usr_demo_mql6uj4s_62176010",
+    "createdAt": "2026-06-19T17:14:02.717Z",
+    "balance": 900,
+    "updatedAt": "2026-06-19T20:44:56.143Z"
+  },
+  "usr_demo_mql9taiw_41a1c45b": {
+    "playerId": "usr_demo_mql9taiw_41a1c45b",
+    "createdAt": "2026-06-19T18:37:03.753Z",
+    "balance": 900,
+    "updatedAt": "2026-06-19T18:37:44.566Z"
+  },
+  "usr_demo_mqlaoo74_3c3aab31": {
+    "playerId": "usr_demo_mqlaoo74_3c3aab31",
+    "createdAt": "2026-06-19T19:01:27.808Z",
+    "balance": 300,
+    "updatedAt": "2026-06-19T20:46:44.462Z"
+  },
+  "usr_demo_mqlav9d7_803936c7": {
+    "playerId": "usr_demo_mqlav9d7_803936c7",
+    "createdAt": "2026-06-19T19:06:35.180Z",
+    "balance": 600,
+    "updatedAt": "2026-06-19T19:14:20.261Z"
+  },
+  "usr_demo_mqlda8c0_849cbfba": {
+    "playerId": "usr_demo_mqlda8c0_849cbfba",
+    "createdAt": "2026-06-19T20:14:12.912Z",
+    "balance": 700,
+    "updatedAt": "2026-06-21T01:21:32.703Z"
+  },
+  "usr_demo_mqldmiu8_01194851": {
+    "playerId": "usr_demo_mqldmiu8_01194851",
+    "createdAt": "2026-06-19T20:23:46.401Z",
+    "balance": 900,
+    "updatedAt": "2026-06-19T20:25:08.473Z"
+  },
+  "usr_demo_mqn3qagl_178c6fc5": {
+    "playerId": "usr_demo_mqn3qagl_178c6fc5",
+    "createdAt": "2026-06-21T01:22:18.358Z",
+    "balance": 1000,
+    "updatedAt": "2026-06-21T01:22:18.358Z"
+  },
+  "usr_demo_mqn3yw8j_8a8876db": {
+    "playerId": "usr_demo_mqn3yw8j_8a8876db",
+    "createdAt": "2026-06-21T01:28:59.827Z",
+    "balance": 1000,
+    "updatedAt": "2026-06-21T01:28:59.827Z"
+  },
+  "usr_demo_mqn4ih1s_9bb85b73": {
+    "playerId": "usr_demo_mqn4ih1s_9bb85b73",
+    "createdAt": "2026-06-21T01:44:13.264Z",
+    "balance": 1000,
+    "updatedAt": "2026-06-21T01:44:13.264Z"
+  }
+}

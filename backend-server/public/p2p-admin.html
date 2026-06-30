@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin P2P - HipiPlay</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #06110b;
+      color: #f4fff7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top, rgba(17, 119, 65, .35), transparent 35%),
+        #06110b;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 16px 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      background: rgba(0,0,0,.68);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(14px);
+    }
+
+    h1, h2, h3 { margin: 0; }
+
+    main {
+      width: min(1600px, calc(100% - 28px));
+      margin: 18px auto 40px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .btn, button {
+      border: 1px solid rgba(255, 215, 0, .42);
+      background: rgba(255, 215, 0, .13);
+      color: #ffe98a;
+      border-radius: 12px;
+      padding: 9px 12px;
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    button.danger {
+      border-color: rgba(255,100,100,.45);
+      background: rgba(255,0,0,.12);
+      color: #ffb0b0;
+    }
+
+    button.success {
+      border-color: rgba(101,255,156,.45);
+      background: rgba(101,255,156,.13);
+      color: #65ff9c;
+    }
+
+    .card {
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .metric small {
+      display: block;
+      opacity: .75;
+      margin-bottom: 6px;
+    }
+
+    .metric strong {
+      font-size: 1.35rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      text-align: left;
+      vertical-align: top;
+      font-size: .9rem;
+    }
+
+    th {
+      color: #ffe98a;
+      background: rgba(0,0,0,.25);
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(0,0,0,.32);
+      color: inherit;
+      padding: 9px;
+      font: inherit;
+    }
+
+    textarea { min-height: 60px; }
+
+    .address {
+      font-family: Consolas, monospace;
+      font-size: .82rem;
+      word-break: break-all;
+    }
+
+    .badge {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 9px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .ok { color: #65ff9c; }
+    .warn { color: #ffe98a; }
+    .bad { color: #ff9b9b; }
+    .muted { opacity: .75; }
+
+    .actions {
+      display: grid;
+      gap: 8px;
+      min-width: 250px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1100px) {
+      header, .grid {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Admin P2P</h1>
+      <small>Ofertas, trades, escrow, balances USDT y wallets asignadas.</small>
+    </div>
+    <div class="row-actions">
+      <a class="btn" href="/admin.html">Volver Admin</a>
+      <a class="btn" href="/deposit-admin.html">Depósitos</a>
+      <a class="btn" href="/casino-history.html">Casino</a>
+      <button onclick="loadAll()">Actualizar</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="summary">
+      <div class="metric">
+        <small>Ofertas abiertas</small>
+        <strong id="openOffers">0</strong>
+      </div>
+      <div class="metric">
+        <small>Trades pendientes</small>
+        <strong id="pendingTrades" class="warn">0</strong>
+      </div>
+      <div class="metric">
+        <small>Trades confirmados</small>
+        <strong id="confirmedTrades" class="ok">0</strong>
+      </div>
+      <div class="metric">
+        <small>Monedas en escrow</small>
+        <strong id="escrowTotal">0</strong>
+      </div>
+      <div class="metric">
+        <small>USDT interno usuarios</small>
+        <strong id="usdtTotal" class="ok">0</strong>
+      </div>
+      <div class="metric">
+        <small>Wallets disponibles</small>
+        <strong id="walletsAvailable">0</strong>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Trades P2P</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Trade</th>
+              <th>Vendedor</th>
+              <th>Comprador</th>
+              <th>Monedas</th>
+              <th>USDT</th>
+              <th>Wallet pago</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tradeRows">
+            <tr><td colspan="8">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Ofertas P2P</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Oferta</th>
+                <th>Vendedor</th>
+                <th>Monedas</th>
+                <th>Precio</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="offerRows">
+              <tr><td colspan="5">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Escrow y USDT interno</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Monedas bloqueadas</th>
+                <th>USDT interno</th>
+              </tr>
+            </thead>
+            <tbody id="balanceRows">
+              <tr><td colspan="3">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Wallet Pool</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Dirección</th>
+              <th>Red</th>
+              <th>Token</th>
+              <th>Estado</th>
+              <th>Orden/Trade asignado</th>
+              <th>Usuario asignado</th>
+            </tr>
+          </thead>
+          <tbody id="walletRows">
+            <tr><td colspan="6">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let trades = [];
+    let offers = [];
+    let escrow = {};
+    let usdtBalances = {};
+    let wallets = [];
+    let summary = {};
+
+    const money = (value) => Number(value || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    });
+
+    const statusClass = (status) => {
+      status = String(status || '').toUpperCase();
+      if (['CONFIRMED', 'COMPLETED', 'USED', 'AVAILABLE'].includes(status)) return 'ok';
+      if (['PAYMENT_PENDING', 'OPEN', 'PARTIAL', 'ASSIGNED', 'TAKEN'].includes(status)) return 'warn';
+      if (['CANCELLED', 'REJECTED', 'RETIRED', 'DISABLED'].includes(status)) return 'bad';
+      return 'muted';
+    };
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, {
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        ...options
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || `${url} respondió ${response.status}`);
+      }
+
+      return data;
+    }
+
+    async function loadAll() {
+      try {
+        const [tradeData, offerData, escrowData, usdtData, walletData] = await Promise.all([
+          fetchJson('/api/admin/p2p/trades'),
+          fetchJson('/api/admin/p2p/offers'),
+          fetchJson('/api/admin/p2p/escrow'),
+          fetchJson('/api/admin/p2p/usdt-balances'),
+          fetchJson('/api/admin/wallet-pool')
+        ]);
+
+        summary = tradeData.summary || {};
+        trades = Array.isArray(tradeData.trades) ? tradeData.trades : [];
+        offers = Array.isArray(offerData.offers) ? offerData.offers : [];
+        escrow = escrowData.escrow || {};
+        usdtBalances = usdtData.usdtBalances || {};
+        wallets = Array.isArray(walletData.wallets) ? walletData.wallets : [];
+
+        renderSummary(walletData.summary || {});
+        renderTrades();
+        renderOffers();
+        renderBalances();
+        renderWallets();
+      } catch (error) {
+        document.getElementById('tradeRows').innerHTML = `<tr><td colspan="8" class="bad">${error.message}</td></tr>`;
+      }
+    }
+
+    function renderSummary(walletSummary) {
+      document.getElementById('openOffers').textContent = money(summary.openOffers);
+      document.getElementById('pendingTrades').textContent = money(summary.pendingTrades);
+      document.getElementById('confirmedTrades').textContent = money(summary.confirmedTrades);
+      document.getElementById('escrowTotal').textContent = money(summary.escrowTotal);
+      document.getElementById('usdtTotal').textContent = money(summary.usdtTotal);
+      document.getElementById('walletsAvailable').textContent = money(walletSummary.AVAILABLE || 0);
+    }
+
+    function renderTrades() {
+      const tbody = document.getElementById('tradeRows');
+
+      if (!trades.length) {
+        tbody.innerHTML = '<tr><td colspan="8">No hay trades P2P.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = trades.map(trade => `
+        <tr>
+          <td>
+            <strong>${trade.tradeId}</strong>
+            <br><small>${trade.createdAt ? new Date(trade.createdAt).toLocaleString() : '-'}</small>
+          </td>
+          <td>${trade.sellerName || trade.sellerId}<br><small>${trade.sellerId}</small></td>
+          <td>${trade.buyerName || trade.buyerId}<br><small>${trade.buyerId}</small></td>
+          <td>${money(trade.coinAmount)}</td>
+          <td>${money(trade.usdtAmount)} ${trade.token || 'USDT'}<br><small>${trade.network || '-'}</small></td>
+          <td class="address">${trade.paymentAddress || '-'}</td>
+          <td class="${statusClass(trade.status)}"><strong>${trade.status}</strong><br><small>${trade.txHash || '-'}</small></td>
+          <td>
+            ${trade.status === 'PAYMENT_PENDING' ? `
+              <div class="actions">
+                <input id="tx-${trade.tradeId}" placeholder="txHash o referencia" />
+                <input id="paid-${trade.tradeId}" type="number" step="0.01" min="0" value="${Number(trade.usdtAmount || 0)}" />
+                <button class="success" onclick="confirmTrade('${trade.tradeId}')">Confirmar</button>
+                <button class="danger" onclick="cancelTrade('${trade.tradeId}')">Cancelar</button>
+              </div>
+            ` : `<span class="muted">Sin acciones</span>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderOffers() {
+      const tbody = document.getElementById('offerRows');
+
+      if (!offers.length) {
+        tbody.innerHTML = '<tr><td colspan="5">No hay ofertas P2P.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = offers.map(offer => `
+        <tr>
+          <td>
+            <strong>${offer.offerId}</strong>
+            <br><small>${offer.createdAt ? new Date(offer.createdAt).toLocaleString() : '-'}</small>
+          </td>
+          <td>${offer.sellerName || offer.sellerId}<br><small>${offer.sellerId}</small></td>
+          <td>${money(offer.remainingCoins)} / ${money(offer.coinAmount)}</td>
+          <td>${money(offer.pricePerCoin)} USDT</td>
+          <td class="${statusClass(offer.status)}"><strong>${offer.status}</strong></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderBalances() {
+      const tbody = document.getElementById('balanceRows');
+      const users = new Set([
+        ...Object.keys(escrow || {}),
+        ...Object.keys(usdtBalances || {})
+      ]);
+
+      if (!users.size) {
+        tbody.innerHTML = '<tr><td colspan="3">No hay balances P2P registrados.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = Array.from(users).map(playerId => {
+        const escrowAmount = escrow[playerId] ? escrow[playerId].p2pLocked : 0;
+        const usdtAmount = usdtBalances[playerId] ? usdtBalances[playerId].balance : 0;
+
+        return `
+          <tr>
+            <td>${playerId}</td>
+            <td>${money(escrowAmount)}</td>
+            <td class="ok">${money(usdtAmount)} USDT</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderWallets() {
+      const tbody = document.getElementById('walletRows');
+
+      if (!wallets.length) {
+        tbody.innerHTML = '<tr><td colspan="6">No hay wallets registradas.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = wallets.map(wallet => `
+        <tr>
+          <td class="address">${wallet.address || '-'}</td>
+          <td>${wallet.network || '-'}</td>
+          <td>${wallet.token || 'USDT'}</td>
+          <td class="${statusClass(wallet.status)}"><strong>${wallet.status || '-'}</strong></td>
+          <td>${wallet.assignedOrderId || '-'}</td>
+          <td>${wallet.assignedPlayerId || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function confirmTrade(tradeId) {
+      const txHash = document.getElementById(`tx-${tradeId}`).value || `ADMIN_CONFIRM_${Date.now()}`;
+      const paidAmount = Number(document.getElementById(`paid-${tradeId}`).value || 0);
+
+      await fetchJson(`/api/admin/p2p/trades/${tradeId}/confirm`, {
+        method: 'POST',
+        body: JSON.stringify({
+          txHash,
+          paidAmount,
+          adminNote: 'Confirmado desde Admin P2P'
+        })
+      });
+
+      await loadAll();
+    }
+
+    async function cancelTrade(tradeId) {
+      const ok = confirm(`¿Seguro que deseas cancelar el trade ${tradeId}?`);
+
+      if (!ok) return;
+
+      await fetchJson(`/api/admin/p2p/trades/${tradeId}/cancel`, {
+        method: 'POST',
+        body: JSON.stringify({
+          adminNote: 'Cancelado desde Admin P2P'
+        })
+      });
+
+      await loadAll();
+    }
+
+    loadAll();
+    setInterval(loadAll, 10000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HipiPlayRD - Panel Admin</title>
+
+    <script src="/security/zero-log.js"></script>
+    <script src="/security/wallet-vault.js"></script>
+    <script src="/security/secure-wipe.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+
+    :root { --bg:#090d0b; --card:#121a16; --card2:#18251f; --gold:#e5b84b; --green:#2ecc71; --red:#e74c3c; --blue:#3498db; --orange:#f39c12; --muted:#9ca3af; --text:#f5f5f5; --border:rgba(229,184,75,.25); }
+    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top,#1b2b22,var(--bg));color:var(--text)} .container{width:min(1450px,96%);margin:24px auto}.header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}.title h1{margin:0;color:var(--gold)}.title p{margin:6px 0 0;color:var(--muted)}.status-pill{padding:12px 18px;border-radius:999px;font-weight:bold;border:1px solid var(--border);background:var(--card)}.online{color:var(--green)}.offline{color:var(--red)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:rgba(18,26,22,.96);border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.25)}.span-3{grid-column:span 3}.span-5{grid-column:span 5}.span-6{grid-column:span 6}.span-7{grid-column:span 7}.span-12{grid-column:span 12}.metric-label{color:var(--muted);font-size:14px;margin-bottom:8px}.metric-value{font-size:34px;font-weight:bold}.phase{color:#111;display:inline-block;padding:8px 14px;border-radius:12px;font-weight:bold}.phase.BETTING{background:var(--green)}.phase.RACE{background:var(--orange)}.phase.RESULTS{background:var(--blue)}.timer{font-size:54px;font-weight:bold;color:var(--gold);margin-top:8px}.progress{width:100%;height:12px;background:#0b100d;border-radius:100px;overflow:hidden;margin-top:12px;border:1px solid rgba(255,255,255,.08)}.progress-bar{height:100%;width:0%;background:var(--gold);transition:width .3s ease}table{width:100%;border-collapse:collapse;margin-top:8px}th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;font-size:14px}th{color:var(--gold);font-size:13px;text-transform:uppercase}.winner-list{display:grid;gap:10px}.winner{background:var(--card2);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;display:flex;justify-content:space-between;align-items:center}.winner strong{color:var(--gold)}.small{color:var(--muted);font-size:13px}.btn{background:var(--gold);color:#111;border:0;border-radius:12px;padding:12px 16px;font-weight:bold;cursor:pointer}.btn-danger{background:var(--red);color:white}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.notice{padding:12px;border-radius:12px;background:rgba(229,184,75,.12);border:1px solid var(--border);color:#f7df9c;margin-top:10px}@media(max-width:950px){.span-3,.span-5,.span-6,.span-7,.span-12{grid-column:span 12}.header{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="header"><div class="title"><h1>HipiPlayRD - Panel Admin</h1><p>Monitoreo en tiempo real + balance enviado por la PWA + pagos x2.</p></div><div id="connectionStatus" class="status-pill offline">Desconectado</div></section>
+    <section class="grid">
+      <div class="card span-3"><div class="metric-label">Carrera actual</div><div id="roundId" class="metric-value">-</div></div>
+      <div class="card span-3"><div class="metric-label">Estado servidor/PWA</div><div id="phase" class="phase">-</div></div>
+      <div class="card span-3"><div class="metric-label">Tiempo restante</div><div id="timer" class="timer">--</div><div class="progress"><div id="progressBar" class="progress-bar"></div></div></div>
+      <div class="card span-3"><div class="metric-label">Apuestas recibidas</div><div id="totalBets" class="metric-value">0</div><div class="small">Suma total: <span id="totalAmount">0</span> | Pago: x<span id="payoutMultiplier">2</span></div></div>
+      <div class="card span-6"><h2>Totales en vivo por caballo</h2><table><thead><tr><th>Caballo</th><th>Color</th><th>Cant. apuestas</th><th>Total apostado</th></tr></thead><tbody id="totalsTable"></tbody></table></div>
+      <div class="card span-6"><h2>Ganadores internos / visibles</h2><div class="notice">En RESULTS, la PWA recibe finalBalance. Si gana: balance después de apostar + apuesta x2. Si pierde: balance después de apostar.</div><h3>Orden interno</h3><div id="orderedResults" class="winner-list"></div><h3>Ganadores visibles para la PWA</h3><div id="visibleWinners" class="winner-list"></div></div>
+      <div class="card span-12"><h2>Pagos y balances calculados</h2><table><thead><tr><th>Jugador</th><th>Caballo</th><th>Balance inicial</th><th>Apostó</th><th>Balance tras apostar</th><th>Ganó</th><th>Pago x2</th><th>Balance final PWA</th></tr></thead><tbody id="settlementsTable"></tbody></table></div>
+      <div class="card span-7"><h2>Apuestas actuales</h2><table><thead><tr><th>Hora</th><th>Jugador</th><th>Caballo</th><th>Apostó</th><th>Balance total</th><th>Balance tras apostar</th></tr></thead><tbody id="betsTable"></tbody></table></div>
+      <div class="card span-5"><h2>Control rápido</h2><div class="toolbar"><button class="btn" onclick="refreshState()">Actualizar estado</button><button class="btn btn-danger" onclick="resetRound()">Reiniciar ronda</button></div><h3>Historial público PWA</h3><pre id="publicHistory" style="white-space:pre-wrap;background:#070a08;padding:12px;border-radius:12px;max-height:220px;overflow:auto;"></pre></div>
+<div class="card span-12">
+  <h2>Estado crudo admin</h2>
+  <pre id="rawState" style="white-space:pre-wrap;background:#070a08;padding:12px;border-radius:12px;max-height:320px;overflow:auto;"></pre>
+</div>
+
+<div class="card span-12">
+  <h2>Bóveda local / Zero Access</h2>
+
+  <div class="notice">
+    Este panel no debe recibir, almacenar ni mostrar semillas reales ni claves privadas de usuarios.
+    La generación y custodia de llaves debe ejecutarse únicamente en la PWA del jugador o mediante wallet externa.
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" onclick="testGenerateEntropy()">Generar entropía local de prueba</button>
+    <button class="btn btn-danger" onclick="HipiSecureWipe.wipeAndReloadPwa()">Borrar datos locales de este dispositivo</button>
+  </div>
+
+  <pre id="vaultOutput" style="white-space:pre-wrap;background:#070a08;padding:12px;border-radius:12px;max-height:220px;overflow:auto;margin-top:12px;"></pre>
+</div>
+
+</section>
+    </section>
+  </main>
+<script>
+const socket=io();
+socket.on('connect',()=>{document.getElementById('connectionStatus').textContent='Conectado';document.getElementById('connectionStatus').className='status-pill online';socket.emit('admin_join');loadPublicHistory();});
+socket.on('disconnect',()=>{document.getElementById('connectionStatus').textContent='Desconectado';document.getElementById('connectionStatus').className='status-pill offline';});
+socket.on('admin_state',(state)=>{render(state);loadPublicHistory();});
+function formatMoney(v){return Number(v||0).toLocaleString('es-DO',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function formatDate(v){return v?new Date(v).toLocaleString('es-DO'):'-';}
+function getPhaseTotalSeconds(s){if(s.phase==='BETTING')return s.bettingSeconds;if(s.phase==='RACE')return s.raceSeconds;if(s.phase==='RESULTS')return s.resultsSeconds;return 1;}
+function renderResults(id,results){const el=document.getElementById(id);if(!results||!results.length){el.innerHTML='<div class="small">Sin información visible todavía.</div>';return;}el.innerHTML=results.map(w=>`<div class="winner"><div><strong>#${w.position} - ${w.name}</strong><div class="small">Caballo No. ${w.horseId} | Color: ${w.color}</div></div><div><strong>${formatMoney(w.totalAmount)}</strong><div class="small">${w.totalBets||0} apuestas</div></div></div>`).join('');}
+function render(state){document.getElementById('roundId').textContent=state.raceNumber||state.roundId;document.getElementById('payoutMultiplier').textContent=state.payoutMultiplier||2;const phaseEl=document.getElementById('phase');phaseEl.textContent=state.phase;phaseEl.className=`phase ${state.phase}`;document.getElementById('timer').textContent=`${state.secondsRemaining}s`;document.getElementById('totalBets').textContent=state.totalBetsReceived;const totalAmount=(state.totals||[]).reduce((sum,item)=>sum+item.totalAmount,0);document.getElementById('totalAmount').textContent=formatMoney(totalAmount);document.getElementById('progressBar').style.width=`${Math.max(0,Math.min(100,(state.secondsRemaining/getPhaseTotalSeconds(state))*100))}%`;document.getElementById('totalsTable').innerHTML=(state.totals||[]).map(t=>`<tr><td>${t.name}</td><td>${t.color}</td><td>${t.totalBets}</td><td>${formatMoney(t.totalAmount)}</td></tr>`).join('');renderResults('orderedResults',state.orderedResults||[]);renderResults('visibleWinners',state.visibleWinnersInPwa||state.winners||[]);document.getElementById('settlementsTable').innerHTML=(state.settlements||[]).map(s=>`<tr><td>${s.clientName||s.playerId}</td><td>${s.horseName}</td><td>${formatMoney(s.balanceBeforeBet)}</td><td>${formatMoney(s.amount)}</td><td>${formatMoney(s.balanceAfterBet)}</td><td>${s.won?'Sí':'No'}</td><td>${formatMoney(s.payout)}</td><td>${formatMoney(s.finalBalance)}</td></tr>`).join('');document.getElementById('betsTable').innerHTML=(state.currentBets||[]).slice().reverse().map(b=>`<tr><td>${formatDate(b.createdAt)}</td><td>${b.clientName||b.playerId}</td><td>${b.horseName}</td><td>${formatMoney(b.balanceApostado)}</td><td>${formatMoney(b.balanceTotal)}</td><td>${formatMoney(b.balanceAfterBet)}</td></tr>`).join('');document.getElementById('rawState').textContent=JSON.stringify(state,null,2);}
+async function loadPublicHistory(){try{const r=await fetch('/api/history');const d=await r.json();document.getElementById('publicHistory').textContent=JSON.stringify(d,null,2);}catch(e){document.getElementById('publicHistory').textContent='No se pudo cargar /api/history';}}
+function refreshState(){socket.emit('get_admin_state');loadPublicHistory();}
+async function resetRound(){
+  if(!confirm('¿Seguro que deseas reiniciar la ronda actual?')) return;
+  await fetch('/api/admin/reset',{method:'POST'});
+  refreshState();
+}
+
+function testGenerateEntropy(){
+  if(!window.HipiWalletVault){
+    document.getElementById('vaultOutput').textContent='No se cargó wallet-vault.js';
+    return;
+  }
+
+  const entropy = HipiWalletVault.generateLocalEntropy();
+
+  document.getElementById('vaultOutput').textContent =
+    'Entropía local generada en este dispositivo:\n' +
+    entropy +
+    '\n\nEsto es una prueba técnica del navegador. En producción, la semilla real del usuario debe generarse en la PWA del jugador con BIP-39 o mediante una wallet externa como MetaMask / WalletConnect.';
+}
+</script>
+<div style="position:fixed;right:18px;top:18px;z-index:99999">
+  <a href="/casino-history.html" style="display:inline-block;background:#f4c542;color:#111;padding:12px 16px;border-radius:14px;font-weight:700;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.35)">
+    Historial Casino
+  </a>
+</div>
+<div style="position:fixed;right:18px;top:122px;z-index:99999">
+  <a href="/deposit-admin.html" style="display:inline-block;background:#4da3ff;color:#06110b;padding:12px 16px;border-radius:14px;font-weight:700;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.35)">
+    Depósitos / Wallet Pool
+  </a>
+</div>
+<div style="position:fixed;right:18px;top:176px;z-index:99999">
+  <a href="/p2p-admin.html" style="display:inline-block;background:#ffe98a;color:#06110b;padding:12px 16px;border-radius:14px;font-weight:700;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.35)">
+    Admin P2P
+  </a>
+</div>
+
+<!-- HIPIPLAY ADMIN LIVE STATE PATCH - START -->
+<style>
+  #hipiAdminLiveState {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 999999;
+    width: min(360px, calc(100vw - 28px));
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(4, 13, 9, 0.94);
+    border: 1px solid rgba(34, 197, 94, 0.42);
+    box-shadow: 0 18px 45px rgba(0,0,0,.45);
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  #hipiAdminLiveState h3 {
+    margin: 0 0 10px;
+    color: #86efac;
+    font-size: 15px;
+  }
+
+  #hipiAdminLiveState .hipi-admin-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    font-size: 13px;
+  }
+
+  #hipiAdminLiveState .hipi-admin-row:last-child {
+    border-bottom: 0;
+  }
+
+  #hipiAdminLiveState strong {
+    color: #facc15;
+  }
+</style>
+
+<div id="hipiAdminLiveState">
+  <h3>HipiPlay servidor</h3>
+  <div id="hipiAdminLiveStateBody">Cargando estado...</div>
+</div>
+
+<script>
+(function () {
+  async function updateHipiAdminLiveState() {
+    const box = document.getElementById('hipiAdminLiveStateBody');
+    if (!box) return;
+
+    try {
+      const response = await fetch('/api/state?v=' + Date.now(), { cache: 'no-store' });
+      const state = await response.json();
+
+      const winners = Array.isArray(state.winners) && state.winners.length
+        ? state.winners.map(function (w, i) { return (i + 1) + '. #' + w; }).join(' | ')
+        : '-';
+
+      box.innerHTML = ''
+        + '<div class="hipi-admin-row"><span>Ronda</span><strong>' + state.roundId + '</strong></div>'
+        + '<div class="hipi-admin-row"><span>Jugada</span><strong>' + state.jugadaId + '</strong></div>'
+        + '<div class="hipi-admin-row"><span>Fase</span><strong>' + state.phase + '</strong></div>'
+        + '<div class="hipi-admin-row"><span>Segundos</span><strong>' + state.secondsRemaining + '</strong></div>'
+        + '<div class="hipi-admin-row"><span>Ganadores</span><strong>' + winners + '</strong></div>'
+        + '<div class="hipi-admin-row"><span>Apuestas</span><strong>' + (state.totalBetsReceived || 0) + '</strong></div>';
+    } catch (error) {
+      box.innerHTML = '<strong style="color:#fca5a5">Sin conexión con /api/state</strong>';
+    }
+  }
+
+  updateHipiAdminLiveState();
+  setInterval(updateHipiAdminLiveState, 1000);
+})();
+</script>
+<!-- HIPIPLAY ADMIN LIVE STATE PATCH - END -->
+
+</body>
+</html>

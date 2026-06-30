@@ -1,0 +1,1842 @@
+HIPIPLAY - DIAGNOSTICO ETAPA 5
+Generado: 2026-06-25T11:22:53
+Servidor: C:\hipiplay-server-windows-v7-db-balance\hipiplay-server-windows-v7-db-balance\server.js
+Archivos modificados: False
+Backend reiniciado: False
+
+============================================================
+ESTADO ACTUAL DEL JUEGO
+============================================================
+phase: BETTING
+roundId: 16246
+jugadaId: 19144
+secondsRemaining: 19
+totalBetsReceived: 0
+
+============================================================
+RESUMEN AUTO-RACE-BETS
+============================================================
+Total registros: 75
+PENDING: 12
+RESOLVED: 63
+Posiblemente pendientes: 12
+
+============================================================
+CONTABILIDAD DOBLE ACTUAL
+PATRON: HIPIPLAY DUAL BALANCE SHADOW - START
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 4195 A 4410 / COINCIDENCIA 4200 -----
+004195:       error: error.message || "No se pudo rechazar el retiro."
+004196:     });
+004197:   }
+004198: });
+004199: 
+004200: // HIPIPLAY DUAL BALANCE SHADOW - START
+004201: const dualBalanceService =
+004202:   require('./dual-balance-service')({
+004203:     dataDir: HIPI_AUTO_DATA_DIR,
+004204:     welcomePromoAmount: 1000
+004205:   });
+004206: 
+004207: function getDualBalanceComparison() {
+004208:   const dualAccounts =
+004209:     dualBalanceService.listAccounts();
+004210: 
+004211:   const dualByPlayer =
+004212:     new Map(
+004213:       dualAccounts.map(
+004214:         account => [
+004215:           account.playerId,
+004216:           account
+004217:         ]
+004218:       )
+004219:     );
+004220: 
+004221:   const legacyIds =
+004222:     Object.keys(
+004223:       playerBalances || {}
+004224:     );
+004225: 
+004226:   const playerIds =
+004227:     Array.from(
+004228:       new Set([
+004229:         ...legacyIds,
+004230:         ...dualAccounts.map(
+004231:           account =>
+004232:             account.playerId
+004233:         )
+004234:       ])
+004235:     );
+004236: 
+004237:   const comparisons =
+004238:     playerIds.map(
+004239:       playerId => {
+004240:         const legacyBalance =
+004241:           Number(
+004242:             playerBalances?.[playerId]?.balance ??
+004243:             0
+004244:           );
+004245: 
+004246:         const dualAccount =
+004247:           dualByPlayer.get(
+004248:             playerId
+004249:           ) || null;
+004250: 
+004251:         const dualBalance =
+004252:           Number(
+004253:             dualAccount?.totalBalance ??
+004254:             0
+004255:           );
+004256: 
+004257:         return {
+004258:           playerId,
+004259:           legacyBalance:
+004260:             Number.isFinite(legacyBalance)
+004261:               ? legacyBalance
+004262:               : 0,
+004263:           dualBalance:
+004264:             Number.isFinite(dualBalance)
+004265:               ? dualBalance
+004266:               : 0,
+004267:           matches:
+004268:             Number(legacyBalance || 0) ===
+004269:             Number(dualBalance || 0)
+004270:         };
+004271:       }
+004272:     );
+004273: 
+004274:   const legacyTotal =
+004275:     comparisons.reduce(
+004276:       (sum, item) =>
+004277:         sum +
+004278:         Number(
+004279:           item.legacyBalance || 0
+004280:         ),
+004281:       0
+004282:     );
+004283: 
+004284:   const promoTotal =
+004285:     dualAccounts.reduce(
+004286:       (sum, account) =>
+004287:         sum +
+004288:         Number(
+004289:           account.promoBalance || 0
+004290:         ),
+004291:       0
+004292:     );
+004293: 
+004294:   const purchasedTotal =
+004295:     dualAccounts.reduce(
+004296:       (sum, account) =>
+004297:         sum +
+004298:         Number(
+004299:           account.purchasedBalance || 0
+004300:         ),
+004301:       0
+004302:     );
+004303: 
+004304:   const mismatches =
+004305:     comparisons.filter(
+004306:       item =>
+004307:         !item.matches
+004308:     );
+004309: 
+004310:   return {
+004311:     mode: 'SHADOW',
+004312:     legacyUsers:
+004313:       legacyIds.length,
+004314:     dualUsers:
+004315:       dualAccounts.length,
+004316:     legacyTotal,
+004317:     promoTotal,
+004318:     purchasedTotal,
+004319:     dualTotal:
+004320:       promoTotal +
+004321:       purchasedTotal,
+004322:     mismatchCount:
+004323:       mismatches.length,
+004324:     mismatches
+004325:   };
+004326: }
+004327: 
+004328: app.get(
+004329:   '/api/admin/dual-balance/summary',
+004330:   (req, res) => {
+004331:     res.set(
+004332:       'Cache-Control',
+004333:       'no-store'
+004334:     );
+004335: 
+004336:     res.json({
+004337:       ok: true,
+004338:       accounting:
+004339:         getDualBalanceComparison()
+004340:     });
+004341:   }
+004342: );
+004343: 
+004344: app.get(
+004345:   '/api/admin/dual-balance/accounts',
+004346:   (req, res) => {
+004347:     res.set(
+004348:       'Cache-Control',
+004349:       'no-store'
+004350:     );
+004351: 
+004352:     res.json({
+004353:       ok: true,
+004354:       mode: 'SHADOW',
+004355:       accounts:
+004356:         dualBalanceService.listAccounts()
+004357:     });
+004358:   }
+004359: );
+004360: 
+004361: app.get(
+004362:   '/api/admin/dual-balance/player/:playerId',
+004363:   (req, res) => {
+004364:     try {
+004365:       res.set(
+004366:         'Cache-Control',
+004367:         'no-store'
+004368:       );
+004369: 
+004370:       res.json({
+004371:         ok: true,
+004372:         mode: 'SHADOW',
+004373:         account:
+004374:           dualBalanceService.getAccount(
+004375:             req.params.playerId
+004376:           ),
+004377:         ledger:
+004378:           dualBalanceService.getLedger(
+004379:             req.params.playerId
+004380:           )
+004381:       });
+004382:     } catch (error) {
+004383:       res.status(400).json({
+004384:         ok: false,
+004385:         error:
+004386:           error.message ||
+004387:           'Could not read dual balance.'
+004388:       });
+004389:     }
+004390:   }
+004391: );
+004392: // HIPIPLAY DUAL BALANCE SHADOW - END
+004393: const demoProfileService =
+004394:   require('./demo-profile-service')({
+004395:     dataDir: HIPI_AUTO_DATA_DIR,
+004396:     getPlayerBalance
+004397:   });
+004398: 
+004399: demoProfileService.registerRoutes(app);
+004400: 
+004401: // HIPIPLAY ETHEREUM SEPOLIA DEPOSITS - START
+004402: const ethereumSepoliaDepositService =
+004403:   require('./ethereum-sepolia-deposit-service')({
+004404:     dataDir:
+004405:       path.join(
+004406:         dataDir,
+004407:         'crypto',
+004408:         'ethereum-sepolia'
+004409:       ),
+004410: 
+
+============================================================
+GET PLAYER BALANCE
+PATRON: function getPlayerBalance\(
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 2534 A 2584 / COINCIDENCIA 2539 -----
+002534: }
+002535: 
+002536: function normalizePlayerId(playerId) {
+002537:   return String(playerId || "").trim();
+002538: }
+002539: function getPlayerBalance(playerId) {
+002540:   const id = normalizePlayerId(playerId);
+002541:   if (!id) return 0;
+002542: 
+002543:   const stored = Number(playerBalances[id]?.balance);
+002544:   if (Number.isFinite(stored)) return Math.max(0, Math.floor(stored));
+002545: 
+002546:   const initialBalance = Number.isFinite(DEFAULT_PLAYER_BALANCE) ? Math.max(0, Math.floor(DEFAULT_PLAYER_BALANCE)) : 0;
+002547:   playerBalances[id] = {
+002548:     playerId: id,
+002549:     balance: initialBalance,
+002550:     createdAt: new Date().toISOString(),
+002551:     updatedAt: new Date().toISOString()
+002552:   };
+002553:   persistPlayerBalances();
+002554:   return initialBalance;
+002555: }
+002556: function setPlayerBalance(playerId, nextBalance) {
+002557:   const id = normalizePlayerId(playerId);
+002558:   if (!id) return 0;
+002559: 
+002560:   const balance = Math.max(0, Math.floor(Number(nextBalance || 0)));
+002561:   playerBalances[id] = {
+002562:     ...(playerBalances[id] || { playerId: id, createdAt: new Date().toISOString() }),
+002563:     playerId: id,
+002564:     balance,
+002565:     updatedAt: new Date().toISOString()
+002566:   };
+002567:   persistPlayerBalances();
+002568:   return balance;
+002569: }
+002570: function getPlayerBalancePayload(playerId) {
+002571:   const id = normalizePlayerId(playerId);
+002572:   return {
+002573:     ok: true,
+002574:     playerId: id,
+002575:     balance: getPlayerBalance(id),
+002576:     serverManaged: true
+002577:   };
+002578: }
+002579: 
+002580: function toNumber(value) { const n = Number(value); return Number.isFinite(n) ? n : NaN; }
+002581: 
+002582: function getHorseTotals() {
+002583:   return horses.map((horse) => {
+002584:     const horseBets = bets.filter((bet) => bet.horseId === horse.id);
+
+============================================================
+SET PLAYER BALANCE
+PATRON: function setPlayerBalance\(
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 2551 A 2596 / COINCIDENCIA 2556 -----
+002551:     updatedAt: new Date().toISOString()
+002552:   };
+002553:   persistPlayerBalances();
+002554:   return initialBalance;
+002555: }
+002556: function setPlayerBalance(playerId, nextBalance) {
+002557:   const id = normalizePlayerId(playerId);
+002558:   if (!id) return 0;
+002559: 
+002560:   const balance = Math.max(0, Math.floor(Number(nextBalance || 0)));
+002561:   playerBalances[id] = {
+002562:     ...(playerBalances[id] || { playerId: id, createdAt: new Date().toISOString() }),
+002563:     playerId: id,
+002564:     balance,
+002565:     updatedAt: new Date().toISOString()
+002566:   };
+002567:   persistPlayerBalances();
+002568:   return balance;
+002569: }
+002570: function getPlayerBalancePayload(playerId) {
+002571:   const id = normalizePlayerId(playerId);
+002572:   return {
+002573:     ok: true,
+002574:     playerId: id,
+002575:     balance: getPlayerBalance(id),
+002576:     serverManaged: true
+002577:   };
+002578: }
+002579: 
+002580: function toNumber(value) { const n = Number(value); return Number.isFinite(n) ? n : NaN; }
+002581: 
+002582: function getHorseTotals() {
+002583:   return horses.map((horse) => {
+002584:     const horseBets = bets.filter((bet) => bet.horseId === horse.id);
+002585:     return {
+002586:       horseId: horse.id,
+002587:       name: horse.name,
+002588:       color: horse.color,
+002589:       totalAmount: horseBets.reduce((sum, bet) => sum + bet.amount, 0),
+002590:       totalBets: horseBets.length
+002591:     };
+002592:   });
+002593: }
+002594: function calculateOrderedResults() {
+002595:   const totals = getHorseTotals()
+002596:     .map((item) => ({ ...item, tieBreaker: Math.random() }))
+
+============================================================
+PAYLOAD VISIBLE DE BALANCE
+PATRON: function getPlayerBalancePayload\(
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 2565 A 2600 / COINCIDENCIA 2570 -----
+002565:     updatedAt: new Date().toISOString()
+002566:   };
+002567:   persistPlayerBalances();
+002568:   return balance;
+002569: }
+002570: function getPlayerBalancePayload(playerId) {
+002571:   const id = normalizePlayerId(playerId);
+002572:   return {
+002573:     ok: true,
+002574:     playerId: id,
+002575:     balance: getPlayerBalance(id),
+002576:     serverManaged: true
+002577:   };
+002578: }
+002579: 
+002580: function toNumber(value) { const n = Number(value); return Number.isFinite(n) ? n : NaN; }
+002581: 
+002582: function getHorseTotals() {
+002583:   return horses.map((horse) => {
+002584:     const horseBets = bets.filter((bet) => bet.horseId === horse.id);
+002585:     return {
+002586:       horseId: horse.id,
+002587:       name: horse.name,
+002588:       color: horse.color,
+002589:       totalAmount: horseBets.reduce((sum, bet) => sum + bet.amount, 0),
+002590:       totalBets: horseBets.length
+002591:     };
+002592:   });
+002593: }
+002594: function calculateOrderedResults() {
+002595:   const totals = getHorseTotals()
+002596:     .map((item) => ({ ...item, tieBreaker: Math.random() }))
+002597:     .sort((a, b) => {
+002598:       if (a.totalAmount === b.totalAmount) {
+002599:         return a.tieBreaker - b.tieBreaker;
+002600:       }
+
+============================================================
+REGISTRO PRINCIPAL DE APUESTA
+PATRON: function registerBet\(
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 2985 A 3095 / COINCIDENCIA 2995 -----
+002985: 
+002986:   secondsRemaining -= 1;
+002987: 
+002988:   if (phase === "BETTING" && secondsRemaining <= 0) return closeBettingAndStartRace();
+002989:   if (phase === "RACE" && secondsRemaining <= 0) return showResults();
+002990:   if (phase === "RESULTS" && secondsRemaining <= 0) return startNewRound();
+002991: 
+002992:   broadcastState();
+002993: }, 1000);
+002994: 
+002995: function registerBet({ playerId, horseId, amount, balanceTotal, balanceApostado, clientName }) {
+002996:   if (phase !== "BETTING") {
+002997:     const error = new Error("Las apuestas estÃƒÆ’Ã‚Â¡n cerradas. Hay una carrera en curso."); error.status = 403; throw error;
+002998:   }
+002999: 
+003000:   const id = normalizePlayerId(playerId);
+003001:   const betAmount = amount !== undefined ? toNumber(amount) : toNumber(balanceApostado);
+003002:   const clientReportedBalance = toNumber(balanceTotal);
+003003: 
+003004:   if (!id || !horseId || !Number.isFinite(betAmount)) {
+003005:     const error = new Error("Faltan datos: playerId, horseId o amount/balanceApostado."); error.status = 400; throw error;
+003006:   }
+003007:   if (betAmount <= 0) {
+003008:     const error = new Error("El balance apostado debe ser mayor que cero."); error.status = 400; throw error;
+003009:   }
+003010: 
+003011:   const horse = horses.find((h) => h.id === Number(horseId));
+003012:   if (!horse) { const error = new Error("Caballo no encontrado."); error.status = 404; throw error; }
+003013: 
+003014:   const alreadyBet = bets.some((bet) => bet.playerId === id);
+003015:   if (alreadyBet) { const error = new Error("Este jugador ya apostÃƒÆ’Ã‚Â³ en la carrera actual."); error.status = 409; throw error; }
+003016: 
+003017:   const balanceBeforeBet = getPlayerBalance(id);
+003018:   if (betAmount > balanceBeforeBet) {
+003019:     const error = new Error(`Saldo insuficiente. Disponible: ${balanceBeforeBet}. Apuesta: ${betAmount}.`); error.status = 403; throw error;
+003020:   }
+003021: 
+003022:   const balanceAfterBet = setPlayerBalance(id, balanceBeforeBet - betAmount);
+003023:   const bet = {
+003024:     id: `${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
+003025:     roundId,
+003026:     raceNumber: roundId,
+003027:     playerId: id,
+003028:     clientName: clientName ? String(clientName) : "",
+003029:     horseId: horse.id,
+003030:     horseName: horse.name,
+003031:     amount: betAmount,
+003032:     balanceApostado: betAmount,
+003033:     balanceTotal: balanceBeforeBet,
+003034:     balanceBeforeBet,
+003035:     balanceAfterBet,
+003036:     clientReportedBalance: Number.isFinite(clientReportedBalance) ? clientReportedBalance : null,
+003037:     createdAt: new Date().toISOString()
+003038:   };
+003039:   bets.push(bet);
+003040: 
+003041:   addLedgerEntry({
+003042:     type: "BET_PLACED",
+003043:     status: "CONFIRMED",
+003044:     raceNumber: roundId,
+003045:     roundId,
+003046:     playerId: id,
+003047:     clientName: bet.clientName,
+003048:     betId: bet.id,
+003049:     horseId: bet.horseId,
+003050:     horseName: bet.horseName,
+003051:     amount: bet.amount,
+003052:     balanceBefore: balanceBeforeBet,
+003053:     balanceAfter: balanceAfterBet
+003054:   });
+003055: 
+003056:   broadcastState();
+003057:   return bet;
+003058: }
+003059: 
+003060: app.get("/", (req, res) => res.redirect("/admin.html"));
+003061: app.get("/api/state", (req, res) => res.json(getPublicState()));
+003062: app.get("/api/history", (req, res) => res.json({ ok: true, history: getPublicHistory() }));
+003063: app.get("/api/player/balance/:playerId", (req, res) => res.json(getPlayerBalancePayload(req.params.playerId)));
+003064: app.get("/api/player/result/:playerId", (req, res) => {
+003065:   if (phase !== "RESULTS") return res.json({ ok: true, raceNumber: roundId, playerId: String(req.params.playerId), available: false, message: "El resultado del jugador solo estÃƒÆ’Ã‚Â¡ disponible durante la fase RESULTS.", phase });
+003066:   res.json({ ...getPlayerResultPayload(req.params.playerId), available: true });
+003067: });
+003068: 
+003069: const ADMIN_TOKEN = String(process.env.HIPIPLAY_ADMIN_TOKEN || "").trim();
+003070: const TRANSFER_PASSKEY_SECRET_FILE = path.join(__dirname, ".secrets", "transfer-passkey-secret.txt");
+003071: 
+003072: function requireAdminToken(req, res, next) {
+003073:   const provided = String(req.get("x-admin-token") || "").trim();
+003074: 
+003075:   if (!ADMIN_TOKEN) {
+003076:     return res.status(503).json({
+003077:       ok: false,
+003078:       error: "ADMIN_TOKEN_NOT_CONFIGURED"
+003079:     });
+003080:   }
+003081: 
+003082:   if (!provided || provided !== ADMIN_TOKEN) {
+003083:     return res.status(401).json({
+003084:       ok: false,
+003085:       error: "UNAUTHORIZED_ADMIN_ENDPOINT"
+003086:     });
+003087:   }
+003088: 
+003089:   return next();
+003090: }
+003091: 
+003092: 
+003093: function readTransferPasskeySecret() {
+003094:   const envSecret = String(process.env.HIPIPLAY_TRANSFER_PASSKEY_SECRET || "").trim();
+003095: 
+
+============================================================
+CALCULO DE LIQUIDACIONES
+PATRON: function calculateSettlements\(
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 2627 A 2737 / COINCIDENCIA 2637 -----
+002627:   if (Number(position) === 3) return PAYOUT_MULTIPLIERS.third;
+002628:   return 0;
+002629: }
+002630: 
+002631: function getPayoutMultiplierForHorse(horseId) {
+002632:   const winner = hiddenWinners.find((item) => Number(item.horseId) === Number(horseId));
+002633:   if (!winner) return 0;
+002634:   return getPayoutMultiplierByPosition(winner.position);
+002635: }
+002636: 
+002637: function calculateSettlements() {
+002638:   const cancelled = roundStatus === "CANCELLED";
+002639: 
+002640:   return bets.map((bet) => {
+002641:     const multiplier = cancelled ? 0 : getPayoutMultiplierForHorse(bet.horseId);
+002642:     const won = !cancelled && multiplier > 0;
+002643:     const payout = won ? Math.floor(bet.amount * multiplier) : 0;
+002644:     const refundAmount = cancelled ? bet.amount : 0;
+002645:     const balanceAfterBet = bet.balanceAfterBet;
+002646:     const finalBalance = balanceAfterBet + payout + refundAmount;
+002647: 
+002648:     return {
+002649:       raceNumber: roundId,
+002650:       roundId,
+002651:       betId: bet.id,
+002652:       playerId: bet.playerId,
+002653:       clientName: bet.clientName,
+002654:       horseId: bet.horseId,
+002655:       horseName: bet.horseName,
+002656:       amount: bet.amount,
+002657:       balanceBeforeBet: bet.balanceTotal,
+002658:       balanceApostado: bet.amount,
+002659:       balanceAfterBet,
+002660:       won,
+002661:       cancelled,
+002662:       refunded: cancelled,
+002663:       refundAmount,
+002664:       payout,
+002665:       finalBalance,
+002666:       multiplier,
+002667:       winners: hiddenWinners.map((winner) => ({
+002668:         position: winner.position,
+002669:         horseId: winner.horseId,
+002670:         multiplier: getPayoutMultiplierByPosition(winner.position)
+002671:       })),
+002672:       createdAt: new Date().toISOString()
+002673:     };
+002674:   });
+002675: }
+002676: 
+002677: function getPlayerSettlements(playerId) {
+002678:   return settlements.filter((settlement) => settlement.playerId === String(playerId));
+002679: }
+002680: function getPlayerResultPayload(playerId) {
+002681:   const playerSettlements = getPlayerSettlements(playerId);
+002682:   const totalPayout = playerSettlements.reduce((sum, item) => sum + item.payout, 0);
+002683:   const totalBetAmount = playerSettlements.reduce((sum, item) => sum + item.amount, 0);
+002684:   const won = playerSettlements.some((item) => item.won);
+002685:   let balanceBeforeBet = null;
+002686:   let balanceAfterBet = null;
+002687:   let finalBalance = null;
+002688:   if (playerSettlements.length > 0) {
+002689:     balanceBeforeBet = playerSettlements[0].balanceBeforeBet;
+002690:     balanceAfterBet = playerSettlements[playerSettlements.length - 1].balanceAfterBet;
+002691:     finalBalance = playerSettlements[playerSettlements.length - 1].finalBalance;
+002692:   }
+002693:   return {
+002694:     ok: true,
+002695:     raceNumber: roundId,
+002696:     roundId,
+002697:     playerId: String(playerId),
+002698:     won,
+002699:     totalBetAmount,
+002700:     totalPayout,
+002701:     payoutMultipliers: PAYOUT_MULTIPLIERS,
+002702:     roundStatus,
+002703:     roundCancelReason,
+002704:     minActiveHorsesRequired: 0,
+002705:     activeHorseCount: getActiveHorseCount(),
+002706:     balanceBeforeBet,
+002707:     balanceAfterBet,
+002708:     finalBalance,
+002709:     winners: hiddenWinners.map((winner) => ({ position: winner.position, horseId: winner.horseId, name: winner.name, color: winner.color })),
+002710:     settlements: playerSettlements.map((item) => ({
+002711:       betId: item.betId,
+002712:       horseId: item.horseId,
+002713:       horseName: item.horseName,
+002714:       amount: item.amount,
+002715:       balanceBeforeBet: item.balanceBeforeBet,
+002716:       balanceAfterBet: item.balanceAfterBet,
+002717:       won: item.won,
+002718:       payout: item.payout,
+002719:       finalBalance: item.finalBalance,
+002720:       multiplier: item.multiplier
+002721:     }))
+002722:   };
+002723: }
+002724: function getRoundFinancialSummary() {
+002725:   const totalAmountReceived = bets.reduce((sum, bet) => sum + bet.amount, 0);
+002726:   const totalPayout = settlements.reduce((sum, item) => sum + item.payout, 0);
+002727:   const totalRefunded = settlements.reduce((sum, item) => sum + (item.refundAmount || 0), 0);
+002728:   const houseRevenue = roundStatus === "CANCELLED" ? 0 : totalAmountReceived - totalPayout - totalRefunded;
+002729: 
+002730:   return {
+002731:     totalAmountReceived,
+002732:     totalPayout,
+002733:     totalRefunded,
+002734:     houseRevenue,
+002735:     houseResult: houseRevenue >= 0 ? "PROFIT" : "LOSS"
+002736:   };
+002737: }
+
+============================================================
+MUESTRA Y APLICACION DE RESULTADOS
+PATRON: function showResults\(
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 2841 A 2981 / COINCIDENCIA 2851 -----
+002841: 
+002842:   roundStatus = "VALID";
+002843:   roundCancelReason = null;
+002844:   hiddenWinners = calculateWinnersFromOrderedResults(orderedResults);
+002845: 
+002846:   winners = [];
+002847:   settlements = [];
+002848:   broadcastState();
+002849: }
+002850: 
+002851: function showResults() {
+002852:   phase = "RESULTS";
+002853:   secondsRemaining = RESULTS_SECONDS;
+002854:   resultsStartedAt = Date.now();
+002855:   winners = roundStatus === "CANCELLED" ? [] : hiddenWinners;
+002856:   settlements = calculateSettlements();
+002857: 
+002858:   settlements.forEach((settlement) => {
+002859:     setPlayerBalance(settlement.playerId, settlement.finalBalance);
+002860: 
+002861:     if (settlement.refunded) {
+002862:       addLedgerEntry({
+002863:         type: "BET_REFUNDED",
+002864:         status: "CONFIRMED",
+002865:         raceNumber: roundId,
+002866:         roundId,
+002867:         playerId: settlement.playerId,
+002868:         clientName: settlement.clientName,
+002869:         betId: settlement.betId,
+002870:         horseId: settlement.horseId,
+002871:         horseName: settlement.horseName,
+002872:         amount: settlement.refundAmount,
+002873:         balanceBefore: settlement.balanceAfterBet,
+002874:         balanceAfter: settlement.finalBalance,
+002875:         reason: roundCancelReason
+002876:       });
+002877:     } else if (settlement.won) {
+002878:       addLedgerEntry({
+002879:         type: "BET_WON",
+002880:         status: "CONFIRMED",
+002881:         raceNumber: roundId,
+002882:         roundId,
+002883:         playerId: settlement.playerId,
+002884:         clientName: settlement.clientName,
+002885:         betId: settlement.betId,
+002886:         horseId: settlement.horseId,
+002887:         horseName: settlement.horseName,
+002888:         amount: settlement.payout,
+002889:         multiplier: settlement.multiplier,
+002890:         balanceBefore: settlement.balanceAfterBet,
+002891:         balanceAfter: settlement.finalBalance
+002892:       });
+002893:     } else {
+002894:       addLedgerEntry({
+002895:         type: "BET_LOST",
+002896:         status: "CONFIRMED",
+002897:         raceNumber: roundId,
+002898:         roundId,
+002899:         playerId: settlement.playerId,
+002900:         clientName: settlement.clientName,
+002901:         betId: settlement.betId,
+002902:         horseId: settlement.horseId,
+002903:         horseName: settlement.horseName,
+002904:         amount: settlement.amount,
+002905:         balanceBefore: settlement.balanceAfterBet,
+002906:         balanceAfter: settlement.finalBalance
+002907:       });
+002908:     }
+002909:   });
+002910: 
+002911:   const financial = getRoundFinancialSummary();
+002912: 
+002913:   if (roundStatus !== "CANCELLED") {
+002914:     applyCasinoRaceResult(roundId, financial.houseRevenue);
+002915:   }
+002916: 
+002917:   addLedgerEntry({
+002918:     type: roundStatus === "CANCELLED" ? "RACE_CANCELLED" : "RACE_SETTLED",
+002919:     status: "CONFIRMED",
+002920:     raceNumber: roundId,
+002921:     roundId,
+002922:     amount: financial.totalAmountReceived,
+002923:     totalPayout: financial.totalPayout,
+002924:     totalRefunded: financial.totalRefunded,
+002925:     houseRevenue: financial.houseRevenue,
+002926:     houseResult: financial.houseResult,
+002927:     activeHorseCount: getActiveHorseCount(),
+002928:     winners: winners.map((winner) => ({
+002929:       position: winner.position,
+002930:       horseId: winner.horseId,
+002931:       multiplier: getPayoutMultiplierByPosition(winner.position)
+002932:     })),
+002933:     reason: roundCancelReason
+002934:   });
+002935: 
+002936:   if (roundStatus !== "CANCELLED") {
+002937:     addLedgerEntry({
+002938:       type: financial.houseRevenue >= 0 ? "HOUSE_REVENUE" : "HOUSE_LOSS",
+002939:       status: "CONFIRMED",
+002940:       raceNumber: roundId,
+002941:       roundId,
+002942:       amount: Math.abs(financial.houseRevenue),
+002943:       houseRevenue: financial.houseRevenue,
+002944:       totalAmountReceived: financial.totalAmountReceived,
+002945:       totalPayout: financial.totalPayout
+002946:     });
+002947:   }
+002948: 
+002949:   [...new Set(bets.map((bet) => bet.playerId))].forEach((playerId) => io.to(`player:${playerId}`).emit("player_result", getPlayerResultPayload(playerId)));
+002950:   broadcastState();
+002951: }
+002952: 
+002953: function startNewRound() {
+002954:   saveRoundLogAndHistory();
+002955:   roundId += 1;
+002956:   phase = "BETTING";
+002957:   secondsRemaining = BETTING_SECONDS;
+002958:   bets = [];
+002959:   winners = [];
+002960:   hiddenWinners = [];
+002961:   orderedResults = [];
+002962:   settlements = [];
+002963:   raceStartedAt = null;
+002964:   resultsStartedAt = null;
+002965:   roundStatus = "BETTING";
+002966:   roundCancelReason = null;
+002967:   broadcastState();
+002968: }
+002969: setInterval(() => {
+002970:   // Si no hay apuestas, el servidor se queda detenido en BETTING.
+002971:   // No inicia carrera, no cancela carrera y no consume el reloj.
+002972:   if (phase === "BETTING" && bets.length <= 0) {
+002973:     secondsRemaining = BETTING_SECONDS;
+002974:     roundStatus = "BETTING";
+002975:     roundCancelReason = null;
+002976:     raceStartedAt = null;
+002977:     resultsStartedAt = null;
+002978:     orderedResults = [];
+002979:     winners = [];
+002980:     hiddenWinners = [];
+002981:     settlements = [];
+
+============================================================
+LIQUIDADOR AUTOMATICO UNO
+PATRON: function hipiAutoSettleBalancesForState\(
+============================================================
+NO ENCONTRADO
+
+============================================================
+LIQUIDADOR AUTOMATICO DOS
+PATRON: function hipiAutoSettleAllBetsForState\(
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 685 A 815 / COINCIDENCIA 695 -----
+000685: 
+000686:     if (changed) {
+000687:       hipiAutoSaveAllBets(bets);
+000688:     }
+000689:   } catch (error) {
+000690:     console.error('Error liquidando balances automaticos:', error);
+000691:   }
+000692: }
+000693: 
+000694: // HIPIPLAY AUTO BALANCE SETTLEMENT PATCH - START
+000695: function hipiAutoSettleAllBetsForState(state) {
+000696:   try {
+000697:     if (!state || String(state.phase || '').toUpperCase() !== 'RESULTS') return;
+000698: 
+000699:     const winners = Array.isArray(state.winners)
+000700:       ? state.winners.map((winner) => Number(winner)).filter((winner) => Number.isFinite(winner))
+000701:       : [];
+000702: 
+000703:     if (!winners.length) return;
+000704: 
+000705:     const bets = hipiAutoGetAllBets();
+000706:     let changed = false;
+000707: 
+000708:     Object.keys(bets).forEach((key) => {
+000709:       const bet = bets[key];
+000710: 
+000711:       if (!bet || Number(bet.roundId) !== Number(state.roundId)) return;
+000712: 
+000713:       if (bet.status === 'resolved' && bet.finalBalance !== undefined && bet.finalBalance !== null) {
+000714:         return;
+000715:       }
+000716: 
+000717:       const selectedHorse = Number(bet.selectedHorse ?? bet.horseId);
+000718:       const position = winners.indexOf(selectedHorse);
+000719:       const multiplier = hipiAutoGetMultiplier(position);
+000720:       const won = multiplier > 0;
+000721:       const payout = won ? Math.floor(Number(bet.amount || 0) * multiplier) : 0;
+000722: 
+000723:       const baseBalance = Number.isFinite(Number(bet.balanceAfterBet))
+000724:         ? Number(bet.balanceAfterBet)
+000725:         : 0;
+000726: 
+000727:       const finalBalance = Math.max(0, Math.floor(baseBalance + payout));
+000728: 
+000729:       bet.status = 'resolved';
+000730:       bet.winners = winners;
+000731:       bet.won = won;
+000732:       bet.payout = payout;
+000733:       bet.finalBalance = finalBalance;
+000734:       bet.walletBalance = finalBalance;
+000735:       bet.serverBalance = finalBalance;
+000736:       bet.resolvedAt = Date.now();
+000737: 
+000738:       if (typeof setPlayerBalance === 'function' && bet.playerId) {
+000739:         setPlayerBalance(bet.playerId, finalBalance);
+000740:       }
+000741: 
+000742:       bets[key] = bet;
+000743:       changed = true;
+000744:     });
+000745: 
+000746:     if (changed) {
+000747:       hipiAutoSaveAllBets(bets);
+000748:     }
+000749:   } catch (error) {
+000750:     console.error('Error liquidando apuestas automaticas:', error);
+000751:   }
+000752: }
+000753: // HIPIPLAY AUTO BALANCE SETTLEMENT PATCH - END
+000754: 
+000755: 
+000756: app.use((req, res, next) => {
+000757:   const path = String(req.path || req.url || '').toLowerCase();
+000758: 
+000759:   if (!path.startsWith('/api')) {
+000760:     return next();
+000761:   }
+000762: 
+000763:   const isBetEndpoint =
+000764:     req.method === 'POST' &&
+000765:     !path.includes('p2p') &&
+000766:     (
+000767:       path.includes('bet') ||
+000768:       path.includes('bets') ||
+000769:       path.includes('apuesta') ||
+000770:       path.includes('apostar')
+000771:     );
+000772: 
+000773:   if (isBetEndpoint) {
+000774:     try {
+000775:       let state = hipiAutoApplyLowestBetWinnersToState(hipiAutoGetState());
+000776: 
+000777:       if (String(state.phase).toUpperCase() !== 'BETTING') {
+000778:         return res.status(400).json({
+000779:           ok: false,
+000780:           message: 'Las apuestas estan cerradas. Espera la proxima jugada.',
+000781:           state
+000782:         });
+000783:       }
+000784: 
+000785:       const body = req.body || {};
+000786:       const playerId = hipiAutoNormalizePlayerId(
+000787:         body.playerId || body.userId || body.clientId || body.id
+000788:       );
+000789: 
+000790:       if (!playerId) {
+000791:         return res.status(400).json({
+000792:           ok: false,
+000793:           message: 'No se recibio playerId para registrar la apuesta.',
+000794:           state
+000795:         });
+000796:       }
+000797: 
+000798:       const selectedHorse = Number(
+000799:         body.selectedHorse ||
+000800:         body.horseId ||
+000801:         body.horse ||
+000802:         body.caballo ||
+000803:         body.caballoId
+000804:       );
+000805: 
+000806:       if (!Number.isFinite(selectedHorse) || selectedHorse < 1 || selectedHorse > 6) {
+000807:         return res.status(400).json({
+000808:           ok: false,
+000809:           message: 'Caballo invalido.',
+000810:           state
+000811:         });
+000812:       }
+000813: 
+000814:       const amount = Math.floor(Number(
+000815:         body.amount ||
+
+============================================================
+MIDDLEWARE AUTOMATICO DE APUESTAS
+PATRON: const isBetEndpoint
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 743 A 943 / COINCIDENCIA 763 -----
+000743:       changed = true;
+000744:     });
+000745: 
+000746:     if (changed) {
+000747:       hipiAutoSaveAllBets(bets);
+000748:     }
+000749:   } catch (error) {
+000750:     console.error('Error liquidando apuestas automaticas:', error);
+000751:   }
+000752: }
+000753: // HIPIPLAY AUTO BALANCE SETTLEMENT PATCH - END
+000754: 
+000755: 
+000756: app.use((req, res, next) => {
+000757:   const path = String(req.path || req.url || '').toLowerCase();
+000758: 
+000759:   if (!path.startsWith('/api')) {
+000760:     return next();
+000761:   }
+000762: 
+000763:   const isBetEndpoint =
+000764:     req.method === 'POST' &&
+000765:     !path.includes('p2p') &&
+000766:     (
+000767:       path.includes('bet') ||
+000768:       path.includes('bets') ||
+000769:       path.includes('apuesta') ||
+000770:       path.includes('apostar')
+000771:     );
+000772: 
+000773:   if (isBetEndpoint) {
+000774:     try {
+000775:       let state = hipiAutoApplyLowestBetWinnersToState(hipiAutoGetState());
+000776: 
+000777:       if (String(state.phase).toUpperCase() !== 'BETTING') {
+000778:         return res.status(400).json({
+000779:           ok: false,
+000780:           message: 'Las apuestas estan cerradas. Espera la proxima jugada.',
+000781:           state
+000782:         });
+000783:       }
+000784: 
+000785:       const body = req.body || {};
+000786:       const playerId = hipiAutoNormalizePlayerId(
+000787:         body.playerId || body.userId || body.clientId || body.id
+000788:       );
+000789: 
+000790:       if (!playerId) {
+000791:         return res.status(400).json({
+000792:           ok: false,
+000793:           message: 'No se recibio playerId para registrar la apuesta.',
+000794:           state
+000795:         });
+000796:       }
+000797: 
+000798:       const selectedHorse = Number(
+000799:         body.selectedHorse ||
+000800:         body.horseId ||
+000801:         body.horse ||
+000802:         body.caballo ||
+000803:         body.caballoId
+000804:       );
+000805: 
+000806:       if (!Number.isFinite(selectedHorse) || selectedHorse < 1 || selectedHorse > 6) {
+000807:         return res.status(400).json({
+000808:           ok: false,
+000809:           message: 'Caballo invalido.',
+000810:           state
+000811:         });
+000812:       }
+000813: 
+000814:       const amount = Math.floor(Number(
+000815:         body.amount ||
+000816:         body.betAmount ||
+000817:         body.balanceApostado ||
+000818:         body.monto ||
+000819:         0
+000820:       ));
+000821: 
+000822:       if (!Number.isFinite(amount) || amount <= 0) {
+000823:         return res.status(400).json({
+000824:           ok: false,
+000825:           message: 'Monto invalido.',
+000826:           state
+000827:         });
+000828:       }
+000829: 
+000830:       const bets = hipiAutoGetAllBets();
+000831:       const key = hipiAutoGetBetKey(state.roundId, playerId);
+000832: 
+000833:       if (bets[key]) {
+000834:         return res.json({
+000835:           ok: true,
+000836:           message: 'Ya tienes una apuesta registrada en esta jugada.',
+000837:           bet: bets[key],
+000838:           state,
+000839:           balanceAfterBet: bets[key].balanceAfterBet,
+000840:           walletBalance: bets[key].balanceAfterBet,
+000841:           serverBalance: bets[key].balanceAfterBet
+000842:         });
+000843:       }
+000844: 
+000845:       // HIPIPLAY AUTO BALANCE RESERVE PATCH - START
+000846:       let balanceBefore = Number.NaN;
+000847: 
+000848:       if (typeof getPlayerBalance === 'function') {
+000849:         balanceBefore = Number(getPlayerBalance(playerId));
+000850:       }
+000851: 
+000852:       if (!Number.isFinite(balanceBefore)) {
+000853:         balanceBefore = Number(
+000854:           body.balanceTotal ??
+000855:           body.walletBalance ??
+000856:           body.balance ??
+000857:           body.demoBalance ??
+000858:           0
+000859:         );
+000860:       }
+000861: 
+000862:       if (!Number.isFinite(balanceBefore)) {
+000863:         balanceBefore = 0;
+000864:       }
+000865: 
+000866:       balanceBefore = Math.max(0, Math.floor(balanceBefore));
+000867: 
+000868:       if (amount > balanceBefore) {
+000869:         return res.status(403).json({
+000870:           ok: false,
+000871:           message: `Saldo insuficiente. Disponible: ${balanceBefore}. Apuesta: ${amount}.`,
+000872:           state,
+000873:           walletBalance: balanceBefore,
+000874:           serverBalance: balanceBefore
+000875:         });
+000876:       }
+000877: 
+000878:       const balanceAfterBet = Math.max(0, Math.floor(balanceBefore - amount));
+000879: 
+000880:       if (typeof setPlayerBalance === 'function') {
+000881:         setPlayerBalance(playerId, balanceAfterBet);
+000882:       }
+000883:       // HIPIPLAY AUTO BALANCE RESERVE PATCH - END
+000884: 
+000885:       const betId = hipiAutoCreateBetId(state.jugadaId);
+000886: 
+000887:       const bet = {
+000888:         id: betId,
+000889:         betId,
+000890:         roundId: state.roundId,
+000891:         raceNumber: state.roundId,
+000892:         raceId: `server-round-${state.roundId}`,
+000893:         raceCode: `Jugada ${state.jugadaId}`,
+000894:         jugadaId: state.jugadaId,
+000895:         playId: state.jugadaId,
+000896:         roundCode: state.jugadaId,
+000897:         playerId,
+000898:         clientName: body.clientName || body.username || body.name || playerId,
+000899:         selectedHorse,
+000900:         horseId: selectedHorse,
+000901:         amount,
+000902:         balanceBefore,
+000903:         balanceBeforeBet: balanceBefore,
+000904:         balanceTotal: balanceBefore,
+000905:         balanceAfterBet,
+000906:         walletBalance: balanceAfterBet,
+000907:         serverBalance: balanceAfterBet,
+000908:         status: 'pending',
+000909:         createdAt: Date.now()
+000910:       };
+000911: 
+000912:       bets[key] = bet;
+000913:       hipiAutoSaveAllBets(bets);
+000914: 
+000915:       return res.json({
+000916:         ok: true,
+000917:         message: 'Apuesta registrada correctamente.',
+000918:         bet,
+000919:         state,
+000920:         balance: balanceAfterBet,
+000921:         balanceAfterBet,
+000922:         walletBalance: balanceAfterBet,
+000923:         serverBalance: balanceAfterBet,
+000924:         finalBalance: balanceAfterBet
+000925:       });
+000926:     } catch (error) {
+000927:       console.error('Error en auto bet:', error);
+000928:       return res.status(500).json({
+000929:         ok: false,
+000930:         message: 'Error registrando apuesta automatica.',
+000931:         error: error.message
+000932:       });
+000933:     }
+000934:   }
+000935: 
+000936:   const isPlayerResultEndpoint =
+000937:     req.method === 'GET' &&
+000938:     path.includes('result') &&
+000939:     (
+000940:       path.includes('player') ||
+000941:       path.includes('user') ||
+000942:       path.includes('jugador')
+000943:     );
+
+============================================================
+RUTA POST API BET
+PATRON: app\.post\(["']\/api\/bet
+============================================================
+COINCIDENCIAS: 1
+
+----- LINEAS 3820 A 3895 / COINCIDENCIA 3830 -----
+003820:       fromEscrow: userEscrow[transfer.fromPlayerId] || null
+003821:     });
+003822:   } catch (error) {
+003823:     res.status(400).json({
+003824:       ok: false,
+003825:       error: error.message || "No se pudo cancelar la transferencia."
+003826:     });
+003827:   }
+003828: });
+003829: 
+003830: app.post("/api/bet", (req, res) => {
+003831:   try {
+003832:     const bet = registerBet(req.body);
+003833:     res.json({
+003834:       ok: true,
+003835:       message: "Apuesta registrada correctamente.",
+003836:       bet: {
+003837:         id: bet.id,
+003838:         raceNumber: bet.raceNumber,
+003839:         playerId: bet.playerId,
+003840:         horseId: bet.horseId,
+003841:         horseName: bet.horseName,
+003842:         balanceApostado: bet.balanceApostado,
+003843:         balanceTotal: bet.balanceTotal,
+003844:         balanceBeforeBet: bet.balanceBeforeBet,
+003845:         balanceAfterBet: bet.balanceAfterBet,
+003846:         serverBalance: bet.balanceAfterBet
+003847:       },
+003848:       state: getPublicState()
+003849:     });
+003850:   } catch (error) { res.status(error.status || 500).json({ ok: false, error: error.message }); }
+003851: });
+003852: 
+003853: app.post("/api/admin/player/balance", (req, res) => {
+003854:   try {
+003855:     const playerId = normalizePlayerId(req.body?.playerId);
+003856:     const balance = toNumber(req.body?.balance);
+003857:     if (!playerId || !Number.isFinite(balance) || balance < 0) {
+003858:       return res.status(400).json({ ok: false, error: "Debe enviar playerId y balance vÃƒÆ’Ã‚Â¡lido." });
+003859:     }
+003860:     const savedBalance = setPlayerBalance(playerId, balance);
+003861:     res.json({ ok: true, playerId, balance: savedBalance, serverManaged: true });
+003862:   } catch (error) {
+003863:     res.status(500).json({ ok: false, error: error.message });
+003864:   }
+003865: });
+003866: 
+003867: app.post("/api/admin/reset", (req, res) => {
+003868:   roundId += 1;
+003869:   phase = "BETTING";
+003870:   secondsRemaining = BETTING_SECONDS;
+003871:   bets = [];
+003872:   winners = [];
+003873:   hiddenWinners = [];
+003874:   orderedResults = [];
+003875:   settlements = [];
+003876:   raceStartedAt = null;
+003877:   resultsStartedAt = null;
+003878:   roundStatus = "BETTING";
+003879:   roundCancelReason = null;
+003880:   broadcastState();
+003881:   res.json({ ok: true, message: "Ronda reiniciada manualmente.", state: getAdminState() });
+003882: });
+003883: 
+003884: app.use("/pwa", express.static(PWA_DIST_PATH));
+003885: 
+003886: app.use("/race-images", express.static(path.join(PWA_DIST_PATH, "race-images")));
+003887: app.get("/race-waith.png", (req, res) => {
+003888:   res.sendFile(path.join(PWA_DIST_PATH, "race-waith.png"));
+003889: });
+003890: 
+003891: app.use("/icons", express.static(path.join(PWA_DIST_PATH, "icons")));
+003892: 
+003893: app.get("/sw.js", (req, res) => {
+003894:   res.sendFile(path.join(PWA_DIST_PATH, "sw.js"));
+003895: });
+
+============================================================
+TODAS LAS ESCRITURAS setPlayerBalance
+PATRON: setPlayerBalance\(
+============================================================
+COINCIDENCIAS: 17
+
+----- LINEAS 671 A 693 / COINCIDENCIA 679 -----
+000671:       bet.payout = payout;
+000672:       bet.finalBalance = finalBalance;
+000673:       bet.balance = finalBalance;
+000674:       bet.walletBalance = finalBalance;
+000675:       bet.serverBalance = finalBalance;
+000676:       bet.resolvedAt = Date.now();
+000677: 
+000678:       if (typeof setPlayerBalance === 'function' && bet.playerId) {
+000679:         setPlayerBalance(bet.playerId, finalBalance);
+000680:       }
+000681: 
+000682:       bets[key] = bet;
+000683:       changed = true;
+000684:     });
+000685: 
+000686:     if (changed) {
+000687:       hipiAutoSaveAllBets(bets);
+000688:     }
+000689:   } catch (error) {
+000690:     console.error('Error liquidando balances automaticos:', error);
+000691:   }
+000692: }
+000693: 
+
+----- LINEAS 731 A 753 / COINCIDENCIA 739 -----
+000731:       bet.won = won;
+000732:       bet.payout = payout;
+000733:       bet.finalBalance = finalBalance;
+000734:       bet.walletBalance = finalBalance;
+000735:       bet.serverBalance = finalBalance;
+000736:       bet.resolvedAt = Date.now();
+000737: 
+000738:       if (typeof setPlayerBalance === 'function' && bet.playerId) {
+000739:         setPlayerBalance(bet.playerId, finalBalance);
+000740:       }
+000741: 
+000742:       bets[key] = bet;
+000743:       changed = true;
+000744:     });
+000745: 
+000746:     if (changed) {
+000747:       hipiAutoSaveAllBets(bets);
+000748:     }
+000749:   } catch (error) {
+000750:     console.error('Error liquidando apuestas automaticas:', error);
+000751:   }
+000752: }
+000753: // HIPIPLAY AUTO BALANCE SETTLEMENT PATCH - END
+
+----- LINEAS 873 A 895 / COINCIDENCIA 881 -----
+000873:           walletBalance: balanceBefore,
+000874:           serverBalance: balanceBefore
+000875:         });
+000876:       }
+000877: 
+000878:       const balanceAfterBet = Math.max(0, Math.floor(balanceBefore - amount));
+000879: 
+000880:       if (typeof setPlayerBalance === 'function') {
+000881:         setPlayerBalance(playerId, balanceAfterBet);
+000882:       }
+000883:       // HIPIPLAY AUTO BALANCE RESERVE PATCH - END
+000884: 
+000885:       const betId = hipiAutoCreateBetId(state.jugadaId);
+000886: 
+000887:       const bet = {
+000888:         id: betId,
+000889:         betId,
+000890:         roundId: state.roundId,
+000891:         raceNumber: state.roundId,
+000892:         raceId: `server-round-${state.roundId}`,
+000893:         raceCode: `Jugada ${state.jugadaId}`,
+000894:         jugadaId: state.jugadaId,
+000895:         playId: state.jugadaId,
+
+----- LINEAS 982 A 1004 / COINCIDENCIA 990 -----
+000982:       const won = multiplier > 0;
+000983:       const payout = won ? Math.floor(Number(bet.amount) * multiplier) : 0;
+000984:       const finalBalance = Number.isFinite(Number(bet.balanceAfterBet))
+000985:         ? Math.max(0, Math.floor(Number(bet.balanceAfterBet) + payout))
+000986:         : null;
+000987: 
+000988:       // HIPIPLAY AUTO BALANCE SET FINAL BALANCE PATCH - START
+000989:       if (finalBalance !== null && typeof setPlayerBalance === 'function') {
+000990:         setPlayerBalance(playerId, finalBalance);
+000991:       }
+000992:       // HIPIPLAY AUTO BALANCE SET FINAL BALANCE PATCH - END
+000993: 
+000994:       bet.status = 'resolved';
+000995:       bet.winners = winners;
+000996:       bet.won = won;
+000997:       bet.payout = payout;
+000998:       bet.finalBalance = finalBalance;
+000999:       bet.resolvedAt = Date.now();
+001000: 
+001001:       bets[key] = bet;
+001002:       hipiAutoSaveAllBets(bets);
+001003: 
+001004:       return res.json({
+
+----- LINEAS 1483 A 1505 / COINCIDENCIA 1491 -----
+001483:   if (!Number.isFinite(creditedAmount) || creditedAmount <= 0) {
+001484:     throw new Error("El monto acreditado debe ser mayor a 0.");
+001485:   }
+001486: 
+001487:   const playerId = normalizePlayerId(order.playerId);
+001488:   const balanceBefore = getPlayerBalance(playerId);
+001489:   const balanceAfter = balanceBefore + creditedAmount;
+001490: 
+001491:   setPlayerBalance(playerId, balanceAfter);
+001492: 
+001493:   order.status = "CONFIRMED";
+001494:   order.creditedAmount = creditedAmount;
+001495:   order.txHash = String(input.txHash || "").trim();
+001496:   order.adminNote = String(input.adminNote || "").trim();
+001497:   order.confirmedAt = new Date().toISOString();
+001498: 
+001499:   const wallet = walletPool.find((item) => String(item.id) === String(order.walletId));
+001500:   if (wallet) {
+001501:     wallet.status = "USED";
+001502:     wallet.usedAt = new Date().toISOString();
+001503:   }
+001504: 
+001505:   persistDepositOrders();
+
+----- LINEAS 1770 A 1792 / COINCIDENCIA 1778 -----
+001770: 
+001771:   if (available < coinAmount) {
+001772:     throw new Error(`Balance insuficiente. Disponible: ${available}, requerido: ${coinAmount}.`);
+001773:   }
+001774: 
+001775:   const balanceBefore = available;
+001776:   const balanceAfter = available - coinAmount;
+001777: 
+001778:   setPlayerBalance(sellerId, balanceAfter);
+001779:   adjustEscrowBalance(sellerId, coinAmount);
+001780: 
+001781:   const offerId = generateP2PId("OFF");
+001782:   const totalUsdt = Number((coinAmount * pricePerCoin).toFixed(8));
+001783:   const now = new Date().toISOString();
+001784: 
+001785:   const offer = {
+001786:     offerId,
+001787:     sellerId,
+001788:     sellerName,
+001789:     coinAmount,
+001790:     remainingCoins: coinAmount,
+001791:     pricePerCoin,
+001792:     totalUsdt,
+
+----- LINEAS 1840 A 1862 / COINCIDENCIA 1848 -----
+001840:   if (activeTrade) {
+001841:     throw new Error("No puedes cancelar la oferta porque tiene una operaciÃƒÂ³n pendiente de pago.");
+001842:   }
+001843: 
+001844:   const remainingCoins = Number(offer.remainingCoins || 0);
+001845: 
+001846:   if (remainingCoins > 0) {
+001847:     const sellerBalanceBefore = getPlayerBalance(offer.sellerId);
+001848:     setPlayerBalance(offer.sellerId, sellerBalanceBefore + remainingCoins);
+001849:     adjustEscrowBalance(offer.sellerId, -remainingCoins);
+001850:   }
+001851: 
+001852:   offer.remainingCoins = 0;
+001853:   offer.status = "CANCELLED";
+001854:   offer.cancelledAt = new Date().toISOString();
+001855:   offer.updatedAt = new Date().toISOString();
+001856:   offer.cancelReason = String(input.reason || input.adminNote || "Cancelada").trim();
+001857: 
+001858:   persistP2POffers();
+001859: 
+001860:   addLedgerEntry({
+001861:     type: "P2P_OFFER_CANCELLED",
+001862:     status: "CANCELLED",
+
+----- LINEAS 1976 A 1998 / COINCIDENCIA 1984 -----
+001976: 
+001977:   if (!Number.isFinite(paidAmount) || paidAmount < Number(trade.usdtAmount || 0)) {
+001978:     throw new Error("Pago insuficiente para confirmar la operaciÃƒÂ³n.");
+001979:   }
+001980: 
+001981:   const buyerBalanceBefore = getPlayerBalance(trade.buyerId);
+001982:   const buyerBalanceAfter = buyerBalanceBefore + Number(trade.coinAmount || 0);
+001983: 
+001984:   setPlayerBalance(trade.buyerId, buyerBalanceAfter);
+001985:   adjustEscrowBalance(trade.sellerId, -Number(trade.coinAmount || 0));
+001986:   const sellerUsdt = adjustUserUsdtBalance(trade.sellerId, Number(trade.usdtAmount || 0));
+001987: 
+001988:   trade.status = "CONFIRMED";
+001989:   trade.txHash = String(input.txHash || `AUTO_P2P_CONFIRM_${Date.now()}`).trim();
+001990:   trade.adminNote = String(input.adminNote || "").trim();
+001991:   trade.confirmedAt = new Date().toISOString();
+001992: 
+001993:   const wallet = walletPool.find((item) => String(item.id) === String(trade.walletId));
+001994: 
+001995:   if (wallet) {
+001996:     wallet.status = "USED";
+001997:     wallet.usedAt = new Date().toISOString();
+001998:   }
+
+----- LINEAS 2133 A 2155 / COINCIDENCIA 2141 -----
+002133:   if (!Number.isFinite(amount) || amount <= 0) throw new Error("La cantidad de monedas debe ser mayor a 0.");
+002134: 
+002135:   const senderBalanceBefore = getPlayerBalance(fromPlayerId);
+002136: 
+002137:   if (senderBalanceBefore < amount) {
+002138:     throw new Error(`Balance insuficiente. Disponible: ${senderBalanceBefore}, requerido: ${amount}.`);
+002139:   }
+002140: 
+002141:   const senderBalanceAfter = setPlayerBalance(fromPlayerId, senderBalanceBefore - amount);
+002142:   adjustEscrowBalance(fromPlayerId, amount);
+002143: 
+002144:   const transferId = generateP2PId("TRF");
+002145:   const now = new Date().toISOString();
+002146: 
+002147:   const transfer = {
+002148:     transferId,
+002149:     fromPlayerId,
+002150:     fromName,
+002151:     toPlayerId,
+002152:     toName,
+002153:     amount,
+002154:     status: "PENDING_CONFIRMATION",
+002155:     note,
+
+----- LINEAS 2195 A 2217 / COINCIDENCIA 2203 -----
+002195: 
+002196:   const confirmingPlayerId = normalizePlayerId(input.confirmingPlayerId || input.fromPlayerId || input.playerId);
+002197: 
+002198:   if (confirmingPlayerId && confirmingPlayerId !== transfer.fromPlayerId) {
+002199:     throw new Error("Solo el emisor puede confirmar esta transferencia.");
+002200:   }
+002201: 
+002202:   const receiverBalanceBefore = getPlayerBalance(transfer.toPlayerId);
+002203:   const receiverBalanceAfter = setPlayerBalance(transfer.toPlayerId, receiverBalanceBefore + Number(transfer.amount || 0));
+002204: 
+002205:   adjustEscrowBalance(transfer.fromPlayerId, -Number(transfer.amount || 0));
+002206: 
+002207:   transfer.status = "CONFIRMED";
+002208:   transfer.confirmedAt = new Date().toISOString();
+002209: 
+002210:   persistCoinTransfers();
+002211: 
+002212:   addLedgerEntry({
+002213:     type: "COIN_TRANSFER_CONFIRMED",
+002214:     status: "CONFIRMED",
+002215:     transferId: transfer.transferId,
+002216:     fromPlayerId: transfer.fromPlayerId,
+002217:     toPlayerId: transfer.toPlayerId,
+
+----- LINEAS 2245 A 2267 / COINCIDENCIA 2253 -----
+002245: 
+002246:   const cancellingPlayerId = normalizePlayerId(input.cancellingPlayerId || input.fromPlayerId || input.playerId);
+002247: 
+002248:   if (cancellingPlayerId && cancellingPlayerId !== transfer.fromPlayerId) {
+002249:     throw new Error("Solo el emisor puede cancelar esta transferencia.");
+002250:   }
+002251: 
+002252:   const senderBalanceBefore = getPlayerBalance(transfer.fromPlayerId);
+002253:   const senderBalanceAfter = setPlayerBalance(transfer.fromPlayerId, senderBalanceBefore + Number(transfer.amount || 0));
+002254: 
+002255:   adjustEscrowBalance(transfer.fromPlayerId, -Number(transfer.amount || 0));
+002256: 
+002257:   transfer.status = "CANCELLED";
+002258:   transfer.cancelledAt = new Date().toISOString();
+002259:   transfer.cancelReason = String(input.reason || input.note || "Cancelada").trim();
+002260: 
+002261:   persistCoinTransfers();
+002262: 
+002263:   addLedgerEntry({
+002264:     type: "COIN_TRANSFER_CANCELLED",
+002265:     status: "CANCELLED",
+002266:     transferId: transfer.transferId,
+002267:     fromPlayerId: transfer.fromPlayerId,
+
+----- LINEAS 2359 A 2381 / COINCIDENCIA 2367 -----
+002359:   if (senderBalanceBefore < amount) {
+002360:     throw new Error(`Balance insuficiente. Disponible: ${senderBalanceBefore}, requerido: ${amount}.`);
+002361:   }
+002362: 
+002363:   const receiverBalanceBefore = getPlayerBalance(toPlayerId);
+002364: 
+002365:   const transferId = generateWalletActionId("TRF");
+002366: 
+002367:   setPlayerBalance(fromPlayerId, senderBalanceBefore - amount);
+002368:   setPlayerBalance(toPlayerId, receiverBalanceBefore + amount);
+002369: 
+002370:   const transfer = {
+002371:     transferId,
+002372:     fromPlayerId,
+002373:     toPlayerId,
+002374:     amount,
+002375:     note,
+002376:     status: "CONFIRMED",
+002377:     createdAt: new Date().toISOString()
+002378:   };
+002379: 
+002380:   addLedgerEntry({
+002381:     type: "PLAYER_COIN_TRANSFER",
+
+----- LINEAS 2360 A 2382 / COINCIDENCIA 2368 -----
+002360:     throw new Error(`Balance insuficiente. Disponible: ${senderBalanceBefore}, requerido: ${amount}.`);
+002361:   }
+002362: 
+002363:   const receiverBalanceBefore = getPlayerBalance(toPlayerId);
+002364: 
+002365:   const transferId = generateWalletActionId("TRF");
+002366: 
+002367:   setPlayerBalance(fromPlayerId, senderBalanceBefore - amount);
+002368:   setPlayerBalance(toPlayerId, receiverBalanceBefore + amount);
+002369: 
+002370:   const transfer = {
+002371:     transferId,
+002372:     fromPlayerId,
+002373:     toPlayerId,
+002374:     amount,
+002375:     note,
+002376:     status: "CONFIRMED",
+002377:     createdAt: new Date().toISOString()
+002378:   };
+002379: 
+002380:   addLedgerEntry({
+002381:     type: "PLAYER_COIN_TRANSFER",
+002382:     status: "CONFIRMED",
+
+----- LINEAS 2548 A 2570 / COINCIDENCIA 2556 -----
+002548:     playerId: id,
+002549:     balance: initialBalance,
+002550:     createdAt: new Date().toISOString(),
+002551:     updatedAt: new Date().toISOString()
+002552:   };
+002553:   persistPlayerBalances();
+002554:   return initialBalance;
+002555: }
+002556: function setPlayerBalance(playerId, nextBalance) {
+002557:   const id = normalizePlayerId(playerId);
+002558:   if (!id) return 0;
+002559: 
+002560:   const balance = Math.max(0, Math.floor(Number(nextBalance || 0)));
+002561:   playerBalances[id] = {
+002562:     ...(playerBalances[id] || { playerId: id, createdAt: new Date().toISOString() }),
+002563:     playerId: id,
+002564:     balance,
+002565:     updatedAt: new Date().toISOString()
+002566:   };
+002567:   persistPlayerBalances();
+002568:   return balance;
+002569: }
+002570: function getPlayerBalancePayload(playerId) {
+
+----- LINEAS 2851 A 2873 / COINCIDENCIA 2859 -----
+002851: function showResults() {
+002852:   phase = "RESULTS";
+002853:   secondsRemaining = RESULTS_SECONDS;
+002854:   resultsStartedAt = Date.now();
+002855:   winners = roundStatus === "CANCELLED" ? [] : hiddenWinners;
+002856:   settlements = calculateSettlements();
+002857: 
+002858:   settlements.forEach((settlement) => {
+002859:     setPlayerBalance(settlement.playerId, settlement.finalBalance);
+002860: 
+002861:     if (settlement.refunded) {
+002862:       addLedgerEntry({
+002863:         type: "BET_REFUNDED",
+002864:         status: "CONFIRMED",
+002865:         raceNumber: roundId,
+002866:         roundId,
+002867:         playerId: settlement.playerId,
+002868:         clientName: settlement.clientName,
+002869:         betId: settlement.betId,
+002870:         horseId: settlement.horseId,
+002871:         horseName: settlement.horseName,
+002872:         amount: settlement.refundAmount,
+002873:         balanceBefore: settlement.balanceAfterBet,
+
+----- LINEAS 3014 A 3036 / COINCIDENCIA 3022 -----
+003014:   const alreadyBet = bets.some((bet) => bet.playerId === id);
+003015:   if (alreadyBet) { const error = new Error("Este jugador ya apostÃƒÆ’Ã‚Â³ en la carrera actual."); error.status = 409; throw error; }
+003016: 
+003017:   const balanceBeforeBet = getPlayerBalance(id);
+003018:   if (betAmount > balanceBeforeBet) {
+003019:     const error = new Error(`Saldo insuficiente. Disponible: ${balanceBeforeBet}. Apuesta: ${betAmount}.`); error.status = 403; throw error;
+003020:   }
+003021: 
+003022:   const balanceAfterBet = setPlayerBalance(id, balanceBeforeBet - betAmount);
+003023:   const bet = {
+003024:     id: `${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
+003025:     roundId,
+003026:     raceNumber: roundId,
+003027:     playerId: id,
+003028:     clientName: clientName ? String(clientName) : "",
+003029:     horseId: horse.id,
+003030:     horseName: horse.name,
+003031:     amount: betAmount,
+003032:     balanceApostado: betAmount,
+003033:     balanceTotal: balanceBeforeBet,
+003034:     balanceBeforeBet,
+003035:     balanceAfterBet,
+003036:     clientReportedBalance: Number.isFinite(clientReportedBalance) ? clientReportedBalance : null,
+
+----- LINEAS 3852 A 3874 / COINCIDENCIA 3860 -----
+003852: 
+003853: app.post("/api/admin/player/balance", (req, res) => {
+003854:   try {
+003855:     const playerId = normalizePlayerId(req.body?.playerId);
+003856:     const balance = toNumber(req.body?.balance);
+003857:     if (!playerId || !Number.isFinite(balance) || balance < 0) {
+003858:       return res.status(400).json({ ok: false, error: "Debe enviar playerId y balance vÃƒÆ’Ã‚Â¡lido." });
+003859:     }
+003860:     const savedBalance = setPlayerBalance(playerId, balance);
+003861:     res.json({ ok: true, playerId, balance: savedBalance, serverManaged: true });
+003862:   } catch (error) {
+003863:     res.status(500).json({ ok: false, error: error.message });
+003864:   }
+003865: });
+003866: 
+003867: app.post("/api/admin/reset", (req, res) => {
+003868:   roundId += 1;
+003869:   phase = "BETTING";
+003870:   secondsRemaining = BETTING_SECONDS;
+003871:   bets = [];
+003872:   winners = [];
+003873:   hiddenWinners = [];
+003874:   orderedResults = [];
+
+============================================================
+TODOS LOS USOS debitForSpend
+PATRON: debitForSpend\(
+============================================================
+NO ENCONTRADO
+
+============================================================
+TODOS LOS USOS creditComposition
+PATRON: creditComposition\(
+============================================================
+NO ENCONTRADO
+
+============================================================
+TODOS LOS USOS dualBalanceService
+PATRON: dualBalanceService\.
+============================================================
+COINCIDENCIAS: 5
+
+----- LINEAS 4201 A 4229 / COINCIDENCIA 4209 -----
+004201: const dualBalanceService =
+004202:   require('./dual-balance-service')({
+004203:     dataDir: HIPI_AUTO_DATA_DIR,
+004204:     welcomePromoAmount: 1000
+004205:   });
+004206: 
+004207: function getDualBalanceComparison() {
+004208:   const dualAccounts =
+004209:     dualBalanceService.listAccounts();
+004210: 
+004211:   const dualByPlayer =
+004212:     new Map(
+004213:       dualAccounts.map(
+004214:         account => [
+004215:           account.playerId,
+004216:           account
+004217:         ]
+004218:       )
+004219:     );
+004220: 
+004221:   const legacyIds =
+004222:     Object.keys(
+004223:       playerBalances || {}
+004224:     );
+004225: 
+004226:   const playerIds =
+004227:     Array.from(
+004228:       new Set([
+004229:         ...legacyIds,
+
+----- LINEAS 4348 A 4376 / COINCIDENCIA 4356 -----
+004348:       'Cache-Control',
+004349:       'no-store'
+004350:     );
+004351: 
+004352:     res.json({
+004353:       ok: true,
+004354:       mode: 'SHADOW',
+004355:       accounts:
+004356:         dualBalanceService.listAccounts()
+004357:     });
+004358:   }
+004359: );
+004360: 
+004361: app.get(
+004362:   '/api/admin/dual-balance/player/:playerId',
+004363:   (req, res) => {
+004364:     try {
+004365:       res.set(
+004366:         'Cache-Control',
+004367:         'no-store'
+004368:       );
+004369: 
+004370:       res.json({
+004371:         ok: true,
+004372:         mode: 'SHADOW',
+004373:         account:
+004374:           dualBalanceService.getAccount(
+004375:             req.params.playerId
+004376:           ),
+
+----- LINEAS 4366 A 4394 / COINCIDENCIA 4374 -----
+004366:         'Cache-Control',
+004367:         'no-store'
+004368:       );
+004369: 
+004370:       res.json({
+004371:         ok: true,
+004372:         mode: 'SHADOW',
+004373:         account:
+004374:           dualBalanceService.getAccount(
+004375:             req.params.playerId
+004376:           ),
+004377:         ledger:
+004378:           dualBalanceService.getLedger(
+004379:             req.params.playerId
+004380:           )
+004381:       });
+004382:     } catch (error) {
+004383:       res.status(400).json({
+004384:         ok: false,
+004385:         error:
+004386:           error.message ||
+004387:           'Could not read dual balance.'
+004388:       });
+004389:     }
+004390:   }
+004391: );
+004392: // HIPIPLAY DUAL BALANCE SHADOW - END
+004393: const demoProfileService =
+004394:   require('./demo-profile-service')({
+
+----- LINEAS 4370 A 4398 / COINCIDENCIA 4378 -----
+004370:       res.json({
+004371:         ok: true,
+004372:         mode: 'SHADOW',
+004373:         account:
+004374:           dualBalanceService.getAccount(
+004375:             req.params.playerId
+004376:           ),
+004377:         ledger:
+004378:           dualBalanceService.getLedger(
+004379:             req.params.playerId
+004380:           )
+004381:       });
+004382:     } catch (error) {
+004383:       res.status(400).json({
+004384:         ok: false,
+004385:         error:
+004386:           error.message ||
+004387:           'Could not read dual balance.'
+004388:       });
+004389:     }
+004390:   }
+004391: );
+004392: // HIPIPLAY DUAL BALANCE SHADOW - END
+004393: const demoProfileService =
+004394:   require('./demo-profile-service')({
+004395:     dataDir: HIPI_AUTO_DATA_DIR,
+004396:     getPlayerBalance
+004397:   });
+004398: 
+
+----- LINEAS 4421 A 4449 / COINCIDENCIA 4429 -----
+004421:   app,
+004422:   dataDir: HIPI_AUTO_DATA_DIR,
+004423:   getPlayerBalance,
+004424:   setPlayerBalance,
+004425:   createTransferPasskeyProof,
+004426:   issueDemoAuthToken:
+004427:     demoProfileService.issueDemoAuthToken,
+004428:   grantWelcomePromo:
+004429:     dualBalanceService.grantWelcomePromo
+004430: });
+004431: server.listen(PORT, "0.0.0.0", () => {
+004432:   console.log("===============================================");
+004433:   console.log("HipiPlayRD Server v7 DB Balance activo");
+004434:   console.log(`Admin:            http://localhost:${PORT}/admin.html`);
+004435:   console.log(`Estado PWA:       http://localhost:${PORT}/api/state`);
+004436:   console.log(`Historial PWA:    http://localhost:${PORT}/api/history`);
+004437:   console.log(`Resultado jugador http://localhost:${PORT}/api/player/result/PLAYER_ID`);
+004438:   console.log(`Balance jugador   http://localhost:${PORT}/api/player/balance/PLAYER_ID`);
+004439:   console.log(`Balance admin     POST http://localhost:${PORT}/api/admin/player/balance`);
+004440:   console.log(`Multiplicadores: 1ro x${PAYOUT_MULTIPLIERS.first} | 2do x${PAYOUT_MULTIPLIERS.second} | 3ro x${PAYOUT_MULTIPLIERS.third}`);
+004441:   console.log(`MÃƒÂ­nimo caballos activos: ${MIN_ACTIVE_HORSES_FOR_VALID_RACE}`);
+004442:   console.log("Fases: BETTING -> RACE -> RESULTS -> BETTING");
+004443:   console.log("===============================================");
+004444: });
+004445: 
+004446: 
+004447: 
+004448: 
+004449: 
+
+============================================================
+RESUMEN DEL DIAGNOSTICO
+============================================================
+setPlayerBalance llamadas/definiciones: 17
+debitForSpend usos: 0
+creditComposition usos: 0
+Liquidadores hipiAutoSettle encontrados: 2
+Archivos modificados: False
+Backend reiniciado: False

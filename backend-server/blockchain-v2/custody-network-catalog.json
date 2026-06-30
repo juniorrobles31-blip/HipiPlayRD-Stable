@@ -1,0 +1,38 @@
+{
+    "enabledNetworks":  [
+                            "BSC_BEP20",
+                            "TRON_TRC20"
+                        ],
+    "defaultNetwork":  "BSC_BEP20",
+    "networks":  {
+                     "BSC_BEP20":  {
+                                       "enabled":  true,
+                                       "networkCode":  "BSC_BEP20",
+                                       "label":  "BSC / BEP20",
+                                       "family":  "EVM",
+                                       "chainId":  56,
+                                       "walletPrefix":  "0x",
+                                       "addressRegex":  "^0x[a-fA-F0-9]{40}$",
+                                       "token":  "USDT",
+                                       "tokenStandard":  "BEP20",
+                                       "tokenContract":  "0x55d398326f99059fF775485246999027B3197955",
+                                       "tokenDecimals":  18,
+                                       "gasToken":  "BNB"
+                                   },
+                     "TRON_TRC20":  {
+                                        "enabled":  true,
+                                        "networkCode":  "TRON_TRC20",
+                                        "label":  "TRON / TRC20",
+                                        "family":  "TRON",
+                                        "chainId":  "tron-mainnet",
+                                        "walletPrefix":  "T",
+                                        "addressRegex":  "^T[1-9A-HJ-NP-Za-km-z]{33}$",
+                                        "token":  "USDT",
+                                        "tokenStandard":  "TRC20",
+                                        "tokenContract":  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+                                        "tokenDecimals":  6,
+                                        "gasToken":  "TRX"
+                                    }
+                 },
+    "updatedAt":  "2026-06-29T23:06:40.3380242Z"
+}

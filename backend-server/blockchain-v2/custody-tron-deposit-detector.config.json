@@ -1,0 +1,17 @@
+{
+    "enabled":  true,
+    "autoMarkPaid":  true,
+    "panelBaseUrl":  "http://127.0.0.1:4105",
+    "tronGridBaseUrl":  "https://api.trongrid.io",
+    "networkCode":  "TRON_TRC20",
+    "networkLabel":  "TRON / TRC20",
+    "token":  "USDT",
+    "tokenStandard":  "TRC20",
+    "tokenContract":  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+    "tokenDecimals":  6,
+    "scanOnlyAssignedWallets":  true,
+    "requireExactOrGreaterAmount":  true,
+    "runEverySeconds":  20,
+    "timeoutSeconds":  20,
+    "updatedAt":  "2026-06-29T23:39:12.7362931Z"
+}

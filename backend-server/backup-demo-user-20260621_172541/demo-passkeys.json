@@ -1,0 +1,18 @@
+{
+  "yzl3zzu7i1ahUAJXnCSbeQ": {
+    "id": "yzl3zzu7i1ahUAJXnCSbeQ",
+    "playerId": "usr_demo_mqn4ih1s_9bb85b73",
+    "webauthnUserID": "dXNyX2RlbW9fbXFuNGloMXNfOWJiODViNzM",
+    "publicKey": "pQECAyYgASFYIIbEb3jlmPkhcd7Lzf1+eH7HWF0+5yQ/DKvvCEpN23IBIlggPEE6MKdQeOQmLotaKFG+zdPR/VLK4SSahS2iZdlQowo=",
+    "counter": 0,
+    "transports": [
+      "hybrid",
+      "internal"
+    ],
+    "deviceType": "multiDevice",
+    "backedUp": true,
+    "createdAt": "2026-06-21T02:52:02.557Z",
+    "updatedAt": "2026-06-21T21:14:43.160Z",
+    "lastUsedAt": "2026-06-21T21:14:43.160Z"
+  }
+}

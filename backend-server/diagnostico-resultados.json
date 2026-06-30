@@ -1,0 +1,95 @@
+﻿{
+    "ok":  true,
+    "serverTime":  1782077929645,
+    "roundId":  7272,
+    "raceNumber":  7272,
+    "phase":  "RACE",
+    "secondsRemaining":  7,
+    "bettingSeconds":  20,
+    "raceSeconds":  8,
+    "resultsSeconds":  8,
+    "payoutMultipliers":  {
+                              "first":  2,
+                              "second":  1.5,
+                              "third":  1.5
+                          },
+    "roundStatus":  "RACE",
+    "roundCancelReason":  null,
+    "minActiveHorsesRequired":  0,
+    "activeHorseCount":  0,
+    "raceStartedAt":  1782077928030,
+    "resultsStartedAt":  null,
+    "horses":  [
+                   {
+                       "id":  1,
+                       "name":  "Caballo 1",
+                       "color":  "Rojo"
+                   },
+                   {
+                       "id":  2,
+                       "name":  "Caballo 2",
+                       "color":  "Azul"
+                   },
+                   {
+                       "id":  3,
+                       "name":  "Caballo 3",
+                       "color":  "Verde"
+                   },
+                   {
+                       "id":  4,
+                       "name":  "Caballo 4",
+                       "color":  "Amarillo"
+                   },
+                   {
+                       "id":  5,
+                       "name":  "Caballo 5",
+                       "color":  "Negro"
+                   },
+                   {
+                       "id":  6,
+                       "name":  "Caballo 6",
+                       "color":  "Blanco"
+                   }
+               ],
+    "totalBetsReceived":  0,
+    "winners":  [
+                    1,
+                    2,
+                    3
+                ],
+    "jugadaId":  "26242",
+    "playId":  "26242",
+    "roundCode":  "26242",
+    "lowestBetTotals":  [
+                            {
+                                "horseId":  1,
+                                "totalAmount":  0,
+                                "totalBets":  0
+                            },
+                            {
+                                "horseId":  2,
+                                "totalAmount":  0,
+                                "totalBets":  0
+                            },
+                            {
+                                "horseId":  3,
+                                "totalAmount":  0,
+                                "totalBets":  0
+                            },
+                            {
+                                "horseId":  4,
+                                "totalAmount":  0,
+                                "totalBets":  0
+                            },
+                            {
+                                "horseId":  5,
+                                "totalAmount":  0,
+                                "totalBets":  0
+                            },
+                            {
+                                "horseId":  6,
+                                "totalAmount":  0,
+                                "totalBets":  0
+                            }
+                        ]
+}

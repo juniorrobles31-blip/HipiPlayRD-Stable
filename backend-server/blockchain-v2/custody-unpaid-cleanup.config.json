@@ -1,0 +1,34 @@
+{
+    "requireZeroBalanceToReleaseWallet":  true,
+    "quarantineWalletsWithFunds":  true,
+    "statusesToClean":  [
+                            "PENDING",
+                            "PAYMENT_PENDING",
+                            "ASSIGNED",
+                            "CREATED",
+                            "NEW",
+                            "WAITING"
+                        ],
+    "paidStatuses":  [
+                         "PAID",
+                         "CONFIRMED",
+                         "COMPLETED",
+                         "SUCCESS",
+                         "CREDITED"
+                     ],
+    "failedStatuses":  [
+                           "FAILED",
+                           "EXPIRED",
+                           "CANCELLED",
+                           "CANCELED",
+                           "REJECTED",
+                           "ERROR",
+                           "CLEANED_UNPAID"
+                       ],
+    "enabled":  true,
+    "maxPendingSeconds":  60,
+    "runEverySeconds":  30,
+    "releaseWalletsWithoutFunds":  true,
+    "deleteUnpaidIntentsFromPanel":  true,
+    "dynamicWalletMode":  "ON_DEMAND_DELETE_UNUSED"
+}

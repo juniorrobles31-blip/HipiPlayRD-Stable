@@ -1,0 +1,122 @@
+[
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x39D40C907063705A2febeFF09D3D2b9751CBECC5",
+    "note": "Wallet BSC USDT pool deposito 0001"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xaDb821728441c61ed35ed9DF2654B72B1d458489",
+    "note": "Wallet BSC USDT pool deposito 0002"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x720E55e5c8b2CbAb58e7BD75375a23314bD25b7E",
+    "note": "Wallet BSC USDT pool deposito 0003"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xA6eDa358eceCa4Aa9E227542Aa13841f7083ac2A",
+    "note": "Wallet BSC USDT pool deposito 0004"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xd70f101426349096a87Ce2a8Fb82439903E4588c",
+    "note": "Wallet BSC USDT pool deposito 0005"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xa9B718a329182AFC8388345DD5484E4d274b0445",
+    "note": "Wallet BSC USDT pool deposito 0006"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xddaE107cf698D66b2c47f70B576BDF7d6db03d21",
+    "note": "Wallet BSC USDT pool deposito 0007"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xA56dC7abDE3945cFb7574aDCf4b34E0312bF4F81",
+    "note": "Wallet BSC USDT pool deposito 0008"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xeaaFCE98e7D043d76f8F7C882Be8fde00d103130",
+    "note": "Wallet BSC USDT pool deposito 0009"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xF6aB1d450AFb67ddeD6BfB8eb29eDa033a6f0632",
+    "note": "Wallet BSC USDT pool deposito 0010"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xa92ceD02A08b111F90506EFafBa64021A5c6107c",
+    "note": "Wallet BSC USDT pool deposito 0011"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xDbEdBab08329B5c16F8dC6F93e99Fa0636cE2e69",
+    "note": "Wallet BSC USDT pool deposito 0012"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x23C13A5FCcdA7c5dD5350c9FD2a81779615bD159",
+    "note": "Wallet BSC USDT pool deposito 0013"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x97bF493643287AfB02A929a454f2C4f91b4Ffd39",
+    "note": "Wallet BSC USDT pool deposito 0014"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x8bE322819624047958CCfeF9371dE4bA8FFF3d9D",
+    "note": "Wallet BSC USDT pool deposito 0015"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x90D522b1b81152a5DCcA0fBB844A93214c49dF90",
+    "note": "Wallet BSC USDT pool deposito 0016"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x8b59803832b8b5Ebc3814B94273FD12b77439010",
+    "note": "Wallet BSC USDT pool deposito 0017"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x38106a8b598Fd655524B6aD79d60E114445942A6",
+    "note": "Wallet BSC USDT pool deposito 0018"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0xf2Eb66C6dfE645b5011a643ceBfF6005Df62dC8A",
+    "note": "Wallet BSC USDT pool deposito 0019"
+  },
+  {
+    "network": "BSC",
+    "token": "USDT",
+    "address": "0x8484A2F76cAaAE2Bfc6352166F63F9F474F04F6B",
+    "note": "Wallet BSC USDT pool deposito 0020"
+  }
+]

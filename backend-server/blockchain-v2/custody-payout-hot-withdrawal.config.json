@@ -1,0 +1,26 @@
+{
+    "enabled":  true,
+    "mode":  "DRY_RUN_ONLY",
+    "broadcastEnabled":  false,
+    "requireManualApproval":  true,
+    "supportedNetworks":  [
+                              "BSC_BEP20",
+                              "TRON_TRC20"
+                          ],
+    "token":  "USDT",
+    "fees":  {
+                 "BSC_BEP20":  {
+                                   "customerFeeUsdt":  0,
+                                   "gasToken":  "BNB",
+                                   "note":  "Pendiente definir comision/gas para cliente"
+                               },
+                 "TRON_TRC20":  {
+                                    "customerFeeUsdt":  0,
+                                    "gasToken":  "TRX",
+                                    "note":  "Pendiente definir comision/gas para cliente"
+                                }
+             },
+    "minWithdrawUsdt":  1,
+    "maxWithdrawUsdt":  100000,
+    "updatedAt":  "2026-06-29T23:45:17.2843613Z"
+}

@@ -1,0 +1,126 @@
+﻿{
+  "raceNumber": 1576,
+  "roundId": 1576,
+  "finishedAt": "2026-06-13T05:32:56.941Z",
+  "totalBetsReceived": 1,
+  "totalAmountReceived": 4,
+  "orderedResults": [
+    {
+      "position": 1,
+      "horseId": 4,
+      "name": "Caballo 4",
+      "color": "Amarillo",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 2,
+      "horseId": 3,
+      "name": "Caballo 3",
+      "color": "Verde",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 3,
+      "horseId": 2,
+      "name": "Caballo 2",
+      "color": "Azul",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 4,
+      "horseId": 6,
+      "name": "Caballo 6",
+      "color": "Blanco",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 5,
+      "horseId": 5,
+      "name": "Caballo 5",
+      "color": "Negro",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 6,
+      "horseId": 1,
+      "name": "Caballo 1",
+      "color": "Rojo",
+      "totalAmount": 4,
+      "totalBets": 1
+    }
+  ],
+  "winners": [
+    {
+      "position": 1,
+      "horseId": 4,
+      "name": "Caballo 4",
+      "color": "Amarillo",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 2,
+      "horseId": 3,
+      "name": "Caballo 3",
+      "color": "Verde",
+      "totalAmount": 0,
+      "totalBets": 0
+    },
+    {
+      "position": 3,
+      "horseId": 2,
+      "name": "Caballo 2",
+      "color": "Azul",
+      "totalAmount": 0,
+      "totalBets": 0
+    }
+  ],
+  "settlements": [
+    {
+      "raceNumber": 1576,
+      "roundId": 1576,
+      "betId": "1781328739064-646235",
+      "playerId": "usr_admin",
+      "clientName": "admin",
+      "horseId": 1,
+      "horseName": "Caballo 1",
+      "amount": 4,
+      "balanceBeforeBet": 4,
+      "balanceApostado": 4,
+      "balanceAfterBet": 0,
+      "won": false,
+      "payout": 0,
+      "finalBalance": 0,
+      "multiplier": 2,
+      "winners": [
+        4,
+        3,
+        2
+      ],
+      "createdAt": "2026-06-13T05:32:46.864Z"
+    }
+  ],
+  "bets": [
+    {
+      "id": "1781328739064-646235",
+      "roundId": 1576,
+      "raceNumber": 1576,
+      "playerId": "usr_admin",
+      "clientName": "admin",
+      "horseId": 1,
+      "horseName": "Caballo 1",
+      "amount": 4,
+      "balanceApostado": 4,
+      "balanceTotal": 4,
+      "balanceBeforeBet": 4,
+      "balanceAfterBet": 0,
+      "clientReportedBalance": 4,
+      "createdAt": "2026-06-13T05:32:19.064Z"
+    }
+  ]
+}

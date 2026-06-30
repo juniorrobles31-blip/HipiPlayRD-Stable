@@ -1,0 +1,16 @@
+{
+    "enabled":  true,
+    "network":  "BSC",
+    "chainId":  56,
+    "token":  "USDT",
+    "tokenContract":  "0x55d398326f99059fF775485246999027B3197955",
+    "tokenDecimals":  18,
+    "payoutHotWalletId":  "cw_bsc_payout_hot_1782760137450_42943a9ba450",
+    "payoutHotAddress":  "0xAF0B348E5F9fe002242487667Fd151E323c9ff68",
+    "broadcastEnabled":  false,
+    "customerPaysGasAsFee":  true,
+    "feeMode":  "DEDUCT_FROM_WITHDRAWAL_AMOUNT",
+    "consolidateBeforePayout":  true,
+    "directMultiWalletPayoutToCustomer":  false,
+    "updatedAt":  "2026-06-29T19:08:57.5304318Z"
+}

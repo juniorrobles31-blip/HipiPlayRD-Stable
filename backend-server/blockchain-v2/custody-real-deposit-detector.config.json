@@ -1,0 +1,11 @@
+﻿{
+    "enabled":  true,
+    "autoMarkPaid":  true,
+    "panelBaseUrl":  "http://127.0.0.1:4105",
+    "minConfirmations":  3,
+    "lookbackBlocks":  2000,
+    "chunkBlocks":  100,
+    "scanOnlyAssignedWallets":  true,
+    "requireExactOrGreaterAmount":  true,
+    "useEventLogs":  false
+}
